@@ -3,7 +3,7 @@ from .settings import *
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['tuusuario.pythonanywhere.com']
+ALLOWED_HOSTS = ['alvin2907.pythonanywhere.com']
 
 # Base de datos en producción — SQLite es suficiente para PythonAnywhere gratuito
 DATABASES = {
