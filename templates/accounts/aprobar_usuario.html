@@ -1,0 +1,46 @@
+{% extends 'base/base.html' %}
+{% block title %}Aprobar Usuario{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+  <div class="col-md-6">
+    <div class="card shadow">
+      <div class="card-header bg-success text-white">
+        <strong>Aprobar solicitud de acceso</strong>
+      </div>
+      <div class="card-body">
+        <p><strong>Nombre:</strong> {{ usuario.get_full_name }}</p>
+        <p><strong>Usuario:</strong> {{ usuario.username }}</p>
+        <p><strong>Cargo solicitado:</strong> {{ usuario.get_cargo_display }}</p>
+        <p><strong>Departamento:</strong> {{ usuario.departamento }}</p>
+        <p><strong>CI:</strong> {{ usuario.documento_identidad }}</p>
+        <p><strong>Motivo:</strong> {{ usuario.motivo_solicitud }}</p>
+        <hr>
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Asignar Rol</label>
+            {{ form.rol }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Universidad</label>
+            {{ form.universidad }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Cargo confirmado</label>
+            {{ form.cargo }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Departamento</label>
+            {{ form.departamento }}
+          </div>
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">✅ Aprobar y activar</button>
+            <a href="{% url 'panel-admin-usuarios' %}" class="btn btn-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

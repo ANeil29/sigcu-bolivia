@@ -1,0 +1,130 @@
+{% extends 'base/base.html' %}
+{% block title %}{{ titulo }} — SIGCU Bolivia{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-3">
+  <div class="col-md-9">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <strong>{{ titulo }}</strong>
+      </div>
+      <div class="card-body p-4">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">{{ form.sede.label }}</label>
+              {{ form.sede }}
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">{{ form.nombre.label }}</label>
+              {{ form.nombre }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">{{ form.area.label }}</label>
+              {{ form.area }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.programa.label }}</label>
+              {{ form.programa }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ form.grado.label }}</label>
+              {{ form.grado }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ form.tipo.label }}</label>
+              {{ form.tipo }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.diploma_academico.label }}</label>
+              {{ form.diploma_academico }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.titulo_profesional.label }}</label>
+              {{ form.titulo_profesional }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.enfoque_curricular.label }}</label>
+              {{ form.enfoque_curricular }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ form.numero_sub.label }}</label>
+              {{ form.numero_sub }}
+            </div>
+            <div class="col-md-3 d-flex align-items-end pb-1">
+              <div class="form-check">
+                {{ form.en_funcionamiento }}
+                <label class="form-check-label">{{ form.en_funcionamiento.label }}</label>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">{{ form.observaciones.label }}</label>
+              {{ form.observaciones }}
+            </div>
+          </div>
+
+          {% if form.errors %}
+            <div class="alert alert-danger mt-3">
+              {% for field in form %}{% for error in field.errors %}
+                <div>{{ field.label }}: {{ error }}</div>
+              {% endfor %}{% endfor %}
+            </div>
+          {% endif %}
+
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-dark">{{ accion }}</button>
+            <a href="{% url 'lista-carreras' %}" class="btn btn-secondary">Cancelar</a>
+            {% if objeto %}
+            <a href="{% url 'eliminar-carrera' objeto.pk %}"
+               class="btn btn-outline-danger ms-auto">Eliminar</a>
+            {% endif %}
+          </div>
+        </form>
+
+        <!-- Planes de estudio asociados (solo en edición) -->
+        {% if objeto %}
+        <hr class="mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="mb-0">Planes de Estudio</h6>
+          <a href="{% url 'crear-plan' objeto.pk %}" class="btn btn-sm btn-outline-dark">
+            + Agregar Plan
+          </a>
+        </div>
+        <table class="table table-sm">
+          <thead class="table-light">
+            <tr><th>Año</th><th>Evento</th><th>HCU</th><th>RAN</th><th>Activo</th><th></th></tr>
+          </thead>
+          <tbody>
+            {% for plan in objeto.planes_estudio.all %}
+            <tr>
+              <td>{{ plan.anio_aprobacion }}</td>
+              <td>{{ plan.evento_aprobacion|default:"—" }}</td>
+              <td>{{ plan.resolucion_hcu|default:"—" }}</td>
+              <td>{{ plan.resolucion_ran|default:"—" }}</td>
+              <td>
+                {% if plan.activo %}
+                  <span class="badge bg-success">Sí</span>
+                {% else %}
+                  <span class="badge bg-secondary">No</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{% url 'editar-plan' plan.pk %}"
+                   class="btn btn-outline-primary btn-sm">Editar</a>
+                <a href="{% url 'eliminar-plan' plan.pk %}"
+                   class="btn btn-outline-danger btn-sm">Eliminar</a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-muted text-center">Sin planes registrados.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

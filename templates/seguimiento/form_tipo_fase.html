@@ -1,0 +1,72 @@
+{% extends 'base/base.html' %}
+{% block title %}{{ titulo }} — SIGCU{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb-sigcu">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lista-tipos-fase' %}">Tipos de Fase</a></li>
+    <li class="breadcrumb-item active">{{ titulo }}</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-2">
+  <div class="col-md-6">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <strong><i class="bi bi-list-check me-2"></i>{{ titulo }}</strong>
+      </div>
+      <div class="card-body p-4">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">{{ form.codigo.label }}</label>
+              {{ form.codigo }}
+            </div>
+            <div class="col-md-5">
+              <label class="form-label">{{ form.nombre.label }}</label>
+              {{ form.nombre }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ form.orden.label }}</label>
+              {{ form.orden }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">{{ form.descripcion.label }}</label>
+              {{ form.descripcion }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">{{ form.medio_verificacion_default.label }}</label>
+              {{ form.medio_verificacion_default }}
+            </div>
+            <div class="col-12">
+              <div class="form-check">
+                {{ form.activa }}
+                <label class="form-check-label">{{ form.activa.label }}</label>
+              </div>
+            </div>
+          </div>
+          {% if form.errors %}
+            <div class="alert alert-danger mt-3">
+              {% for field in form %}{% for error in field.errors %}
+                <div>{{ field.label }}: {{ error }}</div>
+              {% endfor %}{% endfor %}
+            </div>
+          {% endif %}
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-dark">{{ accion }}</button>
+            <a href="{% url 'lista-tipos-fase' %}" class="btn btn-secondary">Cancelar</a>
+            {% if objeto and user.rol == 'SUPERADMIN' %}
+            <a href="{% url 'eliminar-tipo-fase' objeto.pk %}"
+               class="btn btn-outline-danger ms-auto">Eliminar</a>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

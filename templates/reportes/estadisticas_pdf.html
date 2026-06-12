@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 10pt;
+      color: #1a1a1a;
+      margin: 1.5cm;
+    }
+
+    /* Encabezado */
+    .encabezado {
+      border-bottom: 3px solid #0f1f3d;
+      padding-bottom: 10px;
+      margin-bottom: 16px;
+    }
+    .encabezado h1 {
+      font-size: 15pt;
+      color: #0f1f3d;
+      margin-bottom: 3px;
+    }
+    .encabezado p { font-size: 9pt; color: #555; }
+    .fecha-texto  { font-size: 9pt; color: #555; text-align: right; }
+
+    /* Tabla de tarjetas numéricas */
+    .tarjetas { width: 100%; margin-bottom: 16px; }
+    .tarjetas td {
+      text-align: center;
+      border: 1px solid #ddd;
+      border-top: 4px solid #0f1f3d;
+      padding: 8px 4px;
+      border-radius: 4px;
+    }
+    .tarjetas .num {
+      font-size: 20pt;
+      font-weight: bold;
+      color: #0f1f3d;
+      display: block;
+    }
+    .tarjetas .lbl { font-size: 8pt; color: #666; }
+
+    /* Sección */
+    .sec-titulo {
+      background: #0f1f3d;
+      color: white;
+      padding: 5px 10px;
+      font-size: 10pt;
+      font-weight: bold;
+      margin-bottom: 0;
+    }
+    .sec-body {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 14px;
+    }
+
+    /* Tablas internas */
+    table.datos { width: 100%; border-collapse: collapse; font-size: 9pt; }
+    table.datos th {
+      background: #0f1f3d;
+      color: white;
+      padding: 5px 8px;
+      text-align: left;
+    }
+    table.datos td { padding: 4px 8px; border-bottom: 1px solid #eee; }
+    table.datos tr:nth-child(even) td { background: #f8f9fa; }
+
+    /* Badges */
+    .verde     { color: #0a3622; background: #d1e7dd; padding: 1px 7px; border-radius: 8px; }
+    .amarillo  { color: #664d03; background: #fff3cd; padding: 1px 7px; border-radius: 8px; }
+    .rojo      { color: #58151c; background: #f8d7da; padding: 1px 7px; border-radius: 8px; }
+    .gris      { color: #41464b; background: #e2e3e5; padding: 1px 7px; border-radius: 8px; }
+
+    /* Barras de progreso */
+    .barra-wrap { margin-bottom: 8px; }
+    .barra-lbl  {
+      font-size: 8.5pt;
+      margin-bottom: 2px;
+      display: table;
+      width: 100%;
+    }
+    .barra-lbl span { display: table-cell; }
+    .barra-lbl .derecha { text-align: right; color: #666; }
+    .barra-bg {
+      background: #e9ecef;
+      height: 13px;
+      border-radius: 4px;
+      width: 100%;
+    }
+    .barra-fill {
+      height: 13px;
+      border-radius: 4px;
+      font-size: 7.5pt;
+      color: white;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    /* Dos columnas con tabla */
+    .col-izq { width: 48%; display: inline-block; vertical-align: top; }
+    .col-der  { width: 48%; display: inline-block; vertical-align: top; margin-left: 3%; }
+
+    /* Pie */
+    .pie {
+      margin-top: 20px;
+      padding-top: 8px;
+      border-top: 1px solid #ccc;
+      font-size: 8pt;
+      color: #888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Encabezado -->
+  <div class="encabezado">
+    <table style="width:100%"><tr>
+      <td>
+        <h1>SIGCU Bolivia — Resumen Estadístico</h1>
+        <p>Sistema de Información para la Gestión Curricular Universitaria</p>
+        <p>Universidad Autónoma Tomás Frías — Potosí, Bolivia</p>
+      </td>
+      <td class="fecha-texto">
+        <strong>Generado:</strong><br>
+        {{ fecha|date:"d/m/Y" }}<br>
+        {{ fecha|date:"H:i" }} hrs
+      </td>
+    </tr></table>
+  </div>
+
+  <!-- Tarjetas numéricas -->
+  <table class="tarjetas">
+    <tr>
+      <td style="width:16%">
+        <span class="num">{{ stats.total_universidades }}</span>
+        <span class="lbl">Universidades</span>
+      </td>
+      <td style="width:16%">
+        <span class="num">{{ stats.total_sedes }}</span>
+        <span class="lbl">Sedes</span>
+      </td>
+      <td style="width:16%">
+        <span class="num">{{ stats.total_carreras }}</span>
+        <span class="lbl">Carreras</span>
+      </td>
+      <td style="width:16%">
+        <span class="num">{{ stats.total_programas }}</span>
+        <span class="lbl">Programas</span>
+      </td>
+      <td style="width:16%">
+        <span class="num">{{ stats.total_procesos }}</span>
+        <span class="lbl">Procesos</span>
+      </td>
+      <td style="width:16%">
+        <span class="num">{{ stats.formularios_total }}</span>
+        <span class="lbl">Formularios</span>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Fila: Estado Rediseño + Sedes por Departamento -->
+  <table style="width:100%; margin-bottom:14px">
+    <tr>
+      <td style="width:48%; vertical-align:top; padding-right:8px">
+        <div class="sec-titulo">Estado de Rediseño Curricular</div>
+        <div class="sec-body">
+          <table class="datos">
+            <tr><th>Estado</th><th>Cantidad</th></tr>
+            <tr>
+              <td>Vigentes</td>
+              <td><span class="verde">{{ stats.vigentes }}</span></td>
+            </tr>
+            <tr>
+              <td>Próximos a vencer</td>
+              <td><span class="amarillo">{{ stats.proximas }}</span></td>
+            </tr>
+            <tr>
+              <td>Vencidos</td>
+              <td><span class="rojo">{{ stats.vencidas }}</span></td>
+            </tr>
+            <tr>
+              <td>Sin datos</td>
+              <td><span class="gris">{{ stats.sin_datos }}</span></td>
+            </tr>
+          </table>
+        </div>
+      </td>
+      <td style="width:48%; vertical-align:top; padding-left:8px">
+        <div class="sec-titulo">Sedes por Departamento</div>
+        <div class="sec-body">
+          <table class="datos">
+            <tr><th>Departamento</th><th>Sedes</th></tr>
+            {% for d in sedes_por_depto %}
+            <tr>
+              <td>{{ d.departamento }}</td>
+              <td><strong>{{ d.total }}</strong></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="2">Sin datos</td></tr>
+            {% endfor %}
+          </table>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Innovación Curricular — barras -->
+  <div class="sec-titulo">
+    Innovación Curricular — {{ stats.total_carreras_int }} carreras en total
+  </div>
+  <div class="sec-body">
+
+    <div class="barra-wrap">
+      <div class="barra-lbl">
+        <span>Rediseño Curricular</span>
+        <span class="derecha">{{ stats.con_rediseno }} / {{ stats.total_carreras_int }} ({{ stats.pct_rediseno }}%)</span>
+      </div>
+      <div class="barra-bg">
+        <div class="barra-fill" style="width:{{ stats.pct_rediseno }}%; background:#0d6efd;">
+          {% if stats.con_rediseno > 0 %}{{ stats.con_rediseno }}{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="barra-wrap">
+      <div class="barra-lbl">
+        <span>Diseño Curricular</span>
+        <span class="derecha">{{ stats.con_diseno }} / {{ stats.total_carreras_int }} ({{ stats.pct_diseno }}%)</span>
+      </div>
+      <div class="barra-bg">
+        <div class="barra-fill" style="width:{{ stats.pct_diseno }}%; background:#198754;">
+          {% if stats.con_diseno > 0 %}{{ stats.con_diseno }}{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="barra-wrap">
+      <div class="barra-lbl">
+        <span>Ajuste Curricular</span>
+        <span class="derecha">{{ stats.con_ajuste }} / {{ stats.total_carreras_int }} ({{ stats.pct_ajuste }}%)</span>
+      </div>
+      <div class="barra-bg">
+        <div class="barra-fill" style="width:{{ stats.pct_ajuste }}%; background:#ffc107; color:#333;">
+          {% if stats.con_ajuste > 0 %}{{ stats.con_ajuste }}{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="barra-wrap">
+      <div class="barra-lbl">
+        <span>Complementación Curricular</span>
+        <span class="derecha">{{ stats.con_complementacion }} / {{ stats.total_carreras_int }} ({{ stats.pct_complementacion }}%)</span>
+      </div>
+      <div class="barra-bg">
+        <div class="barra-fill" style="width:{{ stats.pct_complementacion }}%; background:#0dcaf0; color:#333;">
+          {% if stats.con_complementacion > 0 %}{{ stats.con_complementacion }}{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="barra-wrap">
+      <div class="barra-lbl">
+        <span>Sin proceso registrado</span>
+        <span class="derecha">{{ stats.sin_proceso }} / {{ stats.total_carreras_int }} ({{ stats.pct_sin_proceso }}%)</span>
+      </div>
+      <div class="barra-bg">
+        <div class="barra-fill" style="width:{{ stats.pct_sin_proceso }}%; background:#6c757d;">
+          {% if stats.sin_proceso > 0 %}{{ stats.sin_proceso }}{% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Carreras por Universidad -->
+  <div class="sec-titulo">Carreras por Universidad</div>
+  <div class="sec-body">
+    <table class="datos">
+      <tr>
+        <th>Sigla</th>
+        <th>Universidad</th>
+        <th style="text-align:center">Carreras</th>
+      </tr>
+      {% for u in carreras_por_universidad %}
+      <tr>
+        <td><strong>{{ u.sede__facultad__universidad__sigla }}</strong></td>
+        <td>{{ u.sede__facultad__universidad__nombre }}</td>
+        <td style="text-align:center"><strong>{{ u.total }}</strong></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="3">Sin datos</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <!-- Pie -->
+  <div class="pie">
+    SIGCU Bolivia · Sistema de Información para la Gestión Curricular Universitaria ·
+    UATF Potosí ·
+  </div>
+
+</body>
+</html>

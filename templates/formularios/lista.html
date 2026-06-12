@@ -1,0 +1,199 @@
+{% extends 'base/base.html' %}
+{% block title %}Formularios de Valoración — SIGCU{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb-sigcu">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+    <li class="breadcrumb-item active">Formularios de Valoración</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-3 align-items-center">
+  <div class="col">
+    <h4><i class="bi bi-file-earmark-text me-2"></i>Formularios de Valoración</h4>
+  </div>
+  <div class="col-auto">
+    {% if user.puede_editar %}
+    <a href="{% url 'crear-formulario' %}" class="btn btn-dark btn-sm">
+      <i class="bi bi-plus-circle me-1"></i>Nuevo Formulario
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Tarjetas de conteo por estado -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md">
+    <a href="?estado=" class="text-decoration-none">
+      <div class="card text-center h-100
+        {% if not estado %}border-dark border-2{% endif %}">
+        <div class="card-body py-2">
+          <div class="fs-3 fw-bold">{{ contadores.todos }}</div>
+          <small class="text-muted">Todos</small>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md">
+    <a href="?estado=BORRADOR" class="text-decoration-none">
+      <div class="card text-center h-100
+        {% if estado == 'BORRADOR' %}border-secondary border-2{% endif %}">
+        <div class="card-body py-2">
+          <div class="fs-3 fw-bold text-secondary">{{ contadores.borradores }}</div>
+          <small class="text-muted">Borrador</small>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md">
+    <a href="?estado=ENVIADO" class="text-decoration-none">
+      <div class="card text-center h-100
+        {% if estado == 'ENVIADO' %}border-primary border-2{% endif %}">
+        <div class="card-body py-2">
+          <div class="fs-3 fw-bold text-primary">{{ contadores.enviados }}</div>
+          <small class="text-muted">Enviado</small>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md">
+    <a href="?estado=APROBADO" class="text-decoration-none">
+      <div class="card text-center h-100
+        {% if estado == 'APROBADO' %}border-success border-2{% endif %}">
+        <div class="card-body py-2">
+          <div class="fs-3 fw-bold text-success">{{ contadores.aprobados }}</div>
+          <small class="text-muted">Aprobado</small>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md">
+    <a href="?estado=OBSERVADO" class="text-decoration-none">
+      <div class="card text-center h-100
+        {% if estado == 'OBSERVADO' %}border-warning border-2{% endif %}">
+        <div class="card-body py-2">
+          <div class="fs-3 fw-bold text-warning">{{ contadores.observados }}</div>
+          <small class="text-muted">Observado</small>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- Buscador -->
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="get" class="row g-2 align-items-center">
+      <div class="col-md-5">
+        <input type="text" name="buscar" value="{{ buscar }}"
+               class="form-control form-control-sm"
+               placeholder="Buscar por código, carrera o responsable...">
+      </div>
+      <div class="col-md-3">
+        <select name="estado" class="form-select form-select-sm">
+          <option value="">-- Todos los estados --</option>
+          {% for val, label in estados %}
+            <option value="{{ val }}" {% if estado == val %}selected{% endif %}>
+              {{ label }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-dark btn-sm">
+          <i class="bi bi-search me-1"></i>Buscar
+        </button>
+        <a href="{% url 'lista-formularios' %}" class="btn btn-outline-secondary btn-sm ms-1">
+          Limpiar
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Tabla -->
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover table-sm mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th>Código</th>
+            <th>Carrera</th>
+            <th>Universidad</th>
+            <th>Proceso</th>
+            <th>Responsable</th>
+            <th>Fecha</th>
+            <th>Archivo</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in formularios %}
+          <tr>
+            <td><strong>{{ f.codigo }}</strong></td>
+            <td>{{ f.proceso.carrera.nombre|truncatechars:35 }}</td>
+            <td>
+              <span class="badge bg-secondary">
+                {{ f.proceso.carrera.sede.facultad.universidad.sigla }}
+              </span>
+            </td>
+            <td>{{ f.proceso.get_tipo_proceso_display }}</td>
+            <td>{{ f.responsable|default:"—" }}</td>
+            <td>{{ f.fecha_elaboracion|date:"d/m/Y" }}</td>
+            <td>
+              {% if f.archivo_adjunto %}
+                <a href="{{ f.archivo_adjunto.url }}" target="_blank"
+                   class="btn btn-outline-secondary btn-sm">
+                  <i class="bi bi-paperclip"></i>
+                </a>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if f.estado == 'BORRADOR' %}
+                <span class="badge bg-secondary">Borrador</span>
+              {% elif f.estado == 'ENVIADO' %}
+                <span class="badge bg-primary">Enviado</span>
+              {% elif f.estado == 'APROBADO' %}
+                <span class="badge bg-success">Aprobado</span>
+              {% elif f.estado == 'OBSERVADO' %}
+                <span class="badge bg-warning text-dark">Observado</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'detalle-formulario' f.pk %}"
+                 class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-eye"></i>
+              </a>
+              {% if user.puede_editar %}
+              <a href="{% url 'editar-formulario' f.pk %}"
+                 class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-pencil"></i>
+              </a>
+              {% endif %}
+              <a href="{% url 'exportar-pdf' f.pk %}"
+                 class="btn btn-outline-danger btn-sm"
+                 title="Descargar PDF">
+                <i class="bi bi-file-pdf"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="9" class="text-center text-muted py-4">
+              No hay formularios registrados.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

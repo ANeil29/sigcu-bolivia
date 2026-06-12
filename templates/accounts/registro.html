@@ -1,0 +1,92 @@
+{% extends 'base/base.html' %}
+{% block title %}Solicitar Acceso — SIGCU Bolivia{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+  <div class="col-md-7">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <strong>Solicitud de Acceso al Sistema SIGCU Bolivia</strong>
+      </div>
+      <div class="card-body p-4">
+        <p class="text-muted">
+          Completa el formulario. Un administrador revisará tu solicitud
+          y te habilitará el acceso según tu cargo e institución.
+        </p>
+        {% for message in messages %}
+          <div class="alert alert-danger">{{ message }}</div>
+        {% endfor %}
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Nombres *</label>
+              {{ form.first_name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Apellidos *</label>
+              {{ form.last_name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Usuario *</label>
+              {{ form.username }}
+              <small class="text-muted">Sin espacios ni caracteres especiales.</small>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Correo electrónico *</label>
+              {{ form.email }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Contraseña *</label>
+              {{ form.password1 }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Confirmar contraseña *</label>
+              {{ form.password2 }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Cargo o función *</label>
+              {{ form.cargo }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Departamento *</label>
+              {{ form.departamento }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Universidad</label>
+              {{ form.universidad }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Teléfono / Celular</label>
+              {{ form.telefono }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">N° de CI o carnet *</label>
+              {{ form.documento_identidad }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">¿Por qué solicita acceso? *</label>
+              {{ form.motivo_solicitud }}
+            </div>
+          </div>
+          {% if form.errors %}
+            <div class="alert alert-danger mt-3">
+              {% for field in form %}
+                {% for error in field.errors %}
+                  <div>{{ field.label }}: {{ error }}</div>
+                {% endfor %}
+              {% endfor %}
+            </div>
+          {% endif %}
+          <div class="mt-4 d-grid">
+            <button type="submit" class="btn btn-dark">Enviar solicitud</button>
+          </div>
+        </form>
+        <p class="text-center mt-3 mb-0">
+          ¿Ya tienes acceso? <a href="{% url 'login' %}">Ingresar</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

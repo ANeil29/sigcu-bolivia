@@ -1,0 +1,232 @@
+{% extends 'base/base.html' %}
+{% block title %}Programas — SIGCU Bolivia{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb-sigcu">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+    <li class="breadcrumb-item active">Programas en Proceso</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-3 align-items-center">
+  <div class="col">
+    <h4><i class="bi bi-clipboard me-2"></i>Programas en Proceso</h4>
+    <p class="text-muted mb-0">
+      Programas académicos que aún no son carreras oficiales.
+    </p>
+  </div>
+  <div class="col-auto d-flex gap-2">
+    {% if user.puede_editar %}
+    <a href="{% url 'crear-programa' %}" class="btn btn-dark btn-sm">
+      <i class="bi bi-plus-circle me-1"></i>Nuevo Programa
+    </a>
+    {% endif %}
+  </div>
+</div>
+
+{% with total=programas_todos|length %}
+{% if total > 0 %}
+<div class="card mb-4">
+  <div class="card-header bg-dark text-white">
+    <i class="bi bi-graph-up-arrow me-2"></i>
+    Resumen de Programas — {{ total }} programa{{ total|pluralize }} registrado{{ total|pluralize }}
+  </div>
+  <div class="card-body">
+    <div class="row g-3">
+
+      <div class="col-12">
+        <div class="d-flex justify-content-between mb-1">
+          <small class="fw-bold">
+            <i class="bi bi-trophy me-1 text-success"></i>
+            Ya son Carreras Oficiales
+          </small>
+          <small class="text-muted">
+            {{ conteo.ya_carrera }} / {{ total }}
+            ({% widthratio conteo.ya_carrera total 100 %}%)
+          </small>
+        </div>
+        <div class="progress mb-1" style="height:20px; border-radius:6px">
+          <div class="progress-bar bg-success"
+               style="width:{% widthratio conteo.ya_carrera total 100 %}%">
+            {% if conteo.ya_carrera > 0 %}{{ conteo.ya_carrera }} convertidos{% endif %}
+          </div>
+        </div>
+        <small class="text-muted">
+          <i class="bi bi-info-circle me-1"></i>
+          Programas marcados como "En Implementación" que ya cuentan con resolución RAN.
+        </small>
+      </div>
+
+      <div class="col-md-3">
+        <div class="d-flex justify-content-between mb-1">
+          <small class="fw-bold text-secondary">En Formulación</small>
+          <small class="text-muted">{{ conteo.formulacion }}</small>
+        </div>
+        <div class="progress" style="height:14px; border-radius:6px">
+          <div class="progress-bar bg-secondary"
+               style="width:{% widthratio conteo.formulacion total 100 %}%">
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="d-flex justify-content-between mb-1">
+          <small class="fw-bold text-warning">En Aprobación</small>
+          <small class="text-muted">{{ conteo.aprobacion }}</small>
+        </div>
+        <div class="progress" style="height:14px; border-radius:6px">
+          <div class="progress-bar bg-warning"
+               style="width:{% widthratio conteo.aprobacion total 100 %}%">
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="d-flex justify-content-between mb-1">
+          <small class="fw-bold text-success">En Implementación</small>
+          <small class="text-muted">{{ conteo.implementacion }}</small>
+        </div>
+        <div class="progress" style="height:14px; border-radius:6px">
+          <div class="progress-bar bg-success"
+               style="width:{% widthratio conteo.implementacion total 100 %}%">
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="d-flex justify-content-between mb-1">
+          <small class="fw-bold text-danger">Suspendidos</small>
+          <small class="text-muted">{{ conteo.suspendido }}</small>
+        </div>
+        <div class="progress" style="height:14px; border-radius:6px">
+          <div class="progress-bar bg-danger"
+               style="width:{% widthratio conteo.suspendido total 100 %}%">
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row g-2 mt-2">
+      <div class="col-auto">
+        <span class="badge bg-success fs-6 px-3">
+          <i class="bi bi-trophy me-1"></i>{{ conteo.ya_carrera }} ya son carreras
+        </span>
+      </div>
+      <div class="col-auto">
+        <span class="badge bg-secondary fs-6 px-3">{{ conteo.formulacion }} en formulación</span>
+      </div>
+      <div class="col-auto">
+        <span class="badge bg-warning text-dark fs-6 px-3">{{ conteo.aprobacion }} en aprobación</span>
+      </div>
+      <div class="col-auto">
+        <span class="badge bg-success fs-6 px-3">{{ conteo.implementacion }} en implementación</span>
+      </div>
+      {% if conteo.suspendido > 0 %}
+      <div class="col-auto">
+        <span class="badge bg-danger fs-6 px-3">{{ conteo.suspendido }} suspendidos</span>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endwith %}
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover table-sm mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th>N°</th>
+            <th>Universidad</th>
+            <th>Facultad</th>
+            <th>Departamento</th>
+            <th>Ciudad</th>
+            <th>Programa</th>
+            <th>Grado previsto</th>
+            <th>Responsable</th>
+            <th>Estado</th>
+            <th>Fecha aprobación</th>
+            {% if user.puede_editar %}<th>Acciones</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in programas %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+              <span class="badge bg-secondary">
+                {{ p.sede.facultad.universidad.sigla }}
+              </span>
+            </td>
+            <td>{{ p.sede.facultad.nombre }}</td>
+            <td>{{ p.sede.departamento }}</td>
+            <td>{{ p.sede.ciudad }}</td>
+            <td>
+              <strong>{{ p.nombre }}</strong>
+              {% if p.observaciones %}
+              <br><small class="text-muted">{{ p.observaciones|truncatechars:50 }}</small>
+              {% endif %}
+            </td>
+            <td>{{ p.get_grado_previsto_display|default:"—" }}</td>
+            <td>{{ p.responsable|default:"—" }}</td>
+            <td>
+              {% if p.estado == 'FORMULACION' %}
+                <span class="badge bg-secondary">En Formulación</span>
+              {% elif p.estado == 'APROBACION' %}
+                <span class="badge bg-warning text-dark">En Aprobación</span>
+              {% elif p.estado == 'IMPLEMENTACION' %}
+                <span class="badge bg-success">En Implementación</span>
+              {% elif p.estado == 'SUSPENDIDO' %}
+                <span class="badge bg-danger">Suspendido</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if p.fecha_prevista_aprobacion %}
+                {% if p.proximo_a_vencer %}
+                  <span class="text-danger fw-bold">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    {{ p.fecha_prevista_aprobacion }}
+                  </span>
+                {% else %}
+                  {{ p.fecha_prevista_aprobacion }}
+                {% endif %}
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            {% if user.puede_editar %}
+            <td>
+              <a href="{% url 'editar-programa' p.pk %}"
+                 class="btn btn-outline-primary btn-sm"
+                 title="Editar">
+                <i class="bi bi-pencil"></i>
+              </a>
+              {% if user.es_admin %}
+              <a href="{% url 'eliminar-programa' p.pk %}"
+                 class="btn btn-outline-danger btn-sm"
+                 title="Eliminar">
+                <i class="bi bi-trash"></i>
+              </a>
+              {% endif %}
+            </td>
+            {% endif %}
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="11" class="text-center text-muted py-4">
+              No hay programas registrados.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

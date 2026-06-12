@@ -1,0 +1,83 @@
+{% extends 'base/base.html' %}
+{% block title %}{{ titulo }} — SIGCU{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb-sigcu">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lista-procesos' %}">Procesos</a></li>
+    <li class="breadcrumb-item">
+      <a href="{% url 'detalle-proceso' proceso.pk %}">Detalle</a>
+    </li>
+    <li class="breadcrumb-item active">Fase</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-2">
+  <div class="col-md-7">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <strong><i class="bi bi-check2-square me-2"></i>{{ titulo }}</strong>
+      </div>
+      <div class="card-body p-4">
+
+        <!-- Info del proceso padre -->
+        <div class="alert alert-secondary py-2 mb-3">
+          <small>
+            <strong>Proceso:</strong> {{ proceso }} &nbsp;|&nbsp;
+            <strong>Carrera:</strong> {{ proceso.carrera.nombre }} &nbsp;|&nbsp;
+            <strong>{{ proceso.carrera.sede.facultad.universidad.sigla }}</strong>
+          </small>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-12" style="display:none">
+              {{ form.proceso }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">{{ form.tipo_fase.label }}</label>
+              {{ form.tipo_fase }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.fecha_inicio.label }}</label>
+              {{ form.fecha_inicio }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.fecha_conclusion.label }}</label>
+              {{ form.fecha_conclusion }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">{{ form.estado.label }}</label>
+              {{ form.estado }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">{{ form.medio_verificacion.label }}</label>
+              {{ form.medio_verificacion }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">{{ form.observaciones.label }}</label>
+              {{ form.observaciones }}
+            </div>
+          </div>
+          {% if form.errors %}
+            <div class="alert alert-danger mt-3">
+              {% for field in form %}{% for error in field.errors %}
+                <div>{{ field.label }}: {{ error }}</div>
+              {% endfor %}{% endfor %}
+            </div>
+          {% endif %}
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-dark">Guardar</button>
+            <a href="{% url 'detalle-proceso' proceso.pk %}"
+               class="btn btn-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

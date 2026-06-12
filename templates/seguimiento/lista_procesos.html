@@ -1,0 +1,99 @@
+{% extends 'base/base.html' %}
+{% block title %}Procesos Curriculares — SIGCU{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb-sigcu">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+    <li class="breadcrumb-item active">Procesos Curriculares</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-3 align-items-center">
+  <div class="col">
+    <h4><i class="bi bi-arrow-repeat me-2"></i>Procesos Curriculares</h4>
+  </div>
+  <div class="col-auto d-flex gap-2">
+    {% if user.puede_editar %}
+    <a href="{% url 'crear-proceso' %}" class="btn btn-dark btn-sm">
+      <i class="bi bi-plus-circle me-1"></i>Nuevo Proceso
+    </a>
+    {% endif %}
+    <a href="{% url 'lista-tipos-fase' %}" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-list-check me-1"></i>Tipos de Fase
+    </a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover table-sm mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th>Carrera</th>
+            <th>Universidad</th>
+            <th>Tipo</th>
+            <th>Nombre</th>
+            <th>Inicio</th>
+            <th>Conclusión</th>
+            <th>Fases</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in procesos %}
+          <tr>
+            <td>{{ p.carrera.nombre }}</td>
+            <td>
+              <span class="badge bg-secondary">
+                {{ p.carrera.sede.facultad.universidad.sigla }}
+              </span>
+            </td>
+            <td>{{ p.get_tipo_proceso_display }}</td>
+            <td>{{ p.nombre_proceso|default:"—" }}</td>
+            <td>{{ p.anio_inicio }}</td>
+            <td>{{ p.anio_conclusion|default:"En proceso" }}</td>
+            <td>
+              <span class="badge bg-info text-dark">
+                {{ p.fases.count }} fase{{ p.fases.count|pluralize }}
+              </span>
+            </td>
+            <td>
+              {% if p.estado == 'EN_PROCESO' %}
+                <span class="badge bg-warning text-dark">En Proceso</span>
+              {% elif p.estado == 'CONCLUIDO' %}
+                <span class="badge bg-success">Concluido</span>
+              {% else %}
+                <span class="badge bg-secondary">Archivado</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'detalle-proceso' p.pk %}"
+                 class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-eye"></i> Ver
+              </a>
+              {% if user.puede_editar %}
+              <a href="{% url 'editar-proceso' p.pk %}"
+                 class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-pencil"></i>
+              </a>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="9" class="text-center text-muted py-4">
+              No hay procesos curriculares registrados.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

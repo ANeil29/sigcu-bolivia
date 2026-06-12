@@ -1,0 +1,74 @@
+{% extends 'base/base.html' %}
+{% block title %}{{ titulo }} — SIGCU{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb-sigcu">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lista-procesos' %}">Procesos</a></li>
+    <li class="breadcrumb-item active">{{ titulo }}</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-2">
+  <div class="col-md-8">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <strong><i class="bi bi-diagram-3 me-2"></i>{{ titulo }}</strong>
+      </div>
+      <div class="card-body p-4">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">{{ form.carrera.label }}</label>
+              {{ form.carrera }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.tipo_proceso.label }}</label>
+              {{ form.tipo_proceso }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.estado.label }}</label>
+              {{ form.estado }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">{{ form.nombre_proceso.label }}</label>
+              {{ form.nombre_proceso }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.anio_inicio.label }}</label>
+              {{ form.anio_inicio }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.anio_conclusion.label }}</label>
+              {{ form.anio_conclusion }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">{{ form.observaciones.label }}</label>
+              {{ form.observaciones }}
+            </div>
+          </div>
+          {% if form.errors %}
+            <div class="alert alert-danger mt-3">
+              {% for field in form %}{% for error in field.errors %}
+                <div>{{ field.label }}: {{ error }}</div>
+              {% endfor %}{% endfor %}
+            </div>
+          {% endif %}
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-dark">{{ accion }}</button>
+            <a href="{% url 'lista-procesos' %}" class="btn btn-secondary">Cancelar</a>
+            {% if objeto %}
+            <a href="{% url 'eliminar-proceso' objeto.pk %}"
+               class="btn btn-outline-danger ms-auto">Eliminar proceso</a>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

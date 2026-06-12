@@ -1,0 +1,52 @@
+{% extends 'base/base.html' %}
+{% block title %}{{ titulo }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-3">
+  <div class="col-md-6">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <strong>{{ titulo }}</strong>
+      </div>
+      <div class="card-body p-4">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">{{ form.carrera.label }}</label>
+              {{ form.carrera }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">{{ form.anio_aprobacion.label }}</label>
+              {{ form.anio_aprobacion }}
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">{{ form.evento_aprobacion.label }}</label>
+              {{ form.evento_aprobacion }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.resolucion_hcu.label }}</label>
+              {{ form.resolucion_hcu }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.resolucion_ran.label }}</label>
+              {{ form.resolucion_ran }}
+            </div>
+            <div class="col-12">
+              <div class="form-check">
+                {{ form.activo }}
+                <label class="form-check-label">{{ form.activo.label }}</label>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-dark">Guardar</button>
+            <a href="{% url 'editar-carrera' carrera.pk %}"
+               class="btn btn-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

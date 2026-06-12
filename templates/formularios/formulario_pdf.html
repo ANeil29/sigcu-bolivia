@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body        { font-family: Arial, sans-serif; font-size: 11pt; margin: 2cm; }
+    h2          { text-align: center; font-size: 13pt; margin-bottom: 4px; }
+    .subtitulo  { text-align: center; font-size: 10pt; color: #555; margin-bottom: 20px; }
+    table       { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td      { border: 1px solid #333; padding: 6px 8px; font-size: 10pt; }
+    th          { background: #0f1f3d; color: #fff; text-align: left; }
+    .seccion    { background: #dce6f0; font-weight: bold; }
+    .pie        { margin-top: 40px; font-size: 9pt; color: #666; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <h2>SISTEMA DE INFORMACIÓN PARA LA GESTIÓN CURRICULAR UNIVERSITARIA</h2>
+  <p class="subtitulo">Formulario de Valoración · SIGCU Bolivia · UATF Potosí</p>
+
+  <table>
+    <tr><th colspan="2" class="seccion">Datos del Formulario</th></tr>
+    <tr><td><b>Código</b></td><td>{{ formulario.codigo }}</td></tr>
+    <tr><td><b>Fecha de elaboración</b></td><td>{{ formulario.fecha_elaboracion }}</td></tr>
+    <tr><td><b>Responsable</b></td><td>{{ formulario.responsable }}</td></tr>
+    <tr><td><b>Estado</b></td><td>{{ formulario.get_estado_display }}</td></tr>
+
+    <tr><th colspan="2" class="seccion">Datos de la Carrera</th></tr>
+    <tr><td><b>Universidad</b></td>
+        <td>{{ formulario.proceso.carrera.sede.facultad.universidad.nombre }}</td></tr>
+    <tr><td><b>Facultad</b></td>
+        <td>{{ formulario.proceso.carrera.sede.facultad.nombre }}</td></tr>
+    <tr><td><b>Sede / Ciudad</b></td>
+        <td>{{ formulario.proceso.carrera.sede.nombre }} — {{ formulario.proceso.carrera.sede.ciudad }}</td></tr>
+    <tr><td><b>Carrera</b></td>
+        <td>{{ formulario.proceso.carrera.nombre }}</td></tr>
+    <tr><td><b>Grado</b></td>
+        <td>{{ formulario.proceso.carrera.get_grado_display }}</td></tr>
+
+    <tr><th colspan="2" class="seccion">Datos del Proceso Curricular</th></tr>
+    <tr><td><b>Tipo de proceso</b></td>
+        <td>{{ formulario.proceso.get_tipo_proceso_display }}</td></tr>
+    <tr><td><b>Año de inicio</b></td>
+        <td>{{ formulario.proceso.anio_inicio }}</td></tr>
+    <tr><td><b>Año de conclusión</b></td>
+        <td>{{ formulario.proceso.anio_conclusion|default:"En proceso" }}</td></tr>
+    <tr><td><b>Estado del proceso</b></td>
+        <td>{{ formulario.proceso.get_estado_display }}</td></tr>
+
+    <tr><th colspan="2" class="seccion">Observaciones</th></tr>
+    <tr><td colspan="2">{{ formulario.observaciones|default:"Sin observaciones." }}</td></tr>
+  </table>
+
+  <p class="pie">Documento generado automáticamente por SIGCU Bolivia · {{ formulario.created_at|date:"d/m/Y H:i" }}</p>
+
+</body>
+</html>

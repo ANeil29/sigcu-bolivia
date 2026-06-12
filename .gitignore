@@ -1,9 +1,35 @@
+# Entorno virtual
 venv/
+env/
+
+# Variables de entorno (NUNCA subir al repo)
+.env
+
+# Base de datos local
+*.sqlite3
+
+# Archivos compilados Python
 __pycache__/
 *.pyc
-.env
-db.sqlite3
-*.log
+*.pyo
+*.pyd
+
+# Archivos de medios subidos
 media/
-static/
-.DS_Store
+
+# Archivos estáticos recolectados
+staticfiles/
+
+# Visual Studio Code
+.vscode/
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# Archivos de migración (opcional, recomendado mantenerlos)
+# Si los quieres excluir descomenta:
+# */migrations/0*.py

@@ -1,0 +1,302 @@
+{% extends 'base/base.html' %}
+{% block title %}Dashboard — SIGCU Bolivia{% endblock %}
+
+{% block content %}
+<div class="row mb-3 align-items-center">
+  <div class="col">
+    <h4><i class="bi bi-speedometer2 me-2"></i>Dashboard</h4>
+    <p class="text-muted mb-0">
+      Bienvenido, {{ user.get_full_name|default:user.username }}
+      <span class="badge bg-secondary ms-1">{{ user.get_rol_display }}</span>
+    </p>
+  </div>
+  <div class="col-auto d-flex gap-2">
+    <a href="{% url 'vista-estadisticas' %}" class="btn btn-outline-dark btn-sm">
+      <i class="bi bi-bar-chart me-1"></i>Estadísticas completas
+    </a>
+    <a href="{% url 'reporte-carreras-excel' %}" class="btn btn-success btn-sm">
+      <i class="bi bi-file-earmark-excel me-1"></i>Excel
+    </a>
+  </div>
+</div>
+
+<!-- ── Fila 1: tarjetas generales ──────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card text-white h-100" style="background:#0f1f3d">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h2 class="mb-0">{{ stats.total_carreras }}</h2>
+            <small>Carreras oficiales</small>
+          </div>
+          <i class="bi bi-journal-bookmark fs-2 opacity-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-white h-100" style="background:#1a3560">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h2 class="mb-0">{{ stats.total_universidades }}</h2>
+            <small>Universidades</small>
+          </div>
+          <i class="bi bi-bank fs-2 opacity-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-white h-100 bg-secondary">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h2 class="mb-0">{{ stats.total_sedes }}</h2>
+            <small>Sedes activas</small>
+          </div>
+          <i class="bi bi-geo-alt fs-2 opacity-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-dark h-100" style="background:#e8a020">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h2 class="mb-0">
+              {{ stats.con_rediseno|add:stats.con_diseno|add:stats.con_ajuste|add:stats.con_complementacion }}
+            </h2>
+            <small>Con innovación curricular</small>
+          </div>
+          <i class="bi bi-arrow-repeat fs-2 opacity-50"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Fila 2: estado de rediseño ──────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card text-white bg-success h-100">
+      <div class="card-body text-center">
+        <h2 class="mb-0">{{ stats.vigentes }}</h2>
+        <small><i class="bi bi-check-circle me-1"></i>Vigentes</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-dark bg-warning h-100">
+      <div class="card-body text-center">
+        <h2 class="mb-0">{{ stats.proximas }}</h2>
+        <small><i class="bi bi-hourglass-split me-1"></i>Próximos a vencer</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-white bg-danger h-100">
+      <div class="card-body text-center">
+        <h2 class="mb-0">{{ stats.vencidas }}</h2>
+        <small><i class="bi bi-x-circle me-1"></i>Vencidos</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card bg-light h-100">
+      <div class="card-body text-center">
+        <h2 class="mb-0">{{ stats.sin_datos }}</h2>
+        <small><i class="bi bi-dash-circle me-1"></i>Sin datos</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Fila 3: procesos curriculares ───────────────────────────────────── -->
+<div class="row g-3 mb-4">
+  <div class="col-md-8">
+    <div class="card h-100">
+      <div class="card-header bg-dark text-white">
+        <i class="bi bi-bar-chart-steps me-2"></i>
+        Innovación Curricular — {{ stats.total_carreras_int }} carreras en total
+      </div>
+      <div class="card-body">
+
+        <!-- Rediseño -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <small class="fw-bold">
+              <i class="bi bi-arrow-repeat me-1 text-primary"></i>Rediseño Curricular
+            </small>
+            <small class="text-muted">
+              {{ stats.con_rediseno }} / {{ stats.total_carreras_int }}
+              ({% widthratio stats.con_rediseno stats.total_carreras_int 100 %}%)
+            </small>
+          </div>
+          <div class="progress" style="height:18px; border-radius:6px">
+            <div class="progress-bar bg-primary fw-bold"
+                 style="width:{% widthratio stats.con_rediseno stats.total_carreras_int 100 %}%">
+              {% if stats.con_rediseno > 0 %}{{ stats.con_rediseno }}{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Diseño -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <small class="fw-bold">
+              <i class="bi bi-pencil-square me-1 text-success"></i>Diseño Curricular
+            </small>
+            <small class="text-muted">
+              {{ stats.con_diseno }} / {{ stats.total_carreras_int }}
+              ({% widthratio stats.con_diseno stats.total_carreras_int 100 %}%)
+            </small>
+          </div>
+          <div class="progress" style="height:18px; border-radius:6px">
+            <div class="progress-bar bg-success fw-bold"
+                 style="width:{% widthratio stats.con_diseno stats.total_carreras_int 100 %}%">
+              {% if stats.con_diseno > 0 %}{{ stats.con_diseno }}{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Ajuste -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <small class="fw-bold">
+              <i class="bi bi-tools me-1 text-warning"></i>Ajuste Curricular
+            </small>
+            <small class="text-muted">
+              {{ stats.con_ajuste }} / {{ stats.total_carreras_int }}
+              ({% widthratio stats.con_ajuste stats.total_carreras_int 100 %}%)
+            </small>
+          </div>
+          <div class="progress" style="height:18px; border-radius:6px">
+            <div class="progress-bar bg-warning fw-bold"
+                 style="width:{% widthratio stats.con_ajuste stats.total_carreras_int 100 %}%">
+              {% if stats.con_ajuste > 0 %}{{ stats.con_ajuste }}{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Complementación -->
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <small class="fw-bold">
+              <i class="bi bi-plus-slash-minus me-1 text-info"></i>Complementación Curricular
+            </small>
+            <small class="text-muted">
+              {{ stats.con_complementacion }} / {{ stats.total_carreras_int }}
+              ({% widthratio stats.con_complementacion stats.total_carreras_int 100 %}%)
+            </small>
+          </div>
+          <div class="progress" style="height:18px; border-radius:6px">
+            <div class="progress-bar bg-info text-dark fw-bold"
+                 style="width:{% widthratio stats.con_complementacion stats.total_carreras_int 100 %}%">
+              {% if stats.con_complementacion > 0 %}{{ stats.con_complementacion }}{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Sin proceso -->
+        <div class="mb-1">
+          <div class="d-flex justify-content-between mb-1">
+            <small class="fw-bold text-secondary">
+              <i class="bi bi-dash-circle me-1"></i>Sin proceso registrado
+            </small>
+            <small class="text-muted">
+              {{ stats.sin_proceso }} / {{ stats.total_carreras_int }}
+              ({% widthratio stats.sin_proceso stats.total_carreras_int 100 %}%)
+            </small>
+          </div>
+          <div class="progress" style="height:12px; border-radius:6px">
+            <div class="progress-bar bg-secondary"
+                 style="width:{% widthratio stats.sin_proceso stats.total_carreras_int 100 %}%">
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Gráfica dona + accesos rápidos -->
+  <div class="col-md-4">
+    <div class="card mb-3">
+      <div class="card-header bg-dark text-white">
+        <i class="bi bi-pie-chart me-2"></i>Estado Rediseño
+      </div>
+      <div class="card-body p-2">
+        <canvas id="graficaDashboard" style="max-height:180px"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header bg-dark text-white">
+        <i class="bi bi-lightning me-2"></i>Accesos rápidos
+      </div>
+      <div class="list-group list-group-flush" style="font-size:.87rem">
+        <a href="{% url 'lista-universidades' %}"
+           class="list-group-item list-group-item-action">
+          <i class="bi bi-bank me-2 text-secondary"></i>Universidades
+        </a>
+        <a href="{% url 'lista-carreras' %}"
+           class="list-group-item list-group-item-action">
+          <i class="bi bi-journal-bookmark me-2 text-primary"></i>Carreras
+        </a>
+        <a href="{% url 'lista-programas' %}"
+           class="list-group-item list-group-item-action">
+          <i class="bi bi-clipboard me-2 text-success"></i>Programas
+        </a>
+        <a href="{% url 'lista-procesos' %}"
+           class="list-group-item list-group-item-action">
+          <i class="bi bi-arrow-repeat me-2 text-warning"></i>Procesos Curriculares
+        </a>
+        <a href="{% url 'mapa' %}"
+           class="list-group-item list-group-item-action">
+          <i class="bi bi-map me-2 text-danger"></i>Mapa de Sedes
+        </a>
+        <a href="{% url 'vista-estadisticas' %}"
+           class="list-group-item list-group-item-action">
+          <i class="bi bi-bar-chart me-2 text-info"></i>Estadísticas completas
+        </a>
+        {% if user.rol == 'SUPERADMIN' %}
+        <a href="{% url 'panel-admin-usuarios' %}"
+           class="list-group-item list-group-item-action">
+          <i class="bi bi-people me-2 text-dark"></i>Panel de Usuarios
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  new Chart(document.getElementById('graficaDashboard'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Vigente', 'Próximo', 'Vencido', 'Sin datos'],
+      datasets: [{
+        data: [
+          {{ stats.vigentes }},
+          {{ stats.proximas }},
+          {{ stats.vencidas }},
+          {{ stats.sin_datos }}
+        ],
+        backgroundColor: ['#198754','#ffc107','#dc3545','#6c757d'],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 10 } } }
+      }
+    }
+  });
+</script>
+{% endblock %}

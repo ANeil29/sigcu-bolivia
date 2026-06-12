@@ -1,0 +1,240 @@
+{% extends 'base/base.html' %}
+{% block title %}Listado de Carreras — SIGCU Bolivia{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb-sigcu">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+    <li class="breadcrumb-item active">Carreras</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-3 align-items-center">
+  <div class="col">
+    <h4><i class="bi bi-journal-bookmark me-2"></i>Listado de Carreras</h4>
+  </div>
+  <div class="col-auto d-flex gap-2">
+    {% if user.puede_editar %}
+    <a href="{% url 'crear-carrera' %}" class="btn btn-dark btn-sm">
+      <i class="bi bi-plus-circle me-1"></i>Nueva Carrera
+    </a>
+    {% endif %}
+    <a href="{% url 'reporte-carreras-excel' %}" class="btn btn-success btn-sm">
+      <i class="bi bi-file-earmark-excel me-1"></i>Exportar Excel
+    </a>
+  </div>
+</div>
+
+{% with total=carreras|length %}
+{% if total > 0 %}
+<div class="card mb-4">
+  <div class="card-header bg-dark text-white">
+    <i class="bi bi-bar-chart-steps me-2"></i>
+    Estado de Innovación Curricular — {{ total }} carrera{{ total|pluralize }}
+  </div>
+  <div class="card-body">
+    <div class="row g-3">
+
+      <div class="col-md-6">
+        <div class="d-flex justify-content-between mb-1">
+          <small class="fw-bold">
+            <i class="bi bi-arrow-repeat me-1 text-primary"></i>Rediseño Curricular
+          </small>
+          <small class="text-muted">
+            {{ conteo.rediseno }} / {{ total }}
+            ({% widthratio conteo.rediseno total 100 %}%)
+          </small>
+        </div>
+        <div class="progress" style="height:18px; border-radius:6px">
+          <div class="progress-bar bg-primary"
+               style="width:{% widthratio conteo.rediseno total 100 %}%">
+            {% if conteo.rediseno > 0 %}{{ conteo.rediseno }}{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="d-flex justify-content-between mb-1">
+          <small class="fw-bold">
+            <i class="bi bi-pencil-square me-1 text-success"></i>Diseño Curricular
+          </small>
+          <small class="text-muted">
+            {{ conteo.diseno }} / {{ total }}
+            ({% widthratio conteo.diseno total 100 %}%)
+          </small>
+        </div>
+        <div class="progress" style="height:18px; border-radius:6px">
+          <div class="progress-bar bg-success"
+               style="width:{% widthratio conteo.diseno total 100 %}%">
+            {% if conteo.diseno > 0 %}{{ conteo.diseno }}{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="d-flex justify-content-between mb-1">
+          <small class="fw-bold">
+            <i class="bi bi-tools me-1 text-warning"></i>Ajuste Curricular
+          </small>
+          <small class="text-muted">
+            {{ conteo.ajuste }} / {{ total }}
+            ({% widthratio conteo.ajuste total 100 %}%)
+          </small>
+        </div>
+        <div class="progress" style="height:18px; border-radius:6px">
+          <div class="progress-bar bg-warning"
+               style="width:{% widthratio conteo.ajuste total 100 %}%">
+            {% if conteo.ajuste > 0 %}{{ conteo.ajuste }}{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="d-flex justify-content-between mb-1">
+          <small class="fw-bold">
+            <i class="bi bi-plus-slash-minus me-1 text-info"></i>Complementación Curricular
+          </small>
+          <small class="text-muted">
+            {{ conteo.complementacion }} / {{ total }}
+            ({% widthratio conteo.complementacion total 100 %}%)
+          </small>
+        </div>
+        <div class="progress" style="height:18px; border-radius:6px">
+          <div class="progress-bar bg-info text-dark"
+               style="width:{% widthratio conteo.complementacion total 100 %}%">
+            {% if conteo.complementacion > 0 %}{{ conteo.complementacion }}{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12">
+        <div class="d-flex justify-content-between mb-1">
+          <small class="fw-bold">
+            <i class="bi bi-dash-circle me-1 text-secondary"></i>Sin proceso registrado
+          </small>
+          <small class="text-muted">
+            {{ conteo.sin_proceso }} / {{ total }}
+            ({% widthratio conteo.sin_proceso total 100 %}%)
+          </small>
+        </div>
+        <div class="progress" style="height:14px; border-radius:6px">
+          <div class="progress-bar bg-secondary"
+               style="width:{% widthratio conteo.sin_proceso total 100 %}%">
+            {% if conteo.sin_proceso > 0 %}{{ conteo.sin_proceso }}{% endif %}
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row g-2 mt-2">
+      <div class="col-auto">
+        <span class="badge bg-primary fs-6 px-3">
+          <i class="bi bi-arrow-repeat me-1"></i>{{ conteo.rediseno }} Rediseños
+        </span>
+      </div>
+      <div class="col-auto">
+        <span class="badge bg-success fs-6 px-3">
+          <i class="bi bi-pencil-square me-1"></i>{{ conteo.diseno }} Diseños
+        </span>
+      </div>
+      <div class="col-auto">
+        <span class="badge bg-warning text-dark fs-6 px-3">
+          <i class="bi bi-tools me-1"></i>{{ conteo.ajuste }} Ajustes
+        </span>
+      </div>
+      <div class="col-auto">
+        <span class="badge bg-info text-dark fs-6 px-3">
+          <i class="bi bi-plus-slash-minus me-1"></i>{{ conteo.complementacion }} Complementaciones
+        </span>
+      </div>
+      <div class="col-auto ms-auto">
+        <span class="badge bg-secondary fs-6 px-3">
+          {{ conteo.sin_proceso }} sin proceso
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endwith %}
+
+<!-- ── Tabla de carreras ───────────────────────────────────────────────── -->
+<div class="card">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-striped table-hover table-sm mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th>N°</th>
+            <th>Universidad</th>
+            <th>Facultad</th>
+            <th>Ciudad</th>
+            <th>Carrera</th>
+            <th>Grado</th>
+            <th>Funcionando</th>
+            <th>Estado Rediseño</th>
+            {% if user.puede_editar %}<th>Acciones</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for carrera in carreras %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+              <span class="badge bg-secondary">
+                {{ carrera.sede.facultad.universidad.sigla }}
+              </span>
+            </td>
+            <td>{{ carrera.sede.facultad.nombre }}</td>
+            <td>{{ carrera.sede.ciudad }}</td>
+            <td>{{ carrera.nombre }}</td>
+            <td>{{ carrera.get_grado_display }}</td>
+            <td>
+              {% if carrera.en_funcionamiento %}
+                <span class="badge bg-success">Sí</span>
+              {% else %}
+                <span class="badge bg-danger">No</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if carrera.estado_rediseno == 'VENCIDO' %}
+                <span class="badge bg-danger">Vencido</span>
+              {% elif carrera.estado_rediseno == 'PROXIMO' %}
+                <span class="badge bg-warning text-dark">Próximo a vencer</span>
+              {% elif carrera.estado_rediseno == 'VIGENTE' %}
+                <span class="badge bg-success">Vigente</span>
+              {% else %}
+                <span class="badge bg-secondary">Sin datos</span>
+              {% endif %}
+            </td>
+            {% if user.puede_editar %}
+            <td>
+              <a href="{% url 'editar-carrera' carrera.pk %}"
+                 class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-pencil"></i>
+              </a>
+              {% if user.es_admin %}
+              <a href="{% url 'eliminar-carrera' carrera.pk %}"
+                 class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-trash"></i>
+              </a>
+              {% endif %}
+            </td>
+            {% endif %}
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="9" class="text-center text-muted py-4">
+              No hay carreras registradas.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

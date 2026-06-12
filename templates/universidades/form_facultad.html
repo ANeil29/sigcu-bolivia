@@ -1,0 +1,56 @@
+{% extends 'base/base.html' %}
+{% block title %}{{ titulo }} — SIGCU Bolivia{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-3">
+  <div class="col-md-6">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <strong>{{ titulo }}</strong>
+      </div>
+      <div class="card-body p-4">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">{{ form.universidad.label }} *</label>
+              {{ form.universidad }}
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">{{ form.nombre.label }} *</label>
+              {{ form.nombre }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">{{ form.sigla.label }}</label>
+              {{ form.sigla }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.decano.label }}</label>
+              {{ form.decano }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.telefono.label }}</label>
+              {{ form.telefono }}
+            </div>
+          </div>
+          {% if form.errors %}
+            <div class="alert alert-danger mt-3">
+              {% for field in form %}{% for error in field.errors %}
+                <div>{{ field.label }}: {{ error }}</div>
+              {% endfor %}{% endfor %}
+            </div>
+          {% endif %}
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-dark">{{ accion }}</button>
+            <a href="{% url 'lista-facultades' %}" class="btn btn-secondary">Cancelar</a>
+            {% if objeto %}
+            <a href="{% url 'eliminar-facultad' objeto.pk %}"
+               class="btn btn-outline-danger ms-auto">Eliminar</a>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

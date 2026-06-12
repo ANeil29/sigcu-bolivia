@@ -1,0 +1,327 @@
+{% extends 'base/base.html' %}
+{% block title %}Estadísticas — SIGCU Bolivia{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb-sigcu">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+    <li class="breadcrumb-item active">Estadísticas</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-3 align-items-center">
+  <div class="col">
+    <h4><i class="bi bi-bar-chart me-2"></i>Resumen Estadístico — SIGCU Bolivia</h4>
+    <p class="text-muted mb-0">Datos en tiempo real del sistema.</p>
+  </div>
+  <div class="col-auto d-flex gap-2">
+  <a href="{% url 'reporte-carreras-excel' %}"
+     class="btn btn-success btn-sm">
+    <i class="bi bi-file-earmark-excel me-1"></i>Exportar Excel
+  </a>
+  <a href="{% url 'reporte-estadisticas-pdf' %}"
+     class="btn btn-danger btn-sm">
+    <i class="bi bi-file-earmark-pdf me-1"></i>Descargar PDF
+  </a>
+  <button onclick="window.print()"
+          class="btn btn-outline-secondary btn-sm">
+    <i class="bi bi-printer me-1"></i>Imprimir
+  </button>
+</div>
+</div>
+
+<!-- Fila 1: tarjetas generales -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-2">
+    <div class="card text-center h-100" style="border-top: 4px solid #0f1f3d">
+      <div class="card-body py-3">
+        <div class="fs-2 fw-bold" style="color:#0f1f3d">{{ stats.total_universidades }}</div>
+        <small class="text-muted">Universidades</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-2">
+    <div class="card text-center h-100" style="border-top: 4px solid #1a3560">
+      <div class="card-body py-3">
+        <div class="fs-2 fw-bold" style="color:#1a3560">{{ stats.total_sedes }}</div>
+        <small class="text-muted">Sedes</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-2">
+    <div class="card text-center h-100" style="border-top: 4px solid #0d6efd">
+      <div class="card-body py-3">
+        <div class="fs-2 fw-bold text-primary">{{ stats.total_carreras }}</div>
+        <small class="text-muted">Carreras</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-2">
+    <div class="card text-center h-100" style="border-top: 4px solid #6f42c1">
+      <div class="card-body py-3">
+        <div class="fs-2 fw-bold" style="color:#6f42c1">{{ stats.total_programas }}</div>
+        <small class="text-muted">Programas</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-2">
+    <div class="card text-center h-100" style="border-top: 4px solid #fd7e14">
+      <div class="card-body py-3">
+        <div class="fs-2 fw-bold text-warning">{{ stats.total_procesos }}</div>
+        <small class="text-muted">Procesos</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-md-2">
+    <div class="card text-center h-100" style="border-top: 4px solid #198754">
+      <div class="card-body py-3">
+        <div class="fs-2 fw-bold text-success">{{ stats.formularios_total }}</div>
+        <small class="text-muted">Formularios</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fila 2: gráficas -->
+<div class="row g-3 mb-4">
+
+  <!-- Dona: estado de rediseño -->
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-header bg-dark text-white">
+        <i class="bi bi-pie-chart me-2"></i>Estado de Rediseño Curricular
+      </div>
+      <div class="card-body d-flex align-items-center justify-content-center">
+        <canvas id="graficaRediseno" style="max-height:260px"></canvas>
+      </div>
+      <div class="card-footer">
+        <div class="row text-center g-1">
+          <div class="col-6">
+            <span class="badge bg-success">Vigentes: {{ stats.vigentes }}</span>
+          </div>
+          <div class="col-6">
+            <span class="badge bg-warning text-dark">Próximos: {{ stats.proximas }}</span>
+          </div>
+          <div class="col-6">
+            <span class="badge bg-danger">Vencidos: {{ stats.vencidas }}</span>
+          </div>
+          <div class="col-6">
+            <span class="badge bg-secondary">Sin datos: {{ stats.sin_datos }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Barras: carreras por universidad -->
+  <div class="col-md-5">
+    <div class="card h-100">
+      <div class="card-header bg-dark text-white">
+        <i class="bi bi-bar-chart me-2"></i>Carreras por Universidad (Top 10)
+      </div>
+      <div class="card-body">
+        <canvas id="graficaUniversidades" style="max-height:260px"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dona: programas por estado -->
+  <div class="col-md-3">
+    <div class="card h-100">
+      <div class="card-header bg-dark text-white">
+        <i class="bi bi-clipboard-check me-2"></i>Programas por Estado
+      </div>
+      <div class="card-body d-flex align-items-center justify-content-center">
+        <canvas id="graficaProgramas" style="max-height:260px"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Fila 3: sedes por departamento + procesos -->
+<div class="row g-3">
+
+  <!-- Tabla sedes por departamento -->
+  <div class="col-md-5">
+    <div class="card">
+      <div class="card-header bg-dark text-white">
+        <i class="bi bi-geo me-2"></i>Sedes por Departamento
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-sm mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Departamento</th>
+              <th class="text-center">Sedes</th>
+              <th>Distribución</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for d in sedes_por_depto %}
+            <tr>
+              <td>{{ d.departamento }}</td>
+              <td class="text-center">
+                <strong>{{ d.total }}</strong>
+              </td>
+              <td style="width:120px">
+                {% with pct=d.total|floatformat:0 %}
+                <div class="progress" style="height:8px">
+                  <div class="progress-bar bg-dark" style="width:{{ pct }}0%"></div>
+                </div>
+                {% endwith %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="3" class="text-muted text-center py-2">Sin datos.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Procesos y formularios -->
+  <div class="col-md-7">
+    <div class="card">
+      <div class="card-header bg-dark text-white">
+        <i class="bi bi-activity me-2"></i>Estado de Procesos y Formularios
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-6">
+            <div class="card bg-warning text-dark text-center">
+              <div class="card-body py-2">
+                <div class="fs-3 fw-bold">{{ stats.procesos_en_proceso }}</div>
+                <small>Procesos en curso</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="card bg-success text-white text-center">
+              <div class="card-body py-2">
+                <div class="fs-3 fw-bold">{{ stats.procesos_concluidos }}</div>
+                <small>Procesos concluidos</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="card bg-primary text-white text-center">
+              <div class="card-body py-2">
+                <div class="fs-3 fw-bold">{{ stats.formularios_total }}</div>
+                <small>Formularios totales</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="card bg-success text-white text-center">
+              <div class="card-body py-2">
+                <div class="fs-3 fw-bold">{{ stats.formularios_aprobados }}</div>
+                <small>Formularios aprobados</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 d-flex gap-2 flex-wrap">
+          <a href="{% url 'lista-procesos' %}"
+             class="btn btn-outline-dark btn-sm">
+            <i class="bi bi-diagram-3 me-1"></i>Ver procesos
+          </a>
+          <a href="{% url 'lista-formularios' %}"
+             class="btn btn-outline-dark btn-sm">
+            <i class="bi bi-file-earmark-text me-1"></i>Ver formularios
+          </a>
+          <a href="{% url 'reporte-carreras-excel' %}"
+             class="btn btn-success btn-sm">
+            <i class="bi bi-file-earmark-excel me-1"></i>Exportar Excel
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // ── Dona: estado de rediseño ──────────────────────────────────────────
+  new Chart(document.getElementById('graficaRediseno'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Vigente', 'Próximo', 'Vencido', 'Sin datos'],
+      datasets: [{
+        data: [
+          {{ stats.vigentes }},
+          {{ stats.proximas }},
+          {{ stats.vencidas }},
+          {{ stats.sin_datos }}
+        ],
+        backgroundColor: ['#198754', '#ffc107', '#dc3545', '#6c757d'],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } }
+    }
+  });
+
+  // ── Barras: carreras por universidad ──────────────────────────────────
+  new Chart(document.getElementById('graficaUniversidades'), {
+    type: 'bar',
+    data: {
+      labels: [
+        {% for u in carreras_por_universidad %}
+          "{{ u.sede__facultad__universidad__sigla }}"
+          {% if not forloop.last %},{% endif %}
+        {% endfor %}
+      ],
+      datasets: [{
+        label: 'Carreras',
+        data: [
+          {% for u in carreras_por_universidad %}
+            {{ u.total }}{% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ],
+        backgroundColor: '#0f1f3d',
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1 } }
+      }
+    }
+  });
+
+  // ── Dona: programas por estado ────────────────────────────────────────
+  new Chart(document.getElementById('graficaProgramas'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Formulación', 'Aprobación', 'Implementación', 'Suspendido'],
+      datasets: [{
+        data: [
+          {{ programas_por_estado.FORMULACION }},
+          {{ programas_por_estado.APROBACION }},
+          {{ programas_por_estado.IMPLEMENTACION }},
+          {{ programas_por_estado.SUSPENDIDO }}
+        ],
+        backgroundColor: ['#6c757d', '#ffc107', '#198754', '#dc3545'],
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }
+    }
+  });
+</script>
+{% endblock %}

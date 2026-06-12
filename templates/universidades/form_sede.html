@@ -1,0 +1,118 @@
+{% extends 'base/base.html' %}
+{% block title %}{{ titulo }} — SIGCU Bolivia{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-3">
+  <div class="col-md-8">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <strong>{{ titulo }}</strong>
+      </div>
+      <div class="card-body p-4">
+        <form method="post">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">{{ form.facultad.label }} *</label>
+              {{ form.facultad }}
+            </div>
+            <div class="col-md-8">
+              <label class="form-label">{{ form.nombre.label }} *</label>
+              {{ form.nombre }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">{{ form.tipo.label }} *</label>
+              {{ form.tipo }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.departamento.label }} *</label>
+              {{ form.departamento }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.ciudad.label }} *</label>
+              {{ form.ciudad }}
+            </div>
+            <div class="col-12">
+              <label class="form-label">{{ form.direccion.label }}</label>
+              {{ form.direccion }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">{{ form.telefono.label }}</label>
+              {{ form.telefono }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ form.latitud.label }}</label>
+              {{ form.latitud }}
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">{{ form.longitud.label }}</label>
+              {{ form.longitud }}
+            </div>
+
+            <!-- Mini mapa para elegir coordenadas visualmente -->
+            <div class="col-12">
+              <label class="form-label">
+                📍 Clic en el mapa para capturar coordenadas automáticamente
+              </label>
+              <div id="mapa-selector" style="height:300px; border-radius:8px;
+                   border:1px solid #ccc;"></div>
+            </div>
+
+            <div class="col-12">
+              <div class="form-check">
+                {{ form.activa }}
+                <label class="form-check-label">{{ form.activa.label }}</label>
+              </div>
+            </div>
+          </div>
+          {% if form.errors %}
+            <div class="alert alert-danger mt-3">
+              {% for field in form %}{% for error in field.errors %}
+                <div>{{ field.label }}: {{ error }}</div>
+              {% endfor %}{% endfor %}
+            </div>
+          {% endif %}
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-dark">{{ accion }}</button>
+            <a href="{% url 'lista-sedes' %}" class="btn btn-secondary">Cancelar</a>
+            {% if objeto %}
+            <a href="{% url 'eliminar-sede' objeto.pk %}"
+               class="btn btn-outline-danger ms-auto">Eliminar</a>
+            {% endif %}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Mapa selector de coordenadas
+  const latInput = document.getElementById('id_latitud');
+  const lonInput = document.getElementById('id_longitud');
+
+  const lat0 = parseFloat(latInput.value) || -16.5;
+  const lon0 = parseFloat(lonInput.value) || -64.5;
+
+  const map = L.map('mapa-selector').setView([lat0, lon0], 6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+
+  let marker = null;
+  if (latInput.value && lonInput.value) {
+    marker = L.marker([lat0, lon0]).addTo(map);
+  }
+
+  map.on('click', function(e) {
+    const { lat, lng } = e.latlng;
+    latInput.value = lat.toFixed(6);
+    lonInput.value = lng.toFixed(6);
+    if (marker) map.removeLayer(marker);
+    marker = L.marker([lat, lng]).addTo(map)
+      .bindPopup(`Lat: ${lat.toFixed(4)}, Lon: ${lng.toFixed(4)}`).openPopup();
+  });
+</script>
+{% endblock %}
