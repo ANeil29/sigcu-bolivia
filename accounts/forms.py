@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from .models import Usuario
 from universidades.models import Universidad
-
+from django.contrib.auth.forms import PasswordResetForm, SetPasswordForm
 
 class FormularioRegistro(forms.ModelForm):
     password1 = forms.CharField(
@@ -116,3 +116,45 @@ class LoginForm(AuthenticationForm):
         label='Contraseña',
         widget=forms.PasswordInput(attrs={'class': 'form-control'})
     )
+
+class RecuperarContrasenaForm(PasswordResetForm):
+    email = forms.EmailField(
+        label='Correo electrónico',
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ingresa el correo con el que te registraste'
+        })
+    )
+
+
+class NuevaContrasenaForm(SetPasswordForm):
+    new_password1 = forms.CharField(
+        label='Nueva contraseña',
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        help_text='Mínimo 8 caracteres.'
+    )
+    new_password2 = forms.CharField(
+        label='Confirmar nueva contraseña',
+        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+    )
+
+
+class CambiarContrasenaAdminForm(forms.Form):
+    """Formulario para que el Superadmin restablezca la contraseña de un usuario."""
+    nueva_contrasena = forms.CharField(
+        label='Nueva contraseña',
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        min_length=8
+    )
+    confirmar_contrasena = forms.CharField(
+        label='Confirmar contraseña',
+        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        p1 = cleaned_data.get('nueva_contrasena')
+        p2 = cleaned_data.get('confirmar_contrasena')
+        if p1 and p2 and p1 != p2:
+            raise forms.ValidationError('Las contraseñas no coinciden.')
+        return cleaned_data

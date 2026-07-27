@@ -32,7 +32,7 @@
           </small>
         </div>
 
-        <form method="post">
+        <form method="post"enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row g-3">
             <div class="col-12" style="display:none">
@@ -62,6 +62,30 @@
               <label class="form-label">{{ form.observaciones.label }}</label>
               {{ form.observaciones }}
             </div>
+            <div class="col-12">
+      <label class="form-label">
+        <i class="bi bi-paperclip me-1"></i>{{ form.archivo_verificacion.label }}
+      </label>
+      {{ form.archivo_verificacion }}
+      <small class="text-muted d-block mt-1">
+        Formatos aceptados: PDF, Word (.doc, .docx), Excel (.xls, .xlsx).
+        Máximo 10 MB.
+      </small>
+      {% if form.instance.archivo_verificacion %}
+      <div class="mt-2 p-2 bg-light rounded">
+        <small class="text-muted">Archivo actual: </small>
+        <a href="{{ form.instance.archivo_verificacion.url }}" target="_blank"
+           class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-file-earmark me-1"></i>
+          {{ form.instance.nombre_archivo }}
+        </a>
+        <small class="text-muted ms-2">
+          (sube un nuevo archivo para reemplazarlo)
+        </small>
+      </div>
+      {% endif %}
+    </div>
+  </div>
           </div>
           {% if form.errors %}
             <div class="alert alert-danger mt-3">

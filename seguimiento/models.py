@@ -51,18 +51,41 @@ class ProcesoCurricular(models.Model):
 
 class FaseProceso(models.Model):
     ESTADO = [
-        ('PENDIENTE', 'Pendiente'),
-        ('EN_PROCESO', 'En Proceso'),
-        ('COMPLETADO', 'Completado'),
+        ('PENDIENTE',   'Pendiente'),
+        ('EN_PROCESO',  'En Proceso'),
+        ('COMPLETADO',  'Completado'),
     ]
-    proceso     = models.ForeignKey(ProcesoCurricular, on_delete=models.CASCADE,
-                                    related_name='fases')
-    tipo_fase   = models.ForeignKey(TipoFase, on_delete=models.PROTECT)
-    fecha_inicio      = models.DateField(null=True, blank=True)
-    fecha_conclusion  = models.DateField(null=True, blank=True)
+    proceso            = models.ForeignKey(ProcesoCurricular,
+                             on_delete=models.CASCADE, related_name='fases')
+    tipo_fase          = models.ForeignKey(TipoFase, on_delete=models.PROTECT)
+    fecha_inicio       = models.DateField(null=True, blank=True)
+    fecha_conclusion   = models.DateField(null=True, blank=True)
     medio_verificacion = models.TextField(blank=True)
-    estado      = models.CharField(max_length=15, choices=ESTADO, default='PENDIENTE')
-    observaciones = models.TextField(blank=True)
+    estado             = models.CharField(max_length=15, choices=ESTADO,
+                             default='PENDIENTE')
+    observaciones      = models.TextField(blank=True)
+
+    archivo_verificacion = models.FileField(
+        upload_to='verificacion_fases/%Y/%m/',
+        null=True, blank=True,
+        help_text='Sube el documento que verifica esta fase (PDF, Word, Excel)'
+    )
+
+    def __str__(self):
+        return f"{self.proceso} — Fase: {self.tipo_fase.codigo}"
+
+    @property
+    def nombre_archivo(self):
+        if self.archivo_verificacion:
+            return self.archivo_verificacion.name.split('/')[-1]
+        return None
+
+    @property
+    def extension_archivo(self):
+        if self.archivo_verificacion:
+            ext = self.archivo_verificacion.name.split('.')[-1].lower()
+            return ext
+        return None
 
     def __str__(self):
         return f"{self.proceso} — Fase: {self.tipo_fase.codigo}"

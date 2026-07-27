@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"></head>
+<body style="font-family:Arial,sans-serif; color:#1a1a1a; padding:20px">
+  <div style="max-width:500px; margin:0 auto; border:1px solid #ddd;
+              border-radius:8px; overflow:hidden">
+    <div style="background:#0f1f3d; padding:20px; text-align:center">
+      <h2 style="color:white; margin:0">SIGCU Bolivia</h2>
+      <p style="color:rgba(255,255,255,.7); margin:4px 0 0">
+        Sistema de Gestión Curricular Universitaria
+      </p>
+    </div>
+    <div style="padding:24px">
+      <h3>Recuperación de contraseña</h3>
+      <p>Hola <strong>{{ user.get_full_name }}</strong>,</p>
+      <p>Recibimos una solicitud para restablecer la contraseña de tu cuenta
+         en SIGCU Bolivia.</p>
+      <p>Haz clic en el siguiente botón para crear una nueva contraseña:</p>
+      <div style="text-align:center; margin:24px 0">
+        <a href="{{ protocol }}://{{ domain }}{% url 'recuperar-confirmar' uidb64=uid token=token %}"
+           style="background:#0f1f3d; color:white; padding:12px 28px;
+                  border-radius:6px; text-decoration:none; font-weight:bold">
+          Restablecer contraseña
+        </a>
+      </div>
+      <p style="color:#666; font-size:0.85em">
+        Este enlace es válido por <strong>1 hora</strong>. Si no solicitaste
+        este cambio, ignora este correo y tu contraseña seguirá siendo la misma.
+      </p>
+    </div>
+    <div style="background:#f8f9fa; padding:12px; text-align:center;
+                font-size:0.8em; color:#888">
+      UATF Potosí · SIGCU Bolivia
+    </div>
+  </div>
+</body>
+</html>

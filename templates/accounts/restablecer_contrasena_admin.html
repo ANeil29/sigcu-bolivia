@@ -1,0 +1,49 @@
+{% extends 'base/base.html' %}
+{% block title %}Restablecer Contraseña — {{ usuario.get_full_name }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-4">
+  <div class="col-md-5">
+    <div class="card shadow">
+      <div class="card-header bg-warning text-dark">
+        <strong><i class="bi bi-key me-2"></i>
+          Restablecer contraseña — {{ usuario.get_full_name }}
+        </strong>
+      </div>
+      <div class="card-body p-4">
+        <div class="alert alert-secondary py-2 mb-3">
+          <small>
+            <strong>Usuario:</strong> {{ usuario.username }}<br>
+            <strong>Rol:</strong> {{ usuario.get_rol_display }}<br>
+            <strong>Correo:</strong> {{ usuario.email|default:"Sin correo" }}
+          </small>
+        </div>
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">{{ form.nueva_contrasena.label }}</label>
+            {{ form.nueva_contrasena }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">{{ form.confirmar_contrasena.label }}</label>
+            {{ form.confirmar_contrasena }}
+          </div>
+          {% if form.errors %}
+          <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+          </div>
+          {% endif %}
+          <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-warning">
+              <i class="bi bi-check2 me-1"></i>Restablecer contraseña
+            </button>
+            <a href="{% url 'panel-admin-usuarios' %}"
+               class="btn btn-secondary">Cancelar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -58,7 +58,8 @@ class FaseProcesoForm(forms.ModelForm):
     class Meta:
         model  = FaseProceso
         fields = ['proceso', 'tipo_fase', 'fecha_inicio', 'fecha_conclusion',
-                  'medio_verificacion', 'estado', 'observaciones']
+                  'medio_verificacion', 'estado', 'observaciones',
+                  'archivo_verificacion']        # ← agrega este campo
         widgets = {
             'proceso':    forms.Select(attrs={'class': 'form-select'}),
             'tipo_fase':  forms.Select(attrs={'class': 'form-select'}),
@@ -69,7 +70,12 @@ class FaseProcesoForm(forms.ModelForm):
             'medio_verificacion': forms.Textarea(attrs={'class': 'form-control',
                                                          'rows': 2}),
             'estado':       forms.Select(attrs={'class': 'form-select'}),
-            'observaciones': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'observaciones': forms.Textarea(attrs={'class': 'form-control',
+                                                    'rows': 2}),
+            'archivo_verificacion': forms.FileInput(
+                attrs={'class': 'form-control',
+                       'accept': '.pdf,.doc,.docx,.xls,.xlsx,.odt,.ods'}
+            ),
         }
         labels = {
             'proceso':    'Proceso curricular *',
@@ -79,4 +85,5 @@ class FaseProcesoForm(forms.ModelForm):
             'medio_verificacion': 'Medio de verificación',
             'estado':       'Estado *',
             'observaciones': 'Observaciones',
+            'archivo_verificacion': 'Documento de verificación',
         }

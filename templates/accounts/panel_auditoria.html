@@ -1,0 +1,183 @@
+{% extends 'base/base.html' %}
+{% block title %}Auditoría — SIGCU Bolivia{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb-sigcu">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'panel-admin-usuarios' %}">Usuarios</a></li>
+    <li class="breadcrumb-item active">Auditoría</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-3 align-items-center">
+  <div class="col">
+    <h4><i class="bi bi-shield-check me-2"></i>Control y Auditoría del Sistema</h4>
+  </div>
+  <div class="col-auto">
+    <a href="{% url 'panel-admin-usuarios' %}" class="btn btn-secondary btn-sm">
+      <i class="bi bi-arrow-left me-1"></i>Volver a Usuarios
+    </a>
+  </div>
+</div>
+
+<!-- Usuarios en línea -->
+<div class="card mb-4">
+  <div class="card-header bg-success text-white d-flex justify-content-between">
+    <span>
+      <i class="bi bi-circle-fill me-2" style="font-size:.6rem"></i>
+      Usuarios en línea ahora
+      <span class="badge bg-white text-success ms-2">{{ en_linea.count }}</span>
+    </span>
+    <small class="opacity-75">Activos en los últimos 10 minutos</small>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Usuario</th><th>Rol</th><th>Último acceso</th>
+            <th>IP</th><th>Navegador</th><th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in en_linea %}
+          <tr>
+            <td>
+              <strong>{{ s.usuario.get_full_name|default:s.usuario.username }}</strong>
+            </td>
+            <td>
+              <span class="badge
+                {% if s.usuario.rol == 'SUPERADMIN' %}bg-dark
+                {% elif s.usuario.rol == 'ADMIN_DSA' %}bg-primary
+                {% else %}bg-secondary{% endif %}">
+                {{ s.usuario.get_rol_display }}
+              </span>
+            </td>
+            <td>{{ s.ultimo_acceso|date:"d/m/Y H:i:s" }}</td>
+            <td><code>{{ s.ip|default:"—" }}</code></td>
+            <td><small>{{ s.navegador|truncatechars:50 }}</small></td>
+            <td>
+              {% if s.esta_en_linea %}
+                <span class="badge bg-success">
+                  <i class="bi bi-circle-fill me-1" style="font-size:.5rem"></i>En línea
+                </span>
+              {% else %}
+                <span class="badge bg-secondary">Inactivo</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted py-3">
+              No hay usuarios activos en este momento.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Filtros de auditoría -->
+<div class="card mb-3">
+  <div class="card-body py-2">
+    <form method="get" class="row g-2 align-items-center">
+      <div class="col-md-3">
+        <select name="usuario" class="form-select form-select-sm">
+          <option value="">-- Todos los usuarios --</option>
+          {% for u in todos_usuarios %}
+          <option value="{{ u.pk }}"
+            {% if filtro_usuario == u.pk|stringformat:"s" %}selected{% endif %}>
+            {{ u.get_full_name|default:u.username }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="accion" class="form-select form-select-sm">
+          <option value="">-- Todas las acciones --</option>
+          {% for val, label in acciones %}
+          <option value="{{ val }}"
+            {% if filtro_accion == val %}selected{% endif %}>
+            {{ label }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <input type="text" name="modulo" value="{{ filtro_modulo }}"
+               class="form-control form-control-sm"
+               placeholder="Filtrar por módulo...">
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-dark btn-sm">
+          <i class="bi bi-search me-1"></i>Filtrar
+        </button>
+        <a href="{% url 'panel-auditoria' %}"
+           class="btn btn-outline-secondary btn-sm ms-1">Limpiar</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Registro de actividades -->
+<div class="card">
+  <div class="card-header bg-dark text-white">
+    <i class="bi bi-clock-history me-2"></i>
+    Registro de Actividades
+    <small class="opacity-75 ms-2">(últimas 200 acciones)</small>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover table-sm mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Fecha y hora</th><th>Usuario</th><th>Acción</th>
+            <th>Módulo</th><th>Descripción</th><th>IP</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in actividades %}
+          <tr>
+            <td><small>{{ a.fecha|date:"d/m/Y H:i:s" }}</small></td>
+            <td>
+              <strong>{{ a.usuario.username|default:"—" }}</strong>
+            </td>
+            <td>
+              {% if a.accion == 'LOGIN' %}
+                <span class="badge bg-success">{{ a.get_accion_display }}</span>
+              {% elif a.accion == 'LOGOUT' %}
+                <span class="badge bg-secondary">{{ a.get_accion_display }}</span>
+              {% elif a.accion == 'CREAR' %}
+                <span class="badge bg-primary">{{ a.get_accion_display }}</span>
+              {% elif a.accion == 'EDITAR' %}
+                <span class="badge bg-warning text-dark">{{ a.get_accion_display }}</span>
+              {% elif a.accion == 'ELIMINAR' %}
+                <span class="badge bg-danger">{{ a.get_accion_display }}</span>
+              {% elif a.accion == 'EXPORTAR' %}
+                <span class="badge bg-info text-dark">{{ a.get_accion_display }}</span>
+              {% else %}
+                <span class="badge bg-light text-dark">{{ a.get_accion_display }}</span>
+              {% endif %}
+            </td>
+            <td><span class="badge bg-secondary">{{ a.modulo }}</span></td>
+            <td><small>{{ a.descripcion|truncatechars:80 }}</small></td>
+            <td><code style="font-size:.75rem">{{ a.ip|default:"—" }}</code></td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">
+              No hay registros de actividad.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

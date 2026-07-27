@@ -10,6 +10,9 @@ from .forms import FormularioRegistro, FormularioAsignarRol, LoginForm
 from .serializers import UsuarioSerializer, RegistroSerializer
 from .decorators import rol_requerido
 
+from .models import RegistroActividad
+from .middleware import get_ip
+
 Usuario = get_user_model()
 
 
@@ -27,6 +30,13 @@ def vista_login(request):
                     'El administrador te notificará cuando esté lista.')
                 return redirect('login')
             login(request, user)
+            RegistroActividad.objects.create(
+    usuario=user,
+    accion='LOGIN',
+    modulo='Autenticación',
+    descripcion=f'Inicio de sesión desde {get_ip(request)}',
+    ip=get_ip(request),
+)
             return redirect('dashboard')
         else:
             messages.error(request, 'Usuario o contraseña incorrectos.')
@@ -50,6 +60,14 @@ def vista_registro(request):
 
 
 def vista_logout(request):
+    if request.user.is_authenticated:
+        RegistroActividad.objects.create(
+            usuario=request.user,
+            accion='LOGOUT',
+            modulo='Autenticación',
+            descripcion='Cierre de sesión',
+            ip=get_ip(request),
+        )
     logout(request)
     return redirect('login')
 
@@ -136,3 +154,87 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     queryset         = Usuario.objects.all()
     serializer_class = UsuarioSerializer
     permission_classes = [permissions.IsAdminUser]
+
+from django.contrib.auth.views import (
+    PasswordResetView, PasswordResetDoneView,
+    PasswordResetConfirmView, PasswordResetCompleteView
+)
+from .forms import CambiarContrasenaAdminForm
+
+
+# Recuperación de contraseña por correo
+
+class RecuperarContrasena(PasswordResetView):
+    template_name         = 'accounts/recuperar_contrasena.html'
+    email_template_name   = 'accounts/email_recuperar_contrasena.html'
+    subject_template_name = 'accounts/email_asunto_recuperar.txt'
+    success_url           = '/auth/recuperar/enviado/'
+
+class RecuperarContrasenaEnviado(PasswordResetDoneView):
+    template_name = 'accounts/recuperar_enviado.html'
+
+class RecuperarContrasenaConfirmar(PasswordResetConfirmView):
+    template_name = 'accounts/recuperar_confirmar.html'
+    success_url   = '/auth/recuperar/completado/'
+
+class RecuperarContrasenaCompletado(PasswordResetCompleteView):
+    template_name = 'accounts/recuperar_completado.html'
+
+
+# Restablecer contraseña manual (solo Superadmin)
+
+@login_required
+@rol_requerido('SUPERADMIN')
+def restablecer_contrasena_admin(request, pk):
+    usuario = get_object_or_404(Usuario, pk=pk)
+    form    = CambiarContrasenaAdminForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        usuario.set_password(form.cleaned_data['nueva_contrasena'])
+        usuario.save()
+        messages.success(request,
+            f'✅ Contraseña de {usuario.get_full_name()} restablecida correctamente.')
+        return redirect('panel-admin-usuarios')
+    return render(request, 'accounts/restablecer_contrasena_admin.html', {
+        'usuario': usuario,
+        'form':    form,
+    })
+
+@login_required
+@rol_requerido('SUPERADMIN')
+def panel_auditoria(request):
+    from .models import SesionActiva, RegistroActividad
+    from django.utils import timezone
+
+    # Usuarios en línea (activos en los últimos 10 minutos)
+    hace_10min  = timezone.now() - timezone.timedelta(minutes=10)
+    en_linea    = SesionActiva.objects.select_related('usuario').filter(
+                      ultimo_acceso__gte=hace_10min
+                  ).order_by('-ultimo_acceso')
+
+    # Filtros de auditoría
+    usuario_id  = request.GET.get('usuario', '')
+    accion      = request.GET.get('accion', '')
+    modulo      = request.GET.get('modulo', '')
+
+    actividades = RegistroActividad.objects.select_related('usuario').all()
+
+    if usuario_id:
+        actividades = actividades.filter(usuario_id=usuario_id)
+    if accion:
+        actividades = actividades.filter(accion=accion)
+    if modulo:
+        actividades = actividades.filter(modulo__icontains=modulo)
+
+    actividades = actividades[:200]  # últimas 200
+
+    todos_usuarios = Usuario.objects.filter(activo_sistema=True).order_by('last_name')
+
+    return render(request, 'accounts/panel_auditoria.html', {
+        'en_linea':       en_linea,
+        'actividades':    actividades,
+        'todos_usuarios': todos_usuarios,
+        'filtro_usuario': usuario_id,
+        'filtro_accion':  accion,
+        'filtro_modulo':  modulo,
+        'acciones':       RegistroActividad.ACCION_CHOICES,
+    })

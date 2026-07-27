@@ -25,6 +25,11 @@
             <div class="alert alert-warning py-2">{{ message }}</div>
           {% endfor %}
           <button type="submit" class="btn btn-dark w-100">Ingresar</button>
+          <p class="text-center mt-3 mb-0">
+  <a href="{% url 'recuperar-contrasena' %}" class="text-muted small">
+    <i class="bi bi-key me-1"></i>¿Olvidaste tu contraseña?
+  </a>
+</p>
         </form>
         <hr>
         <p class="text-center mb-0">

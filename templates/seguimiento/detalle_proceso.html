@@ -103,25 +103,99 @@
       </div>
       <div class="card-body">
         {% with total=proceso.fases.count %}
-        {% with completadas=proceso.fases.all %}
-        {% if total > 0 %}
-          {% for fase in proceso.fases.all %}
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <small>{{ fase.tipo_fase.codigo }} — {{ fase.tipo_fase.nombre|truncatechars:25 }}</small>
-              {% if fase.estado == 'COMPLETADO' %}
-                <span class="badge bg-success"><i class="bi bi-check"></i></span>
-              {% elif fase.estado == 'EN_PROCESO' %}
-                <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split"></i></span>
-              {% else %}
-                <span class="badge bg-light text-dark"><i class="bi bi-circle"></i></span>
-              {% endif %}
-            </div>
-          {% endfor %}
-        {% else %}
-          <p class="text-muted text-center mt-3">Sin fases registradas aún.</p>
-        {% endif %}
-        {% endwith %}
-        {% endwith %}
+{% if total > 0 %}
+  {% with completadas=proceso.fases.filter %}
+
+  {# Calcular conteos #}
+  {% with n_completadas=proceso.fases.all|length %}
+
+  {# Contar manualmente con variables de template #}
+  {% with fases_lista=proceso.fases.all %}
+
+  {# Barra de progreso general #}
+  {% with comp=0 en_proc=0 pend=0 %}
+  {% for f in fases_lista %}
+    {% if f.estado == 'COMPLETADO' %}{% with comp=comp|add:1 %}{% endwith %}{% endif %}
+  {% endfor %}
+  {% endwith %}
+
+  {# Usamos contadores pasados desde la vista #}
+  <div class="mb-3">
+    <div class="d-flex justify-content-between mb-1">
+      <small class="fw-bold text-success">
+        <i class="bi bi-check-circle me-1"></i>Completadas
+      </small>
+      <small class="text-muted">
+        {{ progreso.completadas }} / {{ total }}
+      </small>
+    </div>
+    <div class="progress mb-2" style="height:16px; border-radius:6px">
+      {% if total > 0 %}
+      <div class="progress-bar bg-success fw-bold"
+           style="width:{{ progreso.pct_completadas }}%">
+        {% if progreso.completadas > 0 %}{{ progreso.completadas }}{% endif %}
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="d-flex justify-content-between mb-1">
+      <small class="fw-bold text-warning">
+        <i class="bi bi-hourglass-split me-1"></i>En Proceso
+      </small>
+      <small class="text-muted">{{ progreso.en_proceso }} / {{ total }}</small>
+    </div>
+    <div class="progress mb-2" style="height:14px; border-radius:6px">
+      <div class="progress-bar bg-warning fw-bold"
+           style="width:{{ progreso.pct_en_proceso }}%">
+        {% if progreso.en_proceso > 0 %}{{ progreso.en_proceso }}{% endif %}
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-between mb-1">
+      <small class="fw-bold text-secondary">
+        <i class="bi bi-circle me-1"></i>Pendientes
+      </small>
+      <small class="text-muted">{{ progreso.pendientes }} / {{ total }}</small>
+    </div>
+    <div class="progress mb-3" style="height:12px; border-radius:6px">
+      <div class="progress-bar bg-secondary"
+           style="width:{{ progreso.pct_pendientes }}%">
+        {% if progreso.pendientes > 0 %}{{ progreso.pendientes }}{% endif %}
+      </div>
+    </div>
+
+    <hr class="my-2">
+
+    {# Lista compacta de fases con estado #}
+    {% for fase in fases_lista %}
+    <div class="d-flex justify-content-between align-items-center mb-1">
+      <small style="font-size:.8rem">
+        <strong>{{ fase.tipo_fase.codigo }}</strong>
+        — {{ fase.tipo_fase.nombre|truncatechars:22 }}
+      </small>
+      {% if fase.estado == 'COMPLETADO' %}
+        <span class="badge bg-success" style="font-size:.65rem">
+          <i class="bi bi-check"></i>
+        </span>
+      {% elif fase.estado == 'EN_PROCESO' %}
+        <span class="badge bg-warning text-dark" style="font-size:.65rem">
+          <i class="bi bi-hourglass-split"></i>
+        </span>
+      {% else %}
+        <span class="badge bg-light text-dark border" style="font-size:.65rem">
+          <i class="bi bi-circle"></i>
+        </span>
+      {% endif %}
+    </div>
+    {% endfor %}
+
+  {% endwith %}
+  {% endwith %}
+  {% endwith %}
+{% else %}
+  <p class="text-muted text-center mt-3">Sin fases registradas aún.</p>
+{% endif %}
+{% endwith %}
       </div>
     </div>
   </div>
@@ -158,8 +232,34 @@
             <td>{{ fase.fecha_inicio|default:"—" }}</td>
             <td>{{ fase.fecha_conclusion|default:"—" }}</td>
             <td>
-              <small>{{ fase.medio_verificacion|default:fase.tipo_fase.medio_verificacion_default|truncatechars:60 }}</small>
-            </td>
+  <small>
+    {{ fase.medio_verificacion|default:fase.tipo_fase.medio_verificacion_default|truncatechars:50 }}
+  </small>
+  <!-- Archivo adjunto de verificación -->
+  {% if fase.archivo_verificacion %}
+  <br>
+  <a href="{{ fase.archivo_verificacion.url }}"
+     target="_blank"
+     class="btn btn-outline-success btn-sm mt-1"
+     title="Ver/descargar documento de verificación">
+    {% if fase.extension_archivo == 'pdf' %}
+      <i class="bi bi-file-earmark-pdf me-1 text-danger"></i>
+    {% elif fase.extension_archivo in 'doc docx' %}
+      <i class="bi bi-file-earmark-word me-1 text-primary"></i>
+    {% elif fase.extension_archivo in 'xls xlsx' %}
+      <i class="bi bi-file-earmark-excel me-1 text-success"></i>
+    {% else %}
+      <i class="bi bi-paperclip me-1"></i>
+    {% endif %}
+    {{ fase.nombre_archivo|truncatechars:25 }}
+  </a>
+  {% else %}
+  <br>
+  <small class="text-muted">
+    <i class="bi bi-dash me-1"></i>Sin archivo adjunto
+  </small>
+  {% endif %}
+</td>
             <td>
               {% if fase.estado == 'COMPLETADO' %}
                 <span class="badge bg-success">Completado</span>

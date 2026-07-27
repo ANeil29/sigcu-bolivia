@@ -8,20 +8,34 @@
   </div>
 </div>
 
+<div class="col-auto d-flex gap-2 mb-3">
+  <a href="{% url 'panel-auditoria' %}" class="btn btn-outline-warning btn-sm">
+    <i class="bi bi-shield-check me-1"></i>Auditoría
+  </a>
+</div>
+
 <div class="card mb-4 border-warning">
   <div class="card-header bg-warning text-dark">
     <strong>⏳ Solicitudes pendientes de aprobación ({{ pendientes.count }})</strong>
   </div>
+
   <div class="card-body p-0">
     <div class="table-responsive">
       <table class="table table-sm mb-0">
         <thead class="table-light">
           <tr>
-            <th>Nombre</th><th>Usuario</th><th>Cargo</th>
-            <th>Universidad</th><th>Departamento</th><th>CI</th>
-            <th>Motivo</th><th>Fecha solicitud</th><th>Acciones</th>
+            <th>Nombre</th>
+            <th>Usuario</th>
+            <th>Cargo</th>
+            <th>Universidad</th>
+            <th>Departamento</th>
+            <th>CI</th>
+            <th>Motivo</th>
+            <th>Fecha solicitud</th>
+            <th>Acciones</th>
           </tr>
         </thead>
+
         <tbody>
           {% for u in pendientes %}
           <tr>
@@ -34,12 +48,19 @@
             <td>
               <small>{{ u.motivo_solicitud|truncatechars:60 }}</small>
             </td>
-            <td><small>{{ u.date_joined|date:"d/m/Y" }}</small></td>
+            <td>
+              <small>{{ u.date_joined|date:"d/m/Y" }}</small>
+            </td>
             <td>
               <a href="{% url 'aprobar-usuario' u.pk %}"
-                 class="btn btn-success btn-sm">Aprobar</a>
+                 class="btn btn-success btn-sm">
+                 Aprobar
+              </a>
+
               <a href="{% url 'rechazar-usuario' u.pk %}"
-                 class="btn btn-danger btn-sm">Rechazar</a>
+                 class="btn btn-danger btn-sm">
+                 Rechazar
+              </a>
             </td>
           </tr>
           {% empty %}
@@ -59,21 +80,30 @@
   <div class="card-header bg-dark text-white">
     <strong>👥 Usuarios del sistema ({{ activos.count }})</strong>
   </div>
+
   <div class="card-body p-0">
     <div class="table-responsive">
       <table class="table table-sm mb-0">
+
         <thead class="table-light">
           <tr>
-            <th>Nombre</th><th>Usuario</th><th>Rol</th>
-            <th>Cargo</th><th>Universidad</th><th>Departamento</th>
-            <th>Estado</th><th>Acciones</th>
+            <th>Nombre</th>
+            <th>Usuario</th>
+            <th>Rol</th>
+            <th>Cargo</th>
+            <th>Universidad</th>
+            <th>Departamento</th>
+            <th>Estado</th>
+            <th>Acciones</th>
           </tr>
         </thead>
+
         <tbody>
           {% for u in activos %}
           <tr>
             <td>{{ u.get_full_name }}</td>
             <td>{{ u.username }}</td>
+
             <td>
               <span class="badge
                 {% if u.rol == 'SUPERADMIN' %}bg-dark
@@ -84,9 +114,11 @@
                 {{ u.get_rol_display }}
               </span>
             </td>
+
             <td>{{ u.get_cargo_display|default:"—" }}</td>
             <td>{{ u.universidad|default:"—" }}</td>
             <td>{{ u.departamento|default:"—" }}</td>
+
             <td>
               {% if u.is_active %}
                 <span class="badge bg-success">Activo</span>
@@ -94,13 +126,27 @@
                 <span class="badge bg-danger">Inactivo</span>
               {% endif %}
             </td>
-            <td>
+
+            <td class="d-flex gap-1 flex-wrap">
+
               <a href="{% url 'editar-rol-usuario' u.pk %}"
-                 class="btn btn-outline-primary btn-sm">Editar rol</a>
+                 class="btn btn-outline-primary btn-sm">
+                Editar rol
+              </a>
+
+              <a href="{% url 'restablecer-contrasena-admin' u.pk %}"
+                 class="btn btn-outline-warning btn-sm"
+                 title="Restablecer contraseña">
+                <i class="bi bi-key"></i>
+              </a>
+
               {% if u.is_active and u.pk != request.user.pk %}
               <a href="{% url 'desactivar-usuario' u.pk %}"
-                 class="btn btn-outline-danger btn-sm">Desactivar</a>
+                 class="btn btn-outline-danger btn-sm">
+                Desactivar
+              </a>
               {% endif %}
+
             </td>
           </tr>
           {% empty %}
@@ -111,6 +157,7 @@
           </tr>
           {% endfor %}
         </tbody>
+
       </table>
     </div>
   </div>

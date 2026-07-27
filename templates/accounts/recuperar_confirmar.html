@@ -1,0 +1,48 @@
+{% extends 'base/base.html' %}
+{% block title %}Nueva Contraseña — SIGCU{% endblock %}
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-5">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <strong><i class="bi bi-lock me-2"></i>Establecer Nueva Contraseña</strong>
+      </div>
+      <div class="card-body p-4">
+        {% if validlink %}
+        <form method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Nueva contraseña</label>
+            {{ form.new_password1 }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Confirmar contraseña</label>
+            {{ form.new_password2 }}
+          </div>
+          {% if form.errors %}
+          <div class="alert alert-danger">
+            {% for field in form %}
+              {% for error in field.errors %}
+                <div>{{ error }}</div>
+              {% endfor %}
+            {% endfor %}
+          </div>
+          {% endif %}
+          <button type="submit" class="btn btn-dark w-100">
+            <i class="bi bi-check2 me-1"></i>Guardar nueva contraseña
+          </button>
+        </form>
+        {% else %}
+        <div class="alert alert-danger">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          El enlace de recuperación es inválido o ya expiró (válido por 1 hora).
+        </div>
+        <a href="{% url 'recuperar-contrasena' %}" class="btn btn-dark">
+          Solicitar nuevo enlace
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

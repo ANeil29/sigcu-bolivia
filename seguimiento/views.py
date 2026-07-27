@@ -110,9 +110,28 @@ def detalle_proceso(request, pk):
         pk=pk
     )
     tipos_fase = TipoFase.objects.filter(activa=True).order_by('orden')
+
+    # Calcular progreso de fases
+    fases      = list(proceso.fases.all())
+    total      = len(fases)
+    completadas = sum(1 for f in fases if f.estado == 'COMPLETADO')
+    en_proceso  = sum(1 for f in fases if f.estado == 'EN_PROCESO')
+    pendientes  = sum(1 for f in fases if f.estado == 'PENDIENTE')
+    divisor     = total or 1  # evitar división por cero
+
+    progreso = {
+        'completadas':     completadas,
+        'en_proceso':      en_proceso,
+        'pendientes':      pendientes,
+        'pct_completadas': round(completadas / divisor * 100),
+        'pct_en_proceso':  round(en_proceso  / divisor * 100),
+        'pct_pendientes':  round(pendientes  / divisor * 100),
+    }
+
     return render(request, 'seguimiento/detalle_proceso.html', {
         'proceso':    proceso,
         'tipos_fase': tipos_fase,
+        'progreso':   progreso,
     })
 
 
@@ -160,7 +179,7 @@ def eliminar_proceso(request, pk):
 @puede_editar
 def crear_fase(request, proceso_pk):
     proceso = get_object_or_404(ProcesoCurricular, pk=proceso_pk)
-    form    = FaseProcesoForm(request.POST or None, initial={'proceso': proceso})
+    form    = FaseProcesoForm(request.POST or None, request.FILES or None, initial={'proceso': proceso})
     if request.method == 'POST' and form.is_valid():
         form.save()
         messages.success(request, '✅ Fase agregada.')
@@ -174,7 +193,7 @@ def crear_fase(request, proceso_pk):
 @puede_editar
 def editar_fase(request, pk):
     fase    = get_object_or_404(FaseProceso, pk=pk)
-    form    = FaseProcesoForm(request.POST or None, instance=fase)
+    form    = FaseProcesoForm(request.POST or None, request.FILES or None, instance=fase)
     if request.method == 'POST' and form.is_valid():
         form.save()
         messages.success(request, '✅ Fase actualizada.')
