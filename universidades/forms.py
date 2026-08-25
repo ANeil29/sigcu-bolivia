@@ -63,7 +63,8 @@ class SedeForm(forms.ModelForm):
     class Meta:
         model  = Sede
         fields = ['facultad', 'nombre', 'tipo', 'departamento', 'ciudad',
-                  'direccion', 'telefono', 'latitud', 'longitud', 'activa']
+                  'direccion', 'telefono', 'latitud', 'longitud',
+                  'imagen_referencia', 'descripcion', 'activa']
         widgets = {
             'facultad':    forms.Select(attrs={'class': 'form-select'}),
             'nombre':      forms.TextInput(attrs={'class': 'form-control'}),
@@ -82,7 +83,8 @@ class SedeForm(forms.ModelForm):
                                               ('Pando',      'Pando'),
                                           ]),
             'ciudad':      forms.TextInput(attrs={'class': 'form-control'}),
-            'direccion':   forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'direccion':   forms.Textarea(attrs={'class': 'form-control',
+                                                  'rows': 2}),
             'telefono':    forms.TextInput(attrs={'class': 'form-control'}),
             'latitud':     forms.NumberInput(attrs={'class': 'form-control',
                                                      'step': 'any',
@@ -90,17 +92,23 @@ class SedeForm(forms.ModelForm):
             'longitud':    forms.NumberInput(attrs={'class': 'form-control',
                                                      'step': 'any',
                                                      'placeholder': 'Ej: -65.7531'}),
+            'imagen_referencia': forms.FileInput(attrs={'class': 'form-control',
+                                                         'accept': 'image/*'}),
+            'descripcion': forms.Textarea(attrs={'class': 'form-control',
+                                                  'rows': 3}),
             'activa':      forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
         labels = {
-            'facultad':    'Facultad',
-            'nombre':      'Nombre de la Sede',
-            'tipo':        'Tipo',
-            'departamento': 'Departamento',
-            'ciudad':      'Ciudad',
+            'facultad':    'Facultad *',
+            'nombre':      'Nombre de la Sede *',
+            'tipo':        'Tipo *',
+            'departamento': 'Departamento *',
+            'ciudad':      'Ciudad *',
             'direccion':   'Dirección',
             'telefono':    'Teléfono',
             'latitud':     'Latitud (coordenada Y)',
             'longitud':    'Longitud (coordenada X)',
+            'imagen_referencia': 'Imagen de referencia',
+            'descripcion': 'Descripción de la sede',
             'activa':      '¿Activa?',
         }

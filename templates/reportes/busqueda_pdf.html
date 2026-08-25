@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:Arial,sans-serif; font-size:9pt; color:#1a1a1a; padding:1.2cm; }
+
+    /* Encabezado institucional */
+    .encabezado {
+      border-bottom: 3px solid #0f1f3d;
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+    .enc-top { display:table; width:100%; }
+    .enc-izq  { display:table-cell; vertical-align:middle; }
+    .enc-der  { display:table-cell; vertical-align:middle; text-align:right; width:35%; }
+    .enc-izq h1 { font-size:13pt; color:#0f1f3d; margin-bottom:2px; }
+    .enc-izq p  { font-size:8pt; color:#555; margin:1px 0; }
+    .enc-der p  { font-size:8pt; color:#555; }
+
+    /* Sello institucional simulado */
+    .sello {
+      display:inline-block;
+      border:2px solid #0f1f3d;
+      border-radius:50%;
+      width:50px; height:50px;
+      text-align:center; line-height:50px;
+      font-size:8pt; font-weight:bold;
+      color:#0f1f3d;
+    }
+
+    /* Filtros aplicados */
+    .filtros {
+      background:#f0f4ff;
+      border-left:4px solid #0f1f3d;
+      padding:6px 10px;
+      margin-bottom:12px;
+      font-size:8pt;
+    }
+
+    /* Tabla */
+    table { width:100%; border-collapse:collapse; font-size:8pt; }
+    th {
+      background:#0f1f3d; color:#fff;
+      padding:5px 6px; text-align:left;
+    }
+    td { padding:4px 6px; border-bottom:1px solid #e0e0e0; }
+    tr:nth-child(even) td { background:#f0f4ff; }
+    .c { text-align:center; }
+
+    /* Badges */
+    .b-success  { color:#0a3622; background:#d1e7dd; padding:1px 6px; border-radius:8px; }
+    .b-warning  { color:#664d03; background:#fff3cd; padding:1px 6px; border-radius:8px; }
+    .b-danger   { color:#58151c; background:#f8d7da; padding:1px 6px; border-radius:8px; }
+    .b-primary  { color:#fff;    background:#0d6efd; padding:1px 6px; border-radius:8px; }
+    .b-secondary{ color:#fff;    background:#6c757d; padding:1px 6px; border-radius:8px; }
+    .b-dark     { color:#fff;    background:#212529; padding:1px 6px; border-radius:8px; }
+
+    /* Barra de progreso */
+    .barra-bg   { background:#e9ecef; height:8px; border-radius:4px; }
+    .barra-fill { background:#198754; height:8px; border-radius:4px; }
+
+    /* Pie */
+    .pie {
+      margin-top:16px; padding-top:8px;
+      border-top:1px solid #ccc;
+      font-size:7.5pt; color:#888; text-align:center;
+    }
+
+    /* Resumen numérico */
+    .resumen {
+      display:table; width:100%; margin-bottom:12px;
+    }
+    .res-cel {
+      display:table-cell; text-align:center;
+      border:1px solid #ddd; border-top:3px solid #0f1f3d;
+      padding:6px 4px;
+    }
+    .res-num { font-size:16pt; font-weight:bold; color:#0f1f3d; display:block; }
+    .res-lbl { font-size:7pt; color:#666; }
+  </style>
+</head>
+<body>
+
+  <!-- Encabezado institucional -->
+  <div class="encabezado">
+    <div class="enc-top">
+      <div class="enc-izq">
+        <h1>SIGCU Bolivia — Reporte de Carreras</h1>
+        <p>Sistema de Información para la Gestión Curricular Universitaria</p>
+        <p>Universidad Autónoma Tomás Frías — Potosí, Bolivia</p>
+        <p>Dirección de Servicios Académicos (DSA)</p>
+      </div>
+      <div class="enc-der">
+        <div class="sello">UATF<br>DSA</div>
+        <p style="margin-top:4px"><strong>Fecha:</strong> {{ fecha|date:"d/m/Y" }}</p>
+        <p><strong>Hora:</strong> {{ fecha|date:"H:i" }} hrs</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros aplicados -->
+  <div class="filtros">
+    <strong>Filtros aplicados:</strong>
+    {% if filtros.universidad %}Universidad: <strong>{{ filtros.universidad }}</strong> | {% endif %}
+    {% if filtros.carrera %}Carrera: <strong>{{ filtros.carrera }}</strong> | {% endif %}
+    {% if filtros.estado %}Proceso: <strong>{{ filtros.estado }}</strong> | {% endif %}
+    Total de resultados: <strong>{{ total }}</strong>
+  </div>
+
+  <!-- Resumen numérico -->
+  <div class="resumen">
+    <div class="res-cel">
+      <span class="res-num">{{ total }}</span>
+      <span class="res-lbl">Carreras encontradas</span>
+    </div>
+    <div class="res-cel">
+      <span class="res-num">
+        {% with c=0 %}
+        {{ resultados|length }}
+        {% endwith %}
+      </span>
+      <span class="res-lbl">Con proceso registrado</span>
+    </div>
+  </div>
+
+  <!-- Tabla de resultados -->
+  <table>
+    <thead>
+      <tr>
+        <th style="width:4%">N°</th>
+        <th style="width:8%">Univ.</th>
+        <th style="width:22%">Carrera</th>
+        <th style="width:8%">Grado</th>
+        <th style="width:8%">Ciudad</th>
+        <th style="width:14%">Tipo Proceso</th>
+        <th style="width:10%">Estado Proc.</th>
+        <th style="width:12%">Avance Fases</th>
+        <th style="width:14%">Fase Actual</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in resultados %}
+      <tr>
+        <td class="c">{{ forloop.counter }}</td>
+        <td class="c">
+          <span class="b-dark">{{ r.carrera.sede.facultad.universidad.sigla }}</span>
+        </td>
+        <td>
+          <strong>{{ r.carrera.nombre }}</strong><br>
+          <small style="color:#555">{{ r.carrera.get_grado_display }}</small>
+        </td>
+        <td>{{ r.carrera.get_grado_display }}</td>
+        <td>{{ r.carrera.sede.ciudad }}</td>
+        <td>
+          {% if r.ultimo_proceso %}
+            <span class="b-primary">{{ r.ultimo_proceso.get_tipo_proceso_display }}</span>
+          {% else %}
+            <span class="b-secondary">Sin proceso</span>
+          {% endif %}
+        </td>
+        <td class="c">
+          {% if r.ultimo_proceso %}
+            {% if r.ultimo_proceso.estado == 'EN_PROCESO' %}
+              <span class="b-warning">En Proceso</span>
+            {% elif r.ultimo_proceso.estado == 'CONCLUIDO' %}
+              <span class="b-success">Concluido</span>
+            {% else %}
+              <span class="b-secondary">Archivado</span>
+            {% endif %}
+          {% else %}—{% endif %}
+        </td>
+        <td>
+          {% if r.total_fases > 0 %}
+          <small>{{ r.fases_ok }}/{{ r.total_fases }}
+            ({% widthratio r.fases_ok r.total_fases 100 %}%)</small>
+          <div class="barra-bg">
+            <div class="barra-fill"
+                 style="width:{% widthratio r.fases_ok r.total_fases 100 %}%">
+            </div>
+          </div>
+          {% else %}—{% endif %}
+        </td>
+        <td>
+          {% if r.fase_actual %}
+            <strong>{{ r.fase_actual.tipo_fase.codigo }}</strong>
+            — {{ r.fase_actual.tipo_fase.nombre|truncatechars:20 }}
+          {% else %}
+            {% if r.ultimo_proceso %}Todas completadas{% else %}—{% endif %}
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="9" style="text-align:center; color:#888; padding:12px">
+          No se encontraron resultados.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="pie">
+    SIGCU Bolivia · DSA-UATF Potosí ·
+    Reporte generado el {{ fecha|date:"d/m/Y \a \l\a\s H:i" }} hrs ·
+    Documento de uso interno institucional
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,223 @@
+{% extends 'base/base.html' %}
+{% block title %}Buscador de Carreras — SIGCU Bolivia{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb-sigcu">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'vista-estadisticas' %}">Reportes</a></li>
+    <li class="breadcrumb-item active">Buscador de Carreras</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-3 align-items-center">
+  <div class="col">
+    <h4><i class="bi bi-search me-2"></i>Buscador de Carreras por Proceso</h4>
+    <p class="text-muted mb-0">
+      Consulta el estado específico de cada carrera y su proceso curricular.
+    </p>
+  </div>
+</div>
+
+<!-- Filtros -->
+<div class="card mb-4 border-0 shadow-sm">
+  <div class="card-header bg-dark text-white">
+    <i class="bi bi-funnel me-2"></i>Filtros de búsqueda
+  </div>
+  <div class="card-body">
+    <form method="get" class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label fw-bold">Universidad</label>
+        <select name="universidad" class="form-select">
+          <option value="">-- Todas las universidades --</option>
+          {% for u in universidades %}
+          <option value="{{ u.pk }}"
+            {% if q_universidad == u.pk|stringformat:"s" %}selected{% endif %}>
+            {{ u.sigla }} — {{ u.nombre }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-bold">Nombre de carrera</label>
+        <input type="text" name="carrera" value="{{ q_carrera }}"
+               class="form-control"
+               placeholder="Ej: Derecho, Informática, Medicina...">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label fw-bold">Estado del proceso</label>
+        <select name="estado_proceso" class="form-select">
+          <option value="">-- Todos --</option>
+          {% for val, label in tipos_proceso %}
+          <option value="{{ val }}"
+            {% if q_estado == val %}selected{% endif %}>
+            {{ label }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 d-flex gap-2">
+        <button type="submit" class="btn btn-dark">
+          <i class="bi bi-search me-1"></i>Buscar
+        </button>
+        <a href="{% url 'buscador-carreras' %}"
+           class="btn btn-outline-secondary">
+          <i class="bi bi-x-circle me-1"></i>Limpiar filtros
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if con_filtro %}
+<!-- Resultados -->
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+    <span>
+      <i class="bi bi-list-ul me-2"></i>
+      Resultados
+      <span class="badge bg-secondary ms-2">{{ total }}</span>
+    </span>
+    {% if resultados %}
+    <div class="d-flex gap-2">
+      <a href="{% url 'busqueda-excel' %}?{{ request.GET.urlencode }}"
+         class="btn btn-success btn-sm">
+        <i class="bi bi-file-earmark-excel me-1"></i>Excel
+      </a>
+      <a href="{% url 'busqueda-pdf' %}?{{ request.GET.urlencode }}"
+         class="btn btn-danger btn-sm">
+        <i class="bi bi-file-earmark-pdf me-1"></i>PDF
+      </a>
+    </div>
+    {% endif %}
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover table-sm mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>N°</th>
+            <th>Universidad</th>
+            <th>Carrera</th>
+            <th>Grado</th>
+            <th>Ciudad</th>
+            <th>Tipo proceso</th>
+            <th>Estado proceso</th>
+            <th>Avance fases</th>
+            <th>Fase actual</th>
+            <th>Último plan</th>
+            <th>Estado rediseño</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in resultados %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+              <span class="badge bg-dark">
+                {{ r.carrera.sede.facultad.universidad.sigla }}
+              </span>
+            </td>
+            <td>
+              <strong>{{ r.carrera.nombre }}</strong>
+              <br>
+              <small class="text-muted">
+                {{ r.carrera.sede.facultad.nombre|truncatechars:30 }}
+              </small>
+            </td>
+            <td><small>{{ r.carrera.get_grado_display }}</small></td>
+            <td><small>{{ r.carrera.sede.ciudad }}</small></td>
+            <td>
+              {% if r.ultimo_proceso %}
+              <span class="badge bg-primary">
+                {{ r.ultimo_proceso.get_tipo_proceso_display }}
+              </span>
+              {% else %}
+              <span class="badge bg-light text-dark">Sin proceso</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if r.ultimo_proceso %}
+                {% if r.ultimo_proceso.estado == 'EN_PROCESO' %}
+                  <span class="badge bg-warning text-dark">En Proceso</span>
+                {% elif r.ultimo_proceso.estado == 'CONCLUIDO' %}
+                  <span class="badge bg-success">Concluido</span>
+                {% else %}
+                  <span class="badge bg-secondary">Archivado</span>
+                {% endif %}
+              {% else %}
+              <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if r.total_fases > 0 %}
+              <div style="min-width:80px">
+                <div class="d-flex justify-content-between mb-1">
+                  <small>{{ r.fases_ok }}/{{ r.total_fases }}</small>
+                  <small>{% widthratio r.fases_ok r.total_fases 100 %}%</small>
+                </div>
+                <div class="progress" style="height:8px">
+                  <div class="progress-bar bg-success"
+                       style="width:{% widthratio r.fases_ok r.total_fases 100 %}%">
+                  </div>
+                </div>
+              </div>
+              {% else %}
+              <small class="text-muted">—</small>
+              {% endif %}
+            </td>
+            <td>
+              {% if r.fase_actual %}
+              <small>
+                <strong>{{ r.fase_actual.tipo_fase.codigo }}</strong>
+                — {{ r.fase_actual.tipo_fase.nombre|truncatechars:25 }}
+              </small>
+              {% else %}
+              <small class="text-muted">
+                {% if r.ultimo_proceso %}Completado{% else %}—{% endif %}
+              </small>
+              {% endif %}
+            </td>
+            <td>
+              <small>
+                {{ r.ultimo_plan.anio_aprobacion|default:"—" }}
+              </small>
+            </td>
+            <td>
+              {% if r.estado_rediseno == 'VENCIDO' %}
+                <span class="badge bg-danger">Vencido</span>
+              {% elif r.estado_rediseno == 'PROXIMO' %}
+                <span class="badge bg-warning text-dark">Próximo</span>
+              {% elif r.estado_rediseno == 'VIGENTE' %}
+                <span class="badge bg-success">Vigente</span>
+              {% else %}
+                <span class="badge bg-secondary">Sin datos</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="11" class="text-center text-muted py-5">
+              <i class="bi bi-search" style="font-size:2rem"></i>
+              <p class="mt-2">No se encontraron carreras con los filtros aplicados.</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% else %}
+<!-- Estado inicial sin búsqueda -->
+<div class="text-center py-5 text-muted">
+  <i class="bi bi-search" style="font-size:3.5rem; opacity:.3"></i>
+  <h5 class="mt-3">Usa los filtros de arriba para buscar carreras</h5>
+  <p>Puedes filtrar por universidad, nombre de carrera o tipo de proceso curricular.</p>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,45 +1,72 @@
 {% extends 'base/base.html' %}
 {% block title %}{{ titulo }} — SIGCU Bolivia{% endblock %}
 
+{% block breadcrumb %}
+<nav class="breadcrumb-sigcu">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lista-sedes' %}">Sedes</a></li>
+    {% if objeto %}
+    <li class="breadcrumb-item">
+      <a href="{% url 'detalle-sede-ciudad' objeto.ciudad %}">{{ objeto.ciudad }}</a>
+    </li>
+    {% endif %}
+    <li class="breadcrumb-item active">{{ titulo }}</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block content %}
 <div class="row justify-content-center mt-3">
-  <div class="col-md-8">
+  <div class="col-md-9">
     <div class="card shadow">
       <div class="card-header bg-dark text-white">
-        <strong>{{ titulo }}</strong>
+        <strong><i class="bi bi-geo-alt me-2"></i>{{ titulo }}</strong>
       </div>
       <div class="card-body p-4">
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
           {% csrf_token %}
           <div class="row g-3">
+
+            <!-- Facultad -->
             <div class="col-12">
-              <label class="form-label">{{ form.facultad.label }} *</label>
+              <label class="form-label">{{ form.facultad.label }}</label>
               {{ form.facultad }}
             </div>
+
+            <!-- Nombre y Tipo -->
             <div class="col-md-8">
-              <label class="form-label">{{ form.nombre.label }} *</label>
+              <label class="form-label">{{ form.nombre.label }}</label>
               {{ form.nombre }}
             </div>
             <div class="col-md-4">
-              <label class="form-label">{{ form.tipo.label }} *</label>
+              <label class="form-label">{{ form.tipo.label }}</label>
               {{ form.tipo }}
             </div>
+
+            <!-- Departamento y Ciudad -->
             <div class="col-md-6">
-              <label class="form-label">{{ form.departamento.label }} *</label>
+              <label class="form-label">{{ form.departamento.label }}</label>
               {{ form.departamento }}
             </div>
             <div class="col-md-6">
-              <label class="form-label">{{ form.ciudad.label }} *</label>
+              <label class="form-label">{{ form.ciudad.label }}</label>
               {{ form.ciudad }}
             </div>
+
+            <!-- Dirección -->
             <div class="col-12">
               <label class="form-label">{{ form.direccion.label }}</label>
               {{ form.direccion }}
             </div>
+
+            <!-- Teléfono -->
             <div class="col-md-6">
               <label class="form-label">{{ form.telefono.label }}</label>
               {{ form.telefono }}
             </div>
+
+            <!-- Coordenadas -->
             <div class="col-md-3">
               <label class="form-label">{{ form.latitud.label }}</label>
               {{ form.latitud }}
@@ -49,35 +76,103 @@
               {{ form.longitud }}
             </div>
 
-            <!-- Mini mapa para elegir coordenadas visualmente -->
+            <!-- Mapa interactivo para elegir coordenadas -->
             <div class="col-12">
-              <label class="form-label">
-                📍 Clic en el mapa para capturar coordenadas automáticamente
+              <label class="form-label fw-bold">
+                <i class="bi bi-map me-1"></i>
+                Seleccionar coordenadas en el mapa
               </label>
-              <div id="mapa-selector" style="height:300px; border-radius:8px;
-                   border:1px solid #ccc;"></div>
+              <div class="alert alert-info py-2 mb-2">
+                <small>
+                  <i class="bi bi-info-circle me-1"></i>
+                  Haz clic en el mapa para capturar la latitud y longitud automáticamente.
+                  También puedes escribir las coordenadas directamente arriba.
+                </small>
+              </div>
+              <div id="mapa-selector"
+                   style="height:320px; border-radius:8px; border:1px solid #ccc;">
+              </div>
             </div>
 
+            <!-- Descripción -->
+            <div class="col-12">
+              <label class="form-label">{{ form.descripcion.label }}</label>
+              {{ form.descripcion }}
+              <small class="text-muted">
+                Historia, servicios, horarios u otra información relevante de la sede.
+              </small>
+            </div>
+
+            <!-- Imagen de referencia -->
+            <div class="col-12">
+              <label class="form-label">
+                <i class="bi bi-image me-1"></i>{{ form.imagen_referencia.label }}
+              </label>
+              {{ form.imagen_referencia }}
+              <small class="text-muted d-block mt-1">
+                Formatos aceptados: JPG, PNG, WEBP. Recomendado: foto del edificio
+                o campus de la sede.
+              </small>
+              {% if objeto.imagen_referencia %}
+              <div class="mt-2 p-2 bg-light rounded d-flex align-items-center gap-3">
+                <img src="{{ objeto.imagen_referencia.url }}"
+                     style="max-height:100px; border-radius:6px; object-fit:cover"
+                     alt="Imagen actual">
+                <div>
+                  <small class="text-muted d-block">Imagen actual</small>
+                  <a href="{{ objeto.imagen_referencia.url }}"
+                     target="_blank" class="btn btn-outline-secondary btn-sm mt-1">
+                    <i class="bi bi-eye me-1"></i>Ver imagen completa
+                  </a>
+                  <small class="text-muted d-block mt-1">
+                    Sube una nueva imagen para reemplazarla.
+                  </small>
+                </div>
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Activa -->
             <div class="col-12">
               <div class="form-check">
                 {{ form.activa }}
                 <label class="form-check-label">{{ form.activa.label }}</label>
               </div>
             </div>
+
           </div>
+
+          <!-- Errores -->
           {% if form.errors %}
-            <div class="alert alert-danger mt-3">
-              {% for field in form %}{% for error in field.errors %}
-                <div>{{ field.label }}: {{ error }}</div>
-              {% endfor %}{% endfor %}
-            </div>
+          <div class="alert alert-danger mt-3">
+            {% for field in form %}
+              {% for error in field.errors %}
+                <div><strong>{{ field.label }}:</strong> {{ error }}</div>
+              {% endfor %}
+            {% endfor %}
+          </div>
           {% endif %}
+
+          <!-- Botones -->
           <div class="d-flex gap-2 mt-4">
-            <button type="submit" class="btn btn-dark">{{ accion }}</button>
-            <a href="{% url 'lista-sedes' %}" class="btn btn-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-dark">
+              <i class="bi bi-check2 me-1"></i>{{ accion }}
+            </button>
             {% if objeto %}
+            <a href="{% url 'detalle-sede-ciudad' objeto.ciudad %}"
+               class="btn btn-secondary">
+              <i class="bi bi-arrow-left me-1"></i>Cancelar
+            </a>
+            {% else %}
+            <a href="{% url 'lista-sedes' %}" class="btn btn-secondary">
+              <i class="bi bi-arrow-left me-1"></i>Cancelar
+            </a>
+            {% endif %}
+            {% if objeto and user.es_admin %}
             <a href="{% url 'eliminar-sede' objeto.pk %}"
-               class="btn btn-outline-danger ms-auto">Eliminar</a>
+               class="btn btn-outline-danger ms-auto">
+              <i class="bi bi-trash me-1"></i>Eliminar sede
+            </a>
             {% endif %}
           </div>
         </form>
@@ -89,30 +184,62 @@
 
 {% block scripts %}
 <script>
-  // Mapa selector de coordenadas
   const latInput = document.getElementById('id_latitud');
   const lonInput = document.getElementById('id_longitud');
 
+  // Centro inicial: coordenadas actuales o centro de Bolivia
   const lat0 = parseFloat(latInput.value) || -16.5;
   const lon0 = parseFloat(lonInput.value) || -64.5;
+  const zoom0 = (latInput.value && lonInput.value) ? 13 : 6;
 
-  const map = L.map('mapa-selector').setView([lat0, lon0], 6);
+  const map = L.map('mapa-selector').setView([lat0, lon0], zoom0);
+
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap'
+    attribution: '© OpenStreetMap contributors'
   }).addTo(map);
 
+  // Marcador inicial si ya hay coordenadas
   let marker = null;
   if (latInput.value && lonInput.value) {
-    marker = L.marker([lat0, lon0]).addTo(map);
+    marker = L.marker([lat0, lon0]).addTo(map)
+      .bindPopup(
+        `<b>Ubicación actual</b><br>
+         Lat: ${lat0.toFixed(6)}<br>
+         Lon: ${lon0.toFixed(6)}`
+      ).openPopup();
   }
 
+  // Clic en el mapa → actualiza inputs y marcador
   map.on('click', function(e) {
     const { lat, lng } = e.latlng;
+
     latInput.value = lat.toFixed(6);
     lonInput.value = lng.toFixed(6);
+
     if (marker) map.removeLayer(marker);
     marker = L.marker([lat, lng]).addTo(map)
-      .bindPopup(`Lat: ${lat.toFixed(4)}, Lon: ${lng.toFixed(4)}`).openPopup();
+      .bindPopup(
+        `<b>Nueva ubicación</b><br>
+         Lat: ${lat.toFixed(6)}<br>
+         Lon: ${lng.toFixed(6)}`
+      ).openPopup();
   });
+
+  // Si el usuario escribe las coordenadas manualmente → mover el mapa
+  function actualizarMapaDesdeInputs() {
+    const lat = parseFloat(latInput.value);
+    const lon = parseFloat(lonInput.value);
+    if (!isNaN(lat) && !isNaN(lon)) {
+      map.setView([lat, lon], 13);
+      if (marker) map.removeLayer(marker);
+      marker = L.marker([lat, lon]).addTo(map)
+        .bindPopup(
+          `<b>Ubicación</b><br>Lat: ${lat.toFixed(6)}<br>Lon: ${lon.toFixed(6)}`
+        ).openPopup();
+    }
+  }
+
+  latInput.addEventListener('change', actualizarMapaDesdeInputs);
+  lonInput.addEventListener('change', actualizarMapaDesdeInputs);
 </script>
 {% endblock %}

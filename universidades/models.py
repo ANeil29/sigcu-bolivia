@@ -57,18 +57,46 @@ class Sede(models.Model):
     ciudad       = models.CharField(max_length=100)
     direccion    = models.TextField(blank=True)
     telefono     = models.CharField(max_length=80, blank=True)
+    latitud      = models.FloatField(null=True, blank=True)
+    longitud     = models.FloatField(null=True, blank=True)
+    activa       = models.BooleanField(default=True)
 
-    # ── Georreferenciación ────────────────────────────────────────────────────
-    # Se usan dos FloatField simples en lugar de PointField (GeoDjango).
-    # Leaflet.js consume estos valores directamente para colocar el marcador
-    # en el mapa. Ejemplo de valores para Potosí: latitud=-19.5836, longitud=-65.7531
-    latitud  = models.FloatField(null=True, blank=True,
-                                  help_text='Coordenada Y (ej: -19.5836 para Potosí)')
-    longitud = models.FloatField(null=True, blank=True,
-                                  help_text='Coordenada X (ej: -65.7531 para Potosí)')
+    imagen_referencia = models.ImageField(
+        upload_to='sedes/imagenes/%Y/',
+        null=True, blank=True,
+        help_text='Foto del edificio, campus, entrada u otra imagen de referencia'
+    )
+    descripcion  = models.TextField(
+        blank=True,
+        help_text='Descripción general de la sede, historia, servicios, etc.'
+    )
 
-    activa  = models.BooleanField(default=True)
-    history = HistoricalRecords()
+    history      = HistoricalRecords()
+
+    class Meta:
+        verbose_name = 'Sede'
+        verbose_name_plural = 'Sedes'
+        ordering = ['departamento', 'ciudad']
+
+    def __str__(self):
+        return f"{self.nombre} ({self.ciudad})"
+
+    @property
+    def tiene_coordenadas(self):
+        return self.latitud is not None and self.longitud is not None
+
+    @property
+    def google_maps_url(self):
+        if self.tiene_coordenadas:
+            return f"https://www.google.com/maps?q={self.latitud},{self.longitud}"
+        return None
+
+    @property
+    def total_carreras(self):
+        from carreras.models import Carrera
+        return Carrera.objects.filter(
+            sede=self, en_funcionamiento=True
+        ).count()
 
     class Meta:
         verbose_name = 'Sede'

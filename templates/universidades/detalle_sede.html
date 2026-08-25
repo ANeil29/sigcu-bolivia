@@ -1,0 +1,350 @@
+{% extends 'base/base.html' %}
+{% block title %}Sede {{ ciudad }} — SIGCU Bolivia{% endblock %}
+
+{% block breadcrumb %}
+<nav class="breadcrumb-sigcu">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'lista-sedes' %}">Sedes</a></li>
+    <li class="breadcrumb-item active">{{ ciudad }}</li>
+  </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+
+<!-- Encabezado -->
+<div class="row mb-3 align-items-center">
+  <div class="col">
+    <h4><i class="bi bi-geo-alt me-2"></i>Sede — {{ ciudad }}</h4>
+    <p class="text-muted mb-0">
+      {{ universidad.nombre }} ·
+      <span class="badge bg-dark">{{ universidad.sigla }}</span>
+    </p>
+  </div>
+  <div class="col-auto d-flex gap-2">
+    {% if sede_con_coords %}
+    <a href="{{ sede_con_coords.google_maps_url }}"
+       target="_blank"
+       class="btn btn-outline-danger btn-sm">
+      <i class="bi bi-map me-1"></i>Abrir en Google Maps
+    </a>
+    {% endif %}
+    {% if user.puede_editar %}
+    <div class="dropdown">
+      <button class="btn btn-dark btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+        <i class="bi bi-pencil me-1"></i>Editar
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        {% for sede in sedes %}
+        <li>
+          <a class="dropdown-item" href="{% url 'editar-sede' sede.pk %}">
+            <i class="bi bi-building me-2"></i>{{ sede.facultad.sigla }} — {{ sede.nombre }}
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    <a href="{% url 'lista-sedes' %}" class="btn btn-secondary btn-sm">
+      <i class="bi bi-arrow-left me-1"></i>Volver
+    </a>
+  </div>
+</div>
+
+<!-- Fila principal: info + mapa -->
+<div class="row g-3 mb-4">
+
+  <!-- Columna izquierda: datos de la sede -->
+  <div class="col-md-5">
+
+    <!-- Tarjetas estadísticas -->
+    <div class="row g-2 mb-3">
+      <div class="col-6">
+        <div class="card text-center border-0 bg-primary bg-opacity-10">
+          <div class="card-body py-2">
+            <div class="fs-2 fw-bold text-primary">{{ total_carreras }}</div>
+            <small class="text-muted">Carrera{{ total_carreras|pluralize }}</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="card text-center border-0 bg-secondary bg-opacity-10">
+          <div class="card-body py-2">
+            <div class="fs-2 fw-bold text-secondary">{{ sedes.count }}</div>
+            <small class="text-muted">Facultad{{ sedes.count|pluralize }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Registros de sede por facultad -->
+    {% for sede in sedes %}
+    <div class="card mb-2">
+      <div class="card-header bg-dark text-white py-2">
+        <small class="fw-bold">
+          <i class="bi bi-building me-1"></i>
+          {{ sede.facultad.nombre }}
+        </small>
+        <span class="badge bg-secondary float-end">{{ sede.get_tipo_display }}</span>
+      </div>
+      <div class="card-body py-2">
+        <div class="row g-1">
+          {% if sede.direccion %}
+          <div class="col-12">
+            <small class="text-muted">
+              <i class="bi bi-pin-map me-1"></i>{{ sede.direccion }}
+            </small>
+          </div>
+          {% endif %}
+          {% if sede.telefono %}
+          <div class="col-12">
+            <small class="text-muted">
+              <i class="bi bi-telephone me-1"></i>{{ sede.telefono }}
+            </small>
+          </div>
+          {% endif %}
+          {% if sede.latitud and sede.longitud %}
+          <div class="col-12">
+            <small class="text-success">
+              <i class="bi bi-geo-alt me-1"></i>
+              {{ sede.latitud|floatformat:4 }}, {{ sede.longitud|floatformat:4 }}
+            </small>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% if user.puede_editar %}
+      <div class="card-footer bg-transparent py-1 text-end">
+        <a href="{% url 'editar-sede' sede.pk %}"
+           class="btn btn-outline-primary btn-sm">
+          <i class="bi bi-pencil"></i> Editar
+        </a>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+
+    <!-- Imágenes de referencia -->
+    {% if imagenes %}
+    <div class="card mt-2">
+      <div class="card-header bg-dark text-white py-2">
+        <small class="fw-bold">
+          <i class="bi bi-images me-1"></i>Imágenes de referencia
+        </small>
+      </div>
+      <div class="card-body p-2">
+        <div class="row g-2">
+          {% for img in imagenes %}
+          <div class="col-6">
+            <a href="{{ img.imagen_referencia.url }}" target="_blank">
+              <img src="{{ img.imagen_referencia.url }}"
+                   class="img-fluid rounded"
+                   style="height:100px; width:100%; object-fit:cover"
+                   alt="{{ img.nombre }}">
+            </a>
+            <small class="text-muted d-block text-center mt-1"
+                   style="font-size:.7rem">
+              {{ img.facultad.sigla }}
+            </small>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- Columna derecha: mapa -->
+  <div class="col-md-7">
+    <div class="card h-100">
+      <div class="card-header bg-dark text-white d-flex justify-content-between">
+        <span>
+          <i class="bi bi-map me-2"></i>Georreferenciación — {{ ciudad }}
+        </span>
+        {% if sede_con_coords %}
+        <a href="{{ sede_con_coords.google_maps_url }}"
+           target="_blank"
+           class="btn btn-outline-light btn-sm">
+          <i class="bi bi-box-arrow-up-right me-1"></i>Google Maps
+        </a>
+        {% endif %}
+      </div>
+      <div class="card-body p-0">
+        {% if coords_sedes %}
+        <div id="mapa-sede" style="height:420px; border-radius:0 0 10px 10px"></div>
+        {% else %}
+        <div class="d-flex flex-column align-items-center justify-content-center
+                    text-muted" style="height:420px">
+          <i class="bi bi-geo" style="font-size:3rem"></i>
+          <p class="mt-2">Esta sede no tiene coordenadas registradas.</p>
+          {% if user.puede_editar %}
+          {% for sede in sedes %}
+          <a href="{% url 'editar-sede' sede.pk %}"
+             class="btn btn-outline-dark btn-sm mt-1">
+            Agregar coordenadas — {{ sede.facultad.sigla }}
+          </a>
+          {% endfor %}
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Carreras en esta sede -->
+<div class="card">
+  <div class="card-header bg-dark text-white">
+    <i class="bi bi-journal-bookmark me-2"></i>
+    Carreras en {{ ciudad }}
+    <span class="badge bg-secondary ms-2">{{ total_carreras }}</span>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover table-sm mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Facultad</th>
+            <th>Carrera</th>
+            <th>Grado</th>
+            <th>Dirección sede</th>
+            <th>Teléfono</th>
+            <th>Estado rediseño</th>
+            {% if user.puede_editar %}<th></th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for nombre_sede, lista in carreras_por_sede.items %}
+            <!-- Separador por facultad -->
+            <tr class="table-secondary">
+              <td colspan="{% if user.puede_editar %}7{% else %}6{% endif %}"
+                  class="py-1">
+                <small class="fw-bold text-dark">
+                  <i class="bi bi-building me-1"></i>{{ nombre_sede }}
+                </small>
+              </td>
+            </tr>
+            {% for carrera in lista %}
+            <tr>
+              <td>
+                <small>{{ carrera.sede.facultad.sigla }}</small>
+              </td>
+              <td>
+                <strong>{{ carrera.nombre }}</strong>
+                {% if carrera.programa %}
+                <br><small class="text-muted">{{ carrera.programa }}</small>
+                {% endif %}
+              </td>
+              <td>{{ carrera.get_grado_display }}</td>
+              <td>
+                <small>{{ carrera.sede.direccion|default:"—" }}</small>
+              </td>
+              <td>
+                {% if carrera.sede.telefono %}
+                <small>
+                  <i class="bi bi-telephone me-1"></i>{{ carrera.sede.telefono }}
+                </small>
+                {% else %}
+                <small class="text-muted">—</small>
+                {% endif %}
+              </td>
+              <td>
+                {% if carrera.estado_rediseno == 'VENCIDO' %}
+                  <span class="badge bg-danger">Vencido</span>
+                {% elif carrera.estado_rediseno == 'PROXIMO' %}
+                  <span class="badge bg-warning text-dark">Próximo</span>
+                {% elif carrera.estado_rediseno == 'VIGENTE' %}
+                  <span class="badge bg-success">Vigente</span>
+                {% else %}
+                  <span class="badge bg-secondary">Sin datos</span>
+                {% endif %}
+              </td>
+              {% if user.puede_editar %}
+              <td>
+                <a href="{% url 'editar-carrera' carrera.pk %}"
+                   class="btn btn-outline-primary btn-sm">
+                  <i class="bi bi-pencil"></i>
+                </a>
+              </td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+          {% empty %}
+          <tr>
+            <td colspan="{% if user.puede_editar %}7{% else %}6{% endif %}"
+                class="text-center text-muted py-4">
+              No hay carreras registradas en esta sede.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{% if coords_sedes %}
+<script>
+  // Datos de coordenadas pasados desde Django
+  const coordsSedes = {{ coords_sedes|safe }};
+
+  // Centrar el mapa en la primera sede con coordenadas
+  const lat0 = coordsSedes[0].lat;
+  const lon0 = coordsSedes[0].lon;
+
+  const map = L.map('mapa-sede').setView([lat0, lon0], 13);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  // Marcador personalizado
+  const iconoSede = L.divIcon({
+    className: '',
+    html: `<div style="
+      background:#0f1f3d; color:white; border-radius:50%;
+      width:32px; height:32px; display:flex; align-items:center;
+      justify-content:center; font-size:1rem; border:2px solid #e8a020;
+      box-shadow:0 2px 6px rgba(0,0,0,.4)">
+      <i class="bi bi-building"></i>
+    </div>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+  });
+
+  // Agregar marcador por cada sede con coords
+  const bounds = [];
+  coordsSedes.forEach(s => {
+    if (s.lat && s.lon) {
+      const marker = L.marker([s.lat, s.lon], {icon: iconoSede}).addTo(map);
+      marker.bindPopup(`
+        <div style="min-width:200px">
+          <strong style="color:#0f1f3d">${s.facultad}</strong><br>
+          <small>${s.nombre}</small><br>
+          ${s.direccion ? `<small><i class="bi bi-pin-map"></i> ${s.direccion}</small><br>` : ''}
+          ${s.telefono ? `<small><i class="bi bi-telephone"></i> ${s.telefono}</small><br>` : ''}
+          <small style="color:#888">${s.lat.toFixed(4)}, ${s.lon.toFixed(4)}</small><br>
+          <a href="https://www.google.com/maps?q=${s.lat},${s.lon}"
+             target="_blank"
+             style="color:#dc3545; font-size:.8rem">
+            Abrir en Google Maps →
+          </a>
+        </div>
+      `);
+      bounds.push([s.lat, s.lon]);
+    }
+  });
+
+  // Ajustar zoom para mostrar todos los marcadores
+  if (bounds.length > 1) {
+    map.fitBounds(bounds, {padding: [30, 30]});
+  }
+</script>
+{% endif %}
+{% endblock %}

@@ -1,71 +1,137 @@
 {% extends 'base/base.html' %}
 {% block title %}Sedes — SIGCU Bolivia{% endblock %}
 
+{% block breadcrumb %}
+<nav class="breadcrumb-sigcu">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+    <li class="breadcrumb-item">Institucional</li>
+    <li class="breadcrumb-item active">Sedes</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block content %}
 <div class="row mb-3 align-items-center">
-  <div class="col"><h4>Sedes</h4></div>
-  <div class="col-auto">
+  <div class="col">
+    <h4><i class="bi bi-geo-alt me-2"></i>Sedes Universitarias</h4>
+    <p class="text-muted mb-0">
+      {{ total_ciudades }} sede{{ total_ciudades|pluralize }} registrada{{ total_ciudades|pluralize }}.
+      Haz clic en una sede para ver su información detallada.
+    </p>
+  </div>
+  <div class="col-auto d-flex gap-2">
+    <a href="{% url 'mapa' %}" class="btn btn-outline-dark btn-sm">
+      <i class="bi bi-map me-1"></i>Ver en mapa
+    </a>
     {% if user.puede_editar %}
-    <a href="{% url 'crear-sede' %}" class="btn btn-dark btn-sm">+ Nueva Sede</a>
+    <a href="{% url 'crear-sede' %}" class="btn btn-dark btn-sm">
+      <i class="bi bi-plus-circle me-1"></i>Nueva Sede
+    </a>
     {% endif %}
   </div>
 </div>
 
 {% for message in messages %}
-  <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
-    {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-  </div>
+<div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+  {{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
 {% endfor %}
 
-<div class="table-responsive">
-  <table class="table table-striped table-hover table-sm">
-    <thead class="table-dark">
-      <tr>
-        <th>Universidad</th><th>Facultad</th><th>Sede</th><th>Tipo</th>
-        <th>Departamento</th><th>Ciudad</th><th>Coordenadas</th>
-        <th>Estado</th>{% if user.puede_editar %}<th>Acciones</th>{% endif %}
-      </tr>
-    </thead>
-    <tbody>
-      {% for s in sedes %}
-      <tr>
-        <td>{{ s.facultad.universidad.sigla }}</td>
-        <td>{{ s.facultad.nombre }}</td>
-        <td>{{ s.nombre }}</td>
-        <td>{{ s.get_tipo_display }}</td>
-        <td>{{ s.departamento }}</td>
-        <td>{{ s.ciudad }}</td>
-        <td>
-          {% if s.latitud and s.longitud %}
-            <span class="badge bg-success">✓ {{ s.latitud|floatformat:2 }}, {{ s.longitud|floatformat:2 }}</span>
-          {% else %}
-            <span class="badge bg-warning text-dark">Sin coords</span>
-          {% endif %}
-        </td>
-        <td>
-          {% if s.activa %}
-            <span class="badge bg-success">Activa</span>
-          {% else %}
-            <span class="badge bg-danger">Inactiva</span>
-          {% endif %}
-        </td>
-        {% if user.puede_editar %}
-        <td>
-          <a href="{% url 'editar-sede' s.pk %}"
-             class="btn btn-outline-primary btn-sm">Editar</a>
-          {% if user.es_admin %}
-          <a href="{% url 'eliminar-sede' s.pk %}"
-             class="btn btn-outline-danger btn-sm">Eliminar</a>
-          {% endif %}
-        </td>
+<!-- Tarjetas de sedes por ciudad -->
+<div class="row g-3">
+  {% for s in sedes_por_ciudad %}
+  <div class="col-md-6 col-lg-4">
+    <a href="{% url 'detalle-sede-ciudad' s.ciudad %}"
+       class="text-decoration-none">
+      <div class="card h-100 shadow-sm sede-card"
+           style="transition: transform .15s, box-shadow .15s; cursor:pointer">
+
+        <!-- Imagen de referencia o placeholder -->
+        {% if s.imagen and s.imagen.imagen_referencia %}
+        <img src="{{ s.imagen.imagen_referencia.url }}"
+             class="card-img-top"
+             style="height:160px; object-fit:cover"
+             alt="Sede {{ s.ciudad }}">
+        {% else %}
+        <div class="d-flex align-items-center justify-content-center bg-dark"
+             style="height:160px">
+          <i class="bi bi-building text-white opacity-25"
+             style="font-size:4rem"></i>
+        </div>
         {% endif %}
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="9" class="text-center text-muted py-3">No hay sedes registradas.</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+
+        <div class="card-body">
+          <!-- Ciudad y departamento -->
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <h5 class="card-title mb-0 text-dark">{{ s.ciudad }}</h5>
+              <small class="text-muted">
+                <i class="bi bi-geo me-1"></i>{{ s.departamento }}, Bolivia
+              </small>
+            </div>
+            <span class="badge bg-dark">{{ s.universidad.sigla }}</span>
+          </div>
+
+          <!-- Estadísticas -->
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <div class="p-2 bg-light rounded text-center">
+                <div class="fw-bold text-primary fs-5">{{ s.total_carreras }}</div>
+                <small class="text-muted">Carrera{{ s.total_carreras|pluralize }}</small>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-2 bg-light rounded text-center">
+                <div class="fw-bold text-secondary fs-5">{{ s.total_facultades }}</div>
+                <small class="text-muted">Facultad{{ s.total_facultades|pluralize }}</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Indicadores -->
+          <div class="d-flex gap-2 flex-wrap">
+            {% if s.tiene_coords %}
+            <span class="badge bg-success">
+              <i class="bi bi-geo-alt me-1"></i>Georreferenciada
+            </span>
+            {% else %}
+            <span class="badge bg-warning text-dark">
+              <i class="bi bi-geo me-1"></i>Sin coordenadas
+            </span>
+            {% endif %}
+            <span class="badge bg-secondary">
+              {{ s.total_sedes }} registro{{ s.total_sedes|pluralize }}
+            </span>
+          </div>
+        </div>
+
+        <div class="card-footer bg-transparent border-0 text-end">
+          <small class="text-primary">
+            Ver detalle <i class="bi bi-arrow-right"></i>
+          </small>
+        </div>
+      </div>
+    </a>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <div class="alert alert-info">
+      No hay sedes registradas.
+      {% if user.puede_editar %}
+      <a href="{% url 'crear-sede' %}">Agregar la primera sede</a>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
 </div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+  .sede-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(15,31,61,.15) !important;
+  }
+</style>
 {% endblock %}

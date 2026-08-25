@@ -4,7 +4,7 @@ from .views import (
     UniversidadViewSet, FacultadViewSet, SedeViewSet, sedes_geojson,
     lista_universidades, crear_universidad, editar_universidad, eliminar_universidad,
     lista_facultades, crear_facultad, editar_facultad, eliminar_facultad,
-    lista_sedes, crear_sede, editar_sede, eliminar_sede,
+    lista_sedes, detalle_sede_ciudad, crear_sede, editar_sede, eliminar_sede,
 )
 
 router = DefaultRouter()
@@ -28,6 +28,7 @@ urlpatterns = [
 
     path('web/sedes/',                   lista_sedes,  name='lista-sedes'),
     path('web/sedes/crear/',             crear_sede,   name='crear-sede'),
+    path('web/sedes/ciudad/<str:ciudad>/',    detalle_sede_ciudad,  name='detalle-sede-ciudad'),
     path('web/sedes/<int:pk>/editar/',   editar_sede,  name='editar-sede'),
     path('web/sedes/<int:pk>/eliminar/', eliminar_sede, name='eliminar-sede'),
 
