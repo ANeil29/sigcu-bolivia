@@ -46,3 +46,24 @@ def dashboard(request):
 @login_required
 def mapa(request):
     return render(request, 'core/mapa.html')
+
+#@login_required
+#def bienvenida(request):
+    #"""Pantalla de bienvenida con logo UATF/DSA antes del dashboard."""
+    #return render(request, 'core/bienvenida.html')
+
+@login_required
+def bienvenida(request):
+    from universidades.models import Universidad, Sede
+    from carreras.models import Carrera
+    from seguimiento.models import ProcesoCurricular
+
+    stats = {
+        'total_carreras':      Carrera.objects.filter(en_funcionamiento=True).count(),
+        'total_universidades': Universidad.objects.filter(activa=True).count(),
+        'total_sedes':         Sede.objects.filter(activa=True).values(
+                                   'ciudad', 'facultad__universidad'
+                               ).distinct().count(),
+        'total_procesos':      ProcesoCurricular.objects.count(),
+    }
+    return render(request, 'core/bienvenida.html', {'stats': stats})

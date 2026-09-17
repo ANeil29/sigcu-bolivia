@@ -6,6 +6,7 @@ from drf_spectacular.views import (
     SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 )
 
+LOGIN_REDIRECT_URL = '/'
 urlpatterns = [
     path('admin/',                  admin.site.urls),
     path('auth/',                   include('accounts.urls')),        

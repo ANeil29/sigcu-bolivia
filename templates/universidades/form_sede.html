@@ -194,9 +194,14 @@
 
   const map = L.map('mapa-selector').setView([lat0, lon0], zoom0);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors'
-  }).addTo(map);
+  L.tileLayer(
+    'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=cb1_3ni7_1_8c4972bd350b5b36d24741b6',
+    {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20
+    }
+).addTo(map);
 
   // Marcador inicial si ya hay coordenadas
   let marker = null;

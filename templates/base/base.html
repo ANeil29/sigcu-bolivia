@@ -16,10 +16,45 @@
   <link rel="stylesheet" href="{% static 'css/sigcu.css' %}">
 
   <style>
+    /* ── Indicador de página activa en navbar ── */
+.navbar-sigcu .nav-link.nav-active {
+  background: rgba(232, 160, 32, 0.15);
+  color: #e8a020 !important;
+  border-radius: 6px;
+  position: relative;
+}
+/* Línea inferior decorativa */
+.navbar-sigcu .nav-link.nav-active::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 2px;
+  background: #e8a020;
+  border-radius: 2px;
+}
+
+/* Para el menú de Administración (amarillo ya tiene color, solo marca) */
+.navbar-sigcu .nav-link.nav-active-admin {
+  background: rgb(26, 53, 96) !important;
+  border-radius: 6px;
+}
+
+/* Items activos dentro de dropdowns */
+.navbar-sigcu .dropdown-item.dropdown-active {
+  background: rgba(232, 160, 32, 0.12);
+  color: #e8a020 !important;
+  font-weight: 600;
+  border-left: 3px solid #e8a020;
+  padding-left: calc(1rem - 3px);
+}
+
     /* ── Variables de color SIGCU ── */
     :root {
       --sigcu-dark:    #0f1f3d;
-      --sigcu-mid:     #1a3560;
+      --sigcu-mid:     rgb(26, 53, 96);
       --sigcu-accent:  #e8a020;
       --sigcu-light:   #f4f7fc;
       --sidebar-width: 240px;
@@ -166,205 +201,244 @@
     <!-- Menús -->
     <div class="collapse navbar-collapse" id="navbarMain">
       <ul class="navbar-nav me-auto">
+  {% if user.is_authenticated %}
 
-        {% if user.is_authenticated %}
+  <!-- Dashboard -->
+  <li class="nav-item">
+    <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}nav-active{% endif %}"
+       href="{% url 'dashboard' %}">
+      <i class="bi bi-speedometer2 me-1"></i>Dashboard
+    </a>
+  </li>
 
-        <!-- Dashboard -->
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'dashboard' %}">
-            <i class="bi bi-speedometer2 me-1"></i>Dashboard
-          </a>
-        </li>
+  <!-- Institucional -->
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle
+       {% if request.resolver_match.url_name in 'lista-universidades,lista-facultades,lista-sedes,crear-universidad,crear-facultad,crear-sede,editar-universidad,editar-facultad,editar-sede,detalle-sede-ciudad,mapa' %}nav-active{% endif %}"
+       href="#" data-bs-toggle="dropdown">
+      <i class="bi bi-building me-1"></i>Institucional
+    </a>
+    <ul class="dropdown-menu">
+      <li><h6 class="dropdown-header">Estructura</h6></li>
+      <li>
+        <a class="dropdown-item
+           {% if request.resolver_match.url_name == 'lista-universidades' %}dropdown-active{% endif %}"
+           href="{% url 'lista-universidades' %}">
+          <i class="bi bi-bank me-2"></i>Universidades
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item
+           {% if request.resolver_match.url_name == 'lista-facultades' %}dropdown-active{% endif %}"
+           href="{% url 'lista-facultades' %}">
+          <i class="bi bi-building me-2"></i>Facultades
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item
+           {% if request.resolver_match.url_name in 'lista-sedes,detalle-sede-ciudad' %}dropdown-active{% endif %}"
+           href="{% url 'lista-sedes' %}">
+          <i class="bi bi-geo-alt me-2"></i>Sedes
+        </a>
+      </li>
+      <li><hr class="dropdown-divider"></li>
+      <li>
+        <a class="dropdown-item
+           {% if request.resolver_match.url_name == 'mapa' %}dropdown-active{% endif %}"
+           href="{% url 'mapa' %}">
+          <i class="bi bi-map me-2"></i>Mapa de Sedes
+        </a>
+      </li>
+      {% if user.puede_editar %}
+      <li><hr class="dropdown-divider"></li>
+      <li><h6 class="dropdown-header">Agregar</h6></li>
+      <li>
+        <a class="dropdown-item" href="{% url 'crear-universidad' %}">
+          <i class="bi bi-plus-circle me-2"></i>Nueva Universidad
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{% url 'crear-facultad' %}">
+          <i class="bi bi-plus-circle me-2"></i>Nueva Facultad
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{% url 'crear-sede' %}">
+          <i class="bi bi-plus-circle me-2"></i>Nueva Sede
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </li>
 
-        <!-- ── Menú Institucional ── -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#"
-             data-bs-toggle="dropdown">
-            <i class="bi bi-building me-1"></i>Institucional
-          </a>
-          <ul class="dropdown-menu">
-            <li><h6 class="dropdown-header">Estructura</h6></li>
-            <li>
-              <a class="dropdown-item" href="{% url 'lista-universidades' %}">
-                <i class="bi bi-bank me-2"></i>Universidades
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="{% url 'lista-facultades' %}">
-                <i class="bi bi-building me-2"></i>Facultades
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="{% url 'lista-sedes' %}">
-                <i class="bi bi-geo-alt me-2"></i>Sedes
-              </a>
-            </li>
-            <li><hr class="dropdown-divider"></li>
-            <li>
-              <a class="dropdown-item" href="{% url 'mapa' %}">
-                <i class="bi bi-map me-2"></i>Mapa de Sedes
-              </a>
-            </li>
-            {% if user.puede_editar %}
-            <li><hr class="dropdown-divider"></li>
-            <li><h6 class="dropdown-header">Agregar</h6></li>
-            <li>
-              <a class="dropdown-item" href="{% url 'crear-universidad' %}">
-                <i class="bi bi-plus-circle me-2"></i>Nueva Universidad
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="{% url 'crear-facultad' %}">
-                <i class="bi bi-plus-circle me-2"></i>Nueva Facultad
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="{% url 'crear-sede' %}">
-                <i class="bi bi-plus-circle me-2"></i>Nueva Sede
-              </a>
-            </li>
-            {% endif %}
-          </ul>
-        </li>
+  <!-- Oferta Académica -->
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle
+       {% if request.resolver_match.url_name in 'lista-carreras,lista-programas,crear-carrera,crear-programa,editar-carrera,editar-programa' %}nav-active{% endif %}"
+       href="#" data-bs-toggle="dropdown">
+      <i class="bi bi-journal-bookmark me-1"></i>Oferta Académica
+    </a>
+    <ul class="dropdown-menu">
+      <li><h6 class="dropdown-header">Carreras</h6></li>
+      <li>
+        <a class="dropdown-item
+           {% if request.resolver_match.url_name == 'lista-carreras' %}dropdown-active{% endif %}"
+           href="{% url 'lista-carreras' %}">
+          <i class="bi bi-list-ul me-2"></i>Ver todas las Carreras
+        </a>
+      </li>
+      {% if user.puede_editar %}
+      <li>
+        <a class="dropdown-item" href="{% url 'crear-carrera' %}">
+          <i class="bi bi-plus-circle me-2"></i>Nueva Carrera
+        </a>
+      </li>
+      {% endif %}
+      <li><hr class="dropdown-divider"></li>
+      <li><h6 class="dropdown-header">Programas</h6></li>
+      <li>
+        <a class="dropdown-item
+           {% if request.resolver_match.url_name == 'lista-programas' %}dropdown-active{% endif %}"
+           href="{% url 'lista-programas' %}">
+          <i class="bi bi-clipboard me-2"></i>Ver todos los Programas
+        </a>
+      </li>
+      {% if user.puede_editar %}
+      <li>
+        <a class="dropdown-item" href="{% url 'crear-programa' %}">
+          <i class="bi bi-plus-circle me-2"></i>Nuevo Programa
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+  </li>
 
-        <!-- ── Menú Oferta Académica ── -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#"
-             data-bs-toggle="dropdown">
-            <i class="bi bi-journal-bookmark me-1"></i>Oferta Académica
-          </a>
-          <ul class="dropdown-menu">
-            <li><h6 class="dropdown-header">Carreras</h6></li>
-            <li>
-              <a class="dropdown-item" href="{% url 'lista-carreras' %}">
-                <i class="bi bi-list-ul me-2"></i>Ver todas las Carreras
-              </a>
-            </li>
-            {% if user.puede_editar %}
-            <li>
-              <a class="dropdown-item" href="{% url 'crear-carrera' %}">
-                <i class="bi bi-plus-circle me-2"></i>Nueva Carrera
-              </a>
-            </li>
-            {% endif %}
-            <li><hr class="dropdown-divider"></li>
-            <li><h6 class="dropdown-header">Programas</h6></li>
-            <li>
-              <a class="dropdown-item" href="{% url 'lista-programas' %}">
-                <i class="bi bi-clipboard me-2"></i>Ver todos los Programas
-              </a>
-            </li>
-            {% if user.puede_editar %}
-            <li>
-              <a class="dropdown-item" href="{% url 'crear-programa' %}">
-                <i class="bi bi-plus-circle me-2"></i>Nuevo Programa
-              </a>
-            </li>
-            {% endif %}
-          </ul>
-        </li>
-
-<!-- ── Menú Seguimiento ── -->
-{% if user.puede_editar %}
-<li class="nav-item dropdown">
-  <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-    <i class="bi bi-arrow-repeat me-1"></i>Seguimiento
-  </a>
-  <ul class="dropdown-menu">
-    <li><h6 class="dropdown-header">Procesos</h6></li>
-    <li>
-      <a class="dropdown-item" href="{% url 'lista-procesos' %}">
-        <i class="bi bi-diagram-3 me-2"></i>Ver Procesos
-      </a>
-    </li>
-    <li>
-      <a class="dropdown-item" href="{% url 'crear-proceso' %}">
-        <i class="bi bi-plus-circle me-2"></i>Nuevo Proceso
-      </a>
-    </li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header">Formularios</h6></li>
-    <li>
-      <a class="dropdown-item" href="{% url 'lista-formularios' %}">
-        <i class="bi bi-file-earmark-text me-2"></i>Ver Formularios
-      </a>
-    </li>
-    <li>
-      <a class="dropdown-item" href="{% url 'crear-formulario' %}">
-        <i class="bi bi-plus-circle me-2"></i>Nuevo Formulario
-      </a>
-    </li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header">Configuración</h6></li>
-    <li>
-      <a class="dropdown-item" href="{% url 'lista-tipos-fase' %}">
-        <i class="bi bi-list-check me-2"></i>Tipos de Fase
-      </a>
-    </li>
-  </ul>
-</li>
-{% endif %}
+<!-- Seguimiento -->
+  {% if user.puede_editar %}
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle
+       {% if request.resolver_match.url_name in 'lista-procesos,detalle-proceso,crear-proceso,editar-proceso,lista-tipos-fase,lista-formularios,detalle-formulario,crear-formulario' %}nav-active{% endif %}"
+       href="#" data-bs-toggle="dropdown">
+      <i class="bi bi-arrow-repeat me-1"></i>Seguimiento
+    </a>
+    <ul class="dropdown-menu">
+      <li><h6 class="dropdown-header">Procesos Curriculares</h6></li>
+      <li>
+        <a class="dropdown-item
+           {% if request.resolver_match.url_name in 'lista-procesos,detalle-proceso' %}dropdown-active{% endif %}"
+           href="{% url 'lista-procesos' %}">
+          <i class="bi bi-diagram-3 me-2"></i>Ver Procesos
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{% url 'crear-proceso' %}">
+          <i class="bi bi-plus-circle me-2"></i>Nuevo Proceso
+        </a>
+      </li>
+      <li><hr class="dropdown-divider"></li>
+      <li><h6 class="dropdown-header">Formularios</h6></li>
+      <li>
+        <a class="dropdown-item
+           {% if request.resolver_match.url_name in 'lista-formularios,detalle-formulario' %}dropdown-active{% endif %}"
+           href="{% url 'lista-formularios' %}">
+          <i class="bi bi-file-earmark-text me-2"></i>Ver Formularios
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="{% url 'crear-formulario' %}">
+          <i class="bi bi-plus-circle me-2"></i>Nuevo Formulario
+        </a>
+      </li>
+      <li><hr class="dropdown-divider"></li>
+      <li><h6 class="dropdown-header">Configuración</h6></li>
+      <li>
+        <a class="dropdown-item
+           {% if request.resolver_match.url_name == 'lista-tipos-fase' %}dropdown-active{% endif %}"
+           href="{% url 'lista-tipos-fase' %}">
+          <i class="bi bi-list-check me-2"></i>Tipos de Fase
+        </a>
+      </li>
+    </ul>
+  </li>
+  {% endif %}
 
 <!-- ── Menú Reportes ── -->
-<li>
-  <a class="dropdown-item" href="{% url 'buscador-carreras' %}">
-    <i class="bi bi-search me-2"></i>Buscador por Carrera
-  </a>
-</li>
-
 <li class="nav-item dropdown">
-  <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
-    <i class="bi bi-bar-chart me-1"></i>Reportes
-  </a>
-  <ul class="dropdown-menu">
-    <li><h6 class="dropdown-header">Estadísticas</h6></li>
-    <li>
-      <a class="dropdown-item" href="{% url 'vista-estadisticas' %}">
-        <i class="bi bi-pie-chart me-2"></i>Resumen general
-      </a>
-    </li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header">Exportar</h6></li>
-    <li>
-      <a class="dropdown-item" href="{% url 'reporte-carreras-excel' %}">
-        <i class="bi bi-file-earmark-excel me-2"></i>Carreras — Excel
-      </a>
-    </li>
-  </ul>
-</li>
+    <a class="nav-link dropdown-toggle
+       {% if request.resolver_match.url_name in 'vista-estadisticas,buscador-carreras' %}nav-active{% endif %}"
+       href="#" data-bs-toggle="dropdown">
+      <i class="bi bi-bar-chart me-1"></i>Reportes
+    </a>
+    <ul class="dropdown-menu">
+      <li><h6 class="dropdown-header">Estadísticas</h6></li>
+      <li>
+        <a class="dropdown-item
+           {% if request.resolver_match.url_name == 'vista-estadisticas' %}dropdown-active{% endif %}"
+           href="{% url 'vista-estadisticas' %}">
+          <i class="bi bi-pie-chart me-2"></i>Resumen general
+        </a>
+      </li>
+      <li><hr class="dropdown-divider"></li>
+      <li><h6 class="dropdown-header">Búsqueda específica</h6></li>
+      <li>
+        <a class="dropdown-item
+           {% if request.resolver_match.url_name == 'buscador-carreras' %}dropdown-active{% endif %}"
+           href="{% url 'buscador-carreras' %}">
+          <i class="bi bi-search me-2"></i>Buscador por Carrera
+        </a>
+      </li>
+      <li><hr class="dropdown-divider"></li>
+      <li><h6 class="dropdown-header">Exportar</h6></li>
+      <li>
+        <a class="dropdown-item" href="{% url 'reporte-carreras-excel' %}">
+          <i class="bi bi-file-earmark-excel me-2"></i>Reporte Completo Excel
+        </a>
+      </li>
+    </ul>
+  </li>
 
         <!-- ── Menú Administración (solo SUPERADMIN) ── -->
         {% if user.rol == 'SUPERADMIN' %}
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-warning" href="#"
-             data-bs-toggle="dropdown">
-            <i class="bi bi-shield-lock me-1"></i>Administración
-          </a>
-          <ul class="dropdown-menu">
-            <li><h6 class="dropdown-header">Usuarios y Roles</h6></li>
-            <li>
-              <a class="dropdown-item" href="{% url 'panel-admin-usuarios' %}">
-                <i class="bi bi-people me-2"></i>Panel de Usuarios
-              </a>
-            </li>
-            <li><hr class="dropdown-divider"></li>
-            <li><h6 class="dropdown-header">Sistema</h6></li>
-            <li>
-              <a class="dropdown-item" href="/admin/">
-                <i class="bi bi-gear me-2"></i>Admin Django
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item" href="/api/schema/swagger/">
-                <i class="bi bi-code-slash me-2"></i>Documentación API
-              </a>
-            </li>
-          </ul>
-        </li>
-        {% endif %}
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle text-warning
+       {% if request.resolver_match.url_name in 'panel-admin-usuarios,panel-auditoria' %}nav-active-admin{% endif %}"
+       href="#" data-bs-toggle="dropdown">
+      <i class="bi bi-shield-lock me-1"></i>Administración
+    </a>
+    <ul class="dropdown-menu">
+      <li><h6 class="dropdown-header">Usuarios y Roles</h6></li>
+      <li>
+        <a class="dropdown-item
+           {% if request.resolver_match.url_name == 'panel-admin-usuarios' %}dropdown-active{% endif %}"
+           href="{% url 'panel-admin-usuarios' %}">
+          <i class="bi bi-people me-2"></i>Panel de Usuarios
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item
+           {% if request.resolver_match.url_name == 'panel-auditoria' %}dropdown-active{% endif %}"
+           href="{% url 'panel-auditoria' %}">
+          <i class="bi bi-shield-check me-2"></i>Auditoría y Actividad
+        </a>
+      </li>
+      <li><hr class="dropdown-divider"></li>
+      <li><h6 class="dropdown-header">Sistema</h6></li>
+      <li>
+        <a class="dropdown-item" href="/admin/">
+          <i class="bi bi-gear me-2"></i>Admin Django
+        </a>
+      </li>
+      <li>
+        <a class="dropdown-item" href="/api/schema/swagger/">
+          <i class="bi bi-code-slash me-2"></i>Documentación API
+        </a>
+      </li>
+    </ul>
+  </li>
+  {% endif %}
 
-        {% endif %} {# end is_authenticated #}
-      </ul>
+  {% endif %}
+</ul>
 
       <!-- ── Lado derecho del navbar ── -->
       <ul class="navbar-nav ms-auto align-items-center gap-1">

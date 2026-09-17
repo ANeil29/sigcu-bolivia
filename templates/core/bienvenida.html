@@ -1,0 +1,264 @@
+{% extends 'base/base.html' %}
+{% block title %}Bienvenido — SIGCU Bolivia{% endblock %}
+
+{% block content %}
+<style>
+  /* ── Fondo animado ───────────────────────────────────────────────── */
+  .bienvenida-wrap {
+    min-height: calc(100vh - 130px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #0f1f3d 0%, #1a3560 50%, #0f1f3d 100%);
+    border-radius: 12px;
+    padding: 3rem 2rem;
+  }
+
+  /* Partículas de fondo animadas */
+  .particula {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(232, 160, 32, 0.08);
+    animation: flotar linear infinite;
+  }
+  @keyframes flotar {
+    0%   { transform: translateY(100vh) scale(0);   opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 0.6; }
+    100% { transform: translateY(-20vh) scale(1.2); opacity: 0; }
+  }
+
+  /* Logos */
+  .logos-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3rem;
+    margin-bottom: 2rem;
+    animation: aparecerArriba 0.8s ease both;
+  }
+  .logo-circulo {
+    width: 120px; height: 120px;
+    background: rgba(255,255,255,.08);
+    border: 2px solid rgba(232,160,32,.4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: white;
+    font-size: 0.7rem;
+    text-align: center;
+    padding: 12px;
+    backdrop-filter: blur(4px);
+    transition: transform .3s, box-shadow .3s;
+  }
+  .logo-circulo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(232,160,32,.3);
+  }
+  .logo-circulo .sigla {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #e8a020;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .logo-separador {
+    color: rgba(255,255,255,.2);
+    font-size: 3rem;
+    font-weight: 100;
+    animation: aparecerArriba 1s ease both;
+  }
+
+  /* Texto central */
+  .texto-central {
+    text-align: center;
+    color: white;
+    animation: aparecerAbajo 0.9s ease both;
+    max-width: 680px;
+  }
+  .texto-central h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+    letter-spacing: 1px;
+  }
+  .texto-central h1 span { color: #e8a020; }
+  .texto-central .subtitulo {
+    font-size: 1rem;
+    color: rgba(255,255,255,.7);
+    margin-bottom: 0.3rem;
+  }
+  .texto-central .inst {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,.5);
+    margin-bottom: 2rem;
+  }
+
+  /* Barra decorativa */
+  .barra-deco {
+    width: 80px; height: 3px;
+    background: linear-gradient(90deg, transparent, #e8a020, transparent);
+    margin: 1rem auto;
+    border-radius: 2px;
+  }
+
+  /* Saludo usuario */
+  .saludo-usuario {
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 40px;
+    padding: 0.5rem 1.8rem;
+    color: rgba(255,255,255,.85);
+    font-size: 0.9rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(4px);
+    animation: aparecerAbajo 1s ease both 0.2s;
+  }
+  .saludo-usuario strong { color: #e8a020; }
+
+  /* Botón ingresar */
+  .btn-ingresar {
+    background: linear-gradient(135deg, #e8a020, #c8841a);
+    color: white;
+    border: none;
+    padding: 0.9rem 3rem;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 40px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    box-shadow: 0 4px 20px rgba(232,160,32,.35);
+    transition: transform .2s, box-shadow .2s;
+    animation: aparecerAbajo 1.1s ease both 0.4s;
+  }
+  .btn-ingresar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(232,160,32,.45);
+    color: white;
+  }
+  .btn-ingresar i { font-size: 1.1rem; }
+
+  /* Estadísticas rápidas */
+  .stats-bienvenida {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2.5rem;
+    animation: aparecerAbajo 1.2s ease both 0.6s;
+  }
+  .stat-item {
+    text-align: center;
+    color: rgba(255,255,255,.6);
+  }
+  .stat-item .num {
+    display: block;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #e8a020;
+    line-height: 1;
+  }
+  .stat-item small { font-size: 0.72rem; text-transform: uppercase;
+                      letter-spacing: .5px; }
+
+  /* Animaciones de entrada */
+  @keyframes aparecerArriba {
+    from { opacity:0; transform:translateY(-30px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes aparecerAbajo {
+    from { opacity:0; transform:translateY(30px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* Año en la esquina */
+  .anio-badge {
+    position: absolute;
+    bottom: 1.2rem;
+    right: 1.5rem;
+    color: rgba(255,255,255,.2);
+    font-size: 0.75rem;
+  }
+</style>
+
+<div class="bienvenida-wrap">
+
+  <!-- Partículas animadas de fondo -->
+  {% for i in "123456789" %}
+  <div class="particula" style="
+    width:  {{ forloop.counter|add:20 }}px;
+    height: {{ forloop.counter|add:20 }}px;
+    left:   {{ forloop.counter0 }}0%;
+    animation-duration: {{ forloop.counter|add:8 }}s;
+    animation-delay:    {{ forloop.counter }}s;
+  "></div>
+  {% endfor %}
+
+  <!-- Logos institucionales -->
+  <div class="logos-wrap">
+    <div class="logo-circulo">
+      <span class="sigla">UATF</span>
+      <span>Universidad<br>Autónoma<br>Tomás Frías</span>
+    </div>
+
+    <div class="logo-separador">·</div>
+
+    <div class="logo-circulo">
+      <span class="sigla">DSA</span>
+      <span>Dirección de<br>Servicios<br>Académicos</span>
+    </div>
+  </div>
+
+  <!-- Texto principal -->
+  <div class="texto-central">
+    <h1>SIGCU <span>Bolivia</span></h1>
+    <p class="subtitulo">Sistema de Información para la Gestión Curricular Universitaria</p>
+    <div class="barra-deco"></div>
+    <p class="inst">Potosí, Bolivia · Sistema de la Universidad Boliviana</p>
+  </div>
+
+  <!-- Saludo personalizado -->
+  <div class="saludo-usuario">
+    <i class="bi bi-person-check me-2"></i>
+    Bienvenido, <strong>{{ user.get_full_name|default:user.username }}</strong>
+    &nbsp;·&nbsp;
+    <span style="color:rgba(255,255,255,.6)">{{ user.get_rol_display }}</span>
+  </div>
+
+  <!-- Botón de ingreso -->
+  <a href="{% url 'dashboard' %}" class="btn-ingresar">
+    <i class="bi bi-grid-1x2"></i>
+    Ingresar al Sistema
+  </a>
+
+  <!-- Estadísticas rápidas -->
+  <div class="stats-bienvenida">
+    <div class="stat-item">
+      <span class="num">{{ stats.total_carreras }}</span>
+      <small>Carreras</small>
+    </div>
+    <div class="stat-item">
+      <span class="num">{{ stats.total_universidades }}</span>
+      <small>Universidades</small>
+    </div>
+    <div class="stat-item">
+      <span class="num">{{ stats.total_sedes }}</span>
+      <small>Sedes</small>
+    </div>
+    <div class="stat-item">
+      <span class="num">{{ stats.total_procesos }}</span>
+      <small>Procesos</small>
+    </div>
+  </div>
+
+  <div class="anio-badge">{% now "Y" %}</div>
+
+</div>
+{% endblock %}

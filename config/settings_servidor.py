@@ -8,15 +8,22 @@ ALLOWED_HOSTS = [
     'www.sigcu.uatf.edu.bo',
 ]
 
+# Encoding
+DEFAULT_CHARSET = 'utf-8'
+FILE_CHARSET    = 'utf-8'
+
 # Base de datos
 DATABASES = {
     'default': {
-        'ENGINE':   'django.db.backends.postgresql',
-        'NAME':     os.environ.get('DB_NAME',     'sigcu_db'),
-        'USER':     os.environ.get('DB_USER',     'sigcu_user'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
-        'HOST':     os.environ.get('DB_HOST',     'localhost'),
-        'PORT':     os.environ.get('DB_PORT',     '5432'),
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
+        'OPTIONS': {
+            'client_encoding': 'UTF8',
+        },
     }
 }
 
