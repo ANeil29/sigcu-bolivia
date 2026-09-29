@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from carreras.models import Carrera
 from universidades.models import Universidad, Sede
@@ -47,13 +47,24 @@ def dashboard(request):
 def mapa(request):
     return render(request, 'core/mapa.html')
 
-#@login_required
-#def bienvenida(request):
-    #"""Pantalla de bienvenida con logo UATF/DSA antes del dashboard."""
-    #return render(request, 'core/bienvenida.html')
+def bienvenida_publica(request):
+    """
+    Primera pantalla que ve cualquier visitante.
+    No requiere autenticación.
+    Si ya está logueado lo manda directo al dashboard.
+    """
+    if request.user.is_authenticated:
+        return redirect('bienvenida')
+    return render(request, 'core/bienvenida_publica.html')
 
+
+# Vista PRIVADA — requiere login, muestra stats
 @login_required
 def bienvenida(request):
+    """
+    Bienvenida personalizada después del login.
+    Muestra estadísticas y botón al dashboard.
+    """
     from universidades.models import Universidad, Sede
     from carreras.models import Carrera
     from seguimiento.models import ProcesoCurricular

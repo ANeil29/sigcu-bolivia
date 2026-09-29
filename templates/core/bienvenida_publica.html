@@ -1,0 +1,241 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es" style="height:100%">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SIGCU Bolivia — Bienvenido</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html, body { height:100%; }
+
+    .pantalla-completa {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0a1628 0%, #0f1f3d 40%,
+                                          #1a3560 70%, #0f1f3d 100%);
+      padding: 3rem 2rem;
+    }
+
+    /* Partículas */
+    .particula {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(232,160,32,0.06);
+      animation: flotar linear infinite;
+    }
+    @keyframes flotar {
+      0%   { transform: translateY(100vh) scale(0); opacity:0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 0.5; }
+      100% { transform: translateY(-20vh) scale(1.3); opacity:0; }
+    }
+
+    /* Logos */
+    .logos-wrap {
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+      margin-bottom: 2rem;
+      animation: aparecerArriba .8s ease both;
+    }
+    .logo-circulo {
+      width: 130px; height: 130px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.06);
+      border: 2px solid rgba(232,160,32,.5);
+      box-shadow: 0 0 20px rgba(232,160,32,.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: transform .3s, box-shadow .3s;
+    }
+    .logo-circulo:hover {
+      transform: scale(1.08);
+      box-shadow: 0 0 30px rgba(232,160,32,.35);
+    }
+    .logo-circulo img {
+      width: 112px; height: 112px;
+      object-fit: contain;
+      border-radius: 50%;
+    }
+    .logo-sep {
+      color: rgba(232,160,32,.35);
+      font-size: 2.5rem;
+      font-weight: 100;
+    }
+
+    /* Texto */
+    .texto {
+      text-align: center;
+      color: white;
+      animation: aparecerAbajo .9s ease both;
+      max-width: 680px;
+    }
+    .texto h1 {
+      font-size: 2.4rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: .3rem;
+    }
+    .texto h1 span { color: #e8a020; }
+    .texto .sub {
+      font-size: 1rem;
+      color: rgba(255,255,255,.7);
+      margin-bottom: .2rem;
+    }
+    .texto .inst {
+      font-size: .83rem;
+      color: rgba(255,255,255,.4);
+    }
+    .barra {
+      width: 90px; height: 3px;
+      background: linear-gradient(90deg, transparent, #e8a020, transparent);
+      margin: .9rem auto 1.6rem;
+      border-radius: 2px;
+    }
+
+    /* Botones de acción */
+    .acciones {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      animation: aparecerAbajo 1.1s ease both .3s;
+    }
+    .btn-ingresar {
+      background: linear-gradient(135deg, #e8a020, #c8841a);
+      color: white;
+      border: none;
+      padding: .9rem 2.8rem;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: 40px;
+      letter-spacing: 1px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: .6rem;
+      box-shadow: 0 4px 20px rgba(232,160,32,.4);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .btn-ingresar:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(232,160,32,.5);
+      color: white;
+    }
+    .btn-solicitar {
+      background: transparent;
+      color: rgba(255,255,255,.75);
+      border: 1px solid rgba(255,255,255,.3);
+      padding: .9rem 2rem;
+      font-size: .9rem;
+      border-radius: 40px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      transition: all .2s;
+    }
+    .btn-solicitar:hover {
+      background: rgba(255,255,255,.1);
+      color: white;
+      border-color: rgba(255,255,255,.5);
+    }
+
+    /* Pie */
+    .pie-pub {
+      position: absolute;
+      bottom: 1rem;
+      color: rgba(255,255,255,.18);
+      font-size: .72rem;
+      text-align: center;
+    }
+    .linea-inferior {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg,
+        transparent 0%, #e8a020 30%, #e8a020 70%, transparent 100%);
+    }
+
+    @keyframes aparecerArriba {
+      from { opacity:0; transform:translateY(-30px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    @keyframes aparecerAbajo {
+      from { opacity:0; transform:translateY(30px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="pantalla-completa">
+
+  <!-- Partículas animadas -->
+  {% for i in "123456789" %}
+  <div class="particula" style="
+    width:  {{ forloop.counter|add:15 }}px;
+    height: {{ forloop.counter|add:15 }}px;
+    left:   {{ forloop.counter0 }}0%;
+    animation-duration: {{ forloop.counter|add:9 }}s;
+    animation-delay:    -{{ forloop.counter }}s;
+  "></div>
+  {% endfor %}
+
+  <!-- Logos -->
+  <div class="logos-wrap">
+    <div class="logo-circulo" title="Universidad Autónoma Tomás Frías">
+      <img src="{% static 'img/logo_uatf.png' %}" alt="UATF">
+    </div>
+    <div class="logo-sep">·</div>
+    <div class="logo-circulo" title="Dirección de Servicios Académicos">
+      <img src="{% static 'img/logo_dsa.jpeg' %}"
+           alt="DSA"
+           style="background:#000; border-radius:50%">
+    </div>
+  </div>
+
+  <!-- Texto principal -->
+  <div class="texto">
+    <h1>SIGCU <span>Bolivia</span></h1>
+    <p class="sub">Sistema de Información para la Gestión Curricular Universitaria</p>
+    <div class="barra"></div>
+    <p class="inst">
+      Universidad Autónoma Tomás Frías &nbsp;·&nbsp;
+      Dirección de Servicios Académicos &nbsp;·&nbsp; Potosí, Bolivia
+    </p>
+  </div>
+
+  <!-- Botones -->
+  <div class="acciones mt-4">
+    <a href="{% url 'login' %}" class="btn-ingresar">
+      <i class="bi bi-box-arrow-in-right"></i>
+      Iniciar Sesión
+    </a>
+    <a href="{% url 'registro' %}" class="btn-solicitar">
+      <i class="bi bi-person-plus"></i>
+      Solicitar Acceso
+    </a>
+  </div>
+
+  <!-- Pie -->
+  <div class="pie-pub">
+    SIGCU Bolivia &nbsp;·&nbsp; UATF Potosí &nbsp;·&nbsp; {% now "Y" %}
+  </div>
+
+  <div class="linea-inferior"></div>
+
+</div>
+
+</body>
+</html>

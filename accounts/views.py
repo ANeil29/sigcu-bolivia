@@ -19,25 +19,27 @@ Usuario = get_user_model()
 
 def vista_login(request):
     if request.user.is_authenticated:
-        return redirect('dashboard')
+        return redirect('bienvenida')      # ← si ya está logueado
     form = LoginForm(request, data=request.POST or None)
     if request.method == 'POST':
         if form.is_valid():
             user = form.get_user()
             if not user.activo_sistema:
                 messages.warning(request,
-                    'Tu cuenta está pendiente de aprobación. '
-                    'El administrador te notificará cuando esté lista.')
+                    'Tu cuenta está pendiente de aprobación.')
                 return redirect('login')
             login(request, user)
+            # Registrar actividad
+            from .models import RegistroActividad
+            from .middleware import get_ip
             RegistroActividad.objects.create(
-    usuario=user,
-    accion='LOGIN',
-    modulo='Autenticación',
-    descripcion=f'Inicio de sesión desde {get_ip(request)}',
-    ip=get_ip(request),
-)
-            return redirect('dashboard')
+                usuario=user,
+                accion='LOGIN',
+                modulo='Autenticación',
+                descripcion=f'Inicio de sesión desde {get_ip(request)}',
+                ip=get_ip(request),
+            )
+            return redirect('bienvenida')  # ← va a bienvenida privada con stats
         else:
             messages.error(request, 'Usuario o contraseña incorrectos.')
     return render(request, 'accounts/login.html', {'form': form})

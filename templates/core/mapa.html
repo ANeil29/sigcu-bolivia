@@ -1,48 +1,349 @@
 {% extends 'base/base.html' %}
-
 {% block title %}Mapa de Sedes — SIGCU Bolivia{% endblock %}
 
+{% block breadcrumb %}
+<nav class="breadcrumb-sigcu">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+    <li class="breadcrumb-item active">Mapa de Sedes</li>
+  </ol>
+</nav>
+{% endblock %}
+
 {% block content %}
-<div class="row mb-3">
+<div class="row mb-3 align-items-center">
   <div class="col">
-    <h4>Mapa de Sedes Universitarias — Bolivia</h4>
-    <p class="text-muted">Sedes con coordenadas registradas aparecen como marcadores.</p>
+    <h4><i class="bi bi-map me-2"></i>Mapa de Sedes Universitarias — Bolivia</h4>
+    <p class="text-muted mb-0">
+      Haz clic en un marcador para ver el resumen.
+      Luego usa <strong>Ver facultades</strong> para hacer zoom al detalle de esa sede.
+    </p>
+  </div>
+  <div class="col-auto">
+    <button onclick="resetMapa()" class="btn btn-outline-dark btn-sm">
+      <i class="bi bi-arrow-counterclockwise me-1"></i>Restablecer vista
+    </button>
   </div>
 </div>
 
-<div id="mapa" style="height: 560px; border-radius: 8px; border: 1px solid #ccc;"></div>
+<!-- Leyenda -->
+<div class="d-flex gap-3 mb-3 flex-wrap">
+  <span class="d-flex align-items-center gap-1">
+    <span style="width:14px;height:14px;background:#0f1f3d;
+                 border-radius:50%;display:inline-block;
+                 border:2px solid #e8a020"></span>
+    <small>Sede principal</small>
+  </span>
+  <span class="d-flex align-items-center gap-1">
+    <span style="width:14px;height:14px;background:#198754;
+                 border-radius:50%;display:inline-block;
+                 border:2px solid white"></span>
+    <small>Facultad / detalle</small>
+  </span>
+</div>
+
+<!-- Mapa -->
+<div class="card shadow-sm">
+  <div class="card-body p-0">
+    <div id="mapa-sigcu"
+         style="height: 580px; border-radius: 10px; overflow:hidden">
+    </div>
+  </div>
+</div>
+
+<!-- Panel de info lateral (se muestra al hacer clic en Ver facultades) -->
+<div id="panel-facultades"
+     class="card mt-3 shadow-sm"
+     style="display:none">
+  <div class="card-header bg-dark text-white d-flex justify-content-between">
+    <span id="panel-titulo">
+      <i class="bi bi-building me-2"></i>Facultades
+    </span>
+    <button onclick="cerrarPanel()"
+            class="btn btn-sm btn-outline-light">
+      <i class="bi bi-x"></i>
+    </button>
+  </div>
+  <div class="card-body p-0">
+    <div id="panel-contenido"
+         class="table-responsive">
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
+<style>
+  /* Marcador sede principal */
+  .icono-sede {
+    background: #0f1f3d;
+    color: white;
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    border: 2px solid #e8a020;
+    box-shadow: 0 2px 8px rgba(0,0,0,.4);
+    cursor: pointer;
+    transition: transform .2s;
+  }
+  .icono-sede:hover { transform: scale(1.15); }
+
+  /* Marcador facultad (detalle) */
+  .icono-facultad {
+    background: #198754;
+    color: white;
+    border-radius: 6px;
+    width: 30px; height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    border: 2px solid white;
+    box-shadow: 0 2px 6px rgba(0,0,0,.3);
+  }
+
+  /* Popup */
+  .leaflet-popup-content { min-width: 230px; }
+  .popup-ciudad h6 { color: #0f1f3d; margin-bottom: 4px; font-size: 1rem; }
+  .popup-ciudad .stat {
+    display: inline-block;
+    background: #f0f4ff;
+    border-radius: 4px;
+    padding: 2px 8px;
+    margin: 2px 2px 6px 0;
+    font-size: .8rem;
+    color: #0f1f3d;
+    font-weight: 600;
+  }
+  .btn-ver-fac {
+    background: #0f1f3d; color: white;
+    border: none; border-radius: 4px;
+    padding: 5px 10px; font-size: .82rem;
+    cursor: pointer; margin-right: 4px;
+    transition: background .2s;
+  }
+  .btn-ver-fac:hover { background: #1a3560; }
+  .btn-gmaps {
+    background: white; color: #dc3545;
+    border: 1px solid #dc3545; border-radius: 4px;
+    padding: 5px 10px; font-size: .82rem;
+    cursor: pointer; text-decoration: none;
+    display: inline-block;
+  }
+  .btn-gmaps:hover { background: #fff5f5; color:#dc3545; }
+</style>
+
 <script>
-  const map = L.map('mapa').setView([-16.5, -64.5], 6);
+  // ── Inicializar mapa ────────────────────────────────────────────────────
+  const map = L.map('mapa-sigcu').setView([-17.0, -65.0], 6);
 
   L.tileLayer(
     'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=cb1_3ni7_1_8c4972bd350b5b36d24741b6',
     {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd',
-        maxZoom: 20
+        maxZoom: 50
     }
 ).addTo(map);
 
-  fetch('/api/v1/universidades/sedes/geojson/')
-    .then(r => r.json())
-    .then(data => {
-      L.geoJSON(data, {
-        onEachFeature: function(feature, layer) {
-          const p = feature.properties;
-          layer.bindPopup(
-            `<b>${p.facultad}</b><br>
-             ${p.universidad} — ${p.ciudad}<br>
-             Tel: ${p.telefono || 'No registrado'}`
-          );
-        }
-      }).addTo(map);
-    })
-    .catch(() => {
-      document.getElementById('mapa').innerHTML =
-        '<div class="alert alert-warning m-3">No se pudo cargar el mapa.</div>';
+  // Capas separadas para controlar
+  const capaSedesResumen   = L.layerGroup().addTo(map);
+  const capaFacultadesDetalle = L.layerGroup().addTo(map);
+
+  // Vista inicial guardada para reset
+  const vistaInicial = { center: [-17.0, -65.0], zoom: 6 };
+
+  // ── Iconos ──────────────────────────────────────────────────────────────
+  function iconoSede() {
+    return L.divIcon({
+      className: '',
+      html: `<div class="icono-sede">
+               <i class="bi bi-geo-alt-fill"></i>
+             </div>`,
+      iconSize:   [36, 36],
+      iconAnchor: [18, 18],
+      popupAnchor: [0, -20],
     });
+  }
+
+  function iconoFacultad(sigla) {
+    return L.divIcon({
+      className: '',
+      html: `<div class="icono-facultad">
+               <span style="font-size:.55rem;font-weight:700">
+                 ${sigla.substring(0,3)}
+               </span>
+             </div>`,
+      iconSize:   [30, 30],
+      iconAnchor: [15, 15],
+      popupAnchor: [0, -18],
+    });
+  }
+
+  // ── Cargar sedes resumen ────────────────────────────────────────────────
+  fetch('/api/v1/universidades/api/sedes-mapa/')
+    .then(r => r.json())
+    .then(sedes => {
+      if (!sedes.length) {
+        console.warn('No hay sedes con coordenadas registradas.');
+        return;
+      }
+      sedes.forEach(s => {
+        const marker = L.marker([s.lat, s.lng], { icon: iconoSede() });
+
+        const popupHtml = `
+          <div class="popup-ciudad">
+            <h6><i class="bi bi-geo-alt me-1"></i>${s.ciudad}</h6>
+            <small style="color:#666">${s.departamento}, Bolivia</small><br>
+            <span class="badge bg-dark mt-1 mb-2">${s.universidad}</span>
+            <br>
+            <span class="stat">
+              <i class="bi bi-building me-1"></i>${s.total_facultades} Facultad${s.total_facultades !== 1 ? 'es' : ''}
+            </span>
+            <span class="stat">
+              <i class="bi bi-journal-bookmark me-1"></i>${s.total_carreras} Carrera${s.total_carreras !== 1 ? 's' : ''}
+            </span>
+            <br>
+            <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+              <button class="btn-ver-fac"
+                onclick="verFacultades('${s.ciudad}', ${s.lat}, ${s.lng})">
+                <i class="bi bi-zoom-in me-1"></i>Ver facultades
+              </button>
+              <a class="btn-gmaps"
+                 href="https://www.google.com/maps?q=${s.lat},${s.lng}"
+                 target="_blank" rel="noopener">
+                <i class="bi bi-map me-1"></i>Google Maps
+              </a>
+            </div>
+          </div>`;
+
+        marker.bindPopup(popupHtml);
+        marker.addTo(capaSedesResumen);
+      });
+    })
+    .catch(err => console.error('Error cargando sedes:', err));
+
+  // ── Ver facultades al hacer zoom ────────────────────────────────────────
+  function verFacultades(ciudad, lat, lng) {
+    capaFacultadesDetalle.clearLayers();
+    map.closePopup();
+
+    fetch(`/api/v1/universidades/api/facultades-por-sede/?ciudad=${encodeURIComponent(ciudad)}`)
+      .then(r => r.json())
+      .then(facultades => {
+        if (!facultades.length) {
+          map.flyTo([lat, lng], 14);
+          return;
+        }
+
+        facultades.forEach(f => {
+          const marker = L.marker(
+            [f.latitud, f.longitud],
+            { icon: iconoFacultad(f.facultad_sigla || f.facultad) }
+          );
+
+          const popupFac = `
+            <div>
+              <strong style="color:#0f1f3d">${f.facultad}</strong><br>
+              <small style="color:#555">${f.nombre}</small><br>
+              <span class="badge bg-success mt-1">${f.tipo}</span>
+              <span class="badge bg-secondary mt-1">${f.total_carreras} carrera${f.total_carreras !== 1 ? 's' : ''}</span>
+              ${f.telefono ? `<br><small><i class="bi bi-telephone me-1"></i>${f.telefono}</small>` : ''}
+              ${f.direccion ? `<br><small><i class="bi bi-pin-map me-1"></i>${f.direccion}</small>` : ''}
+              <br>
+              <div style="display:flex;gap:6px;margin-top:6px">
+                <a href="${f.detalle_url}"
+                   class="btn-ver-fac"
+                   style="text-decoration:none">
+                  <i class="bi bi-arrow-right me-1"></i>Ver detalle completo
+                </a>
+                <a href="https://www.google.com/maps?q=${f.latitud},${f.longitud}"
+                   target="_blank" rel="noopener"
+                   class="btn-gmaps">
+                  <i class="bi bi-map me-1"></i>Maps
+                </a>
+              </div>
+            </div>`;
+
+          marker.bindPopup(popupFac);
+          marker.addTo(capaFacultadesDetalle);
+        });
+
+        // Zoom adaptativo
+        if (facultades.length > 1) {
+          const bounds = L.latLngBounds(
+            facultades.map(f => [f.latitud, f.longitud])
+          );
+          map.fitBounds(bounds, { padding: [60, 60], maxZoom: 16 });
+        } else {
+          map.flyTo([lat, lng], 15, { duration: 1.2 });
+        }
+
+        // Mostrar panel lateral con tabla de facultades
+        mostrarPanel(ciudad, facultades);
+      })
+      .catch(err => console.error('Error cargando facultades:', err));
+  }
+
+  // ── Panel lateral informativo ───────────────────────────────────────────
+  function mostrarPanel(ciudad, facultades) {
+    document.getElementById('panel-titulo').innerHTML =
+      `<i class="bi bi-building me-2"></i>Facultades en ${ciudad}
+       <span class="badge bg-secondary ms-2">${facultades.length}</span>`;
+
+    const tabla = `
+      <table class="table table-sm table-hover mb-0">
+        <thead class="table-dark">
+          <tr>
+            <th>Facultad</th>
+            <th class="text-center">Carreras</th>
+            <th>Teléfono</th>
+            <th>Detalle</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${facultades.map(f => `
+            <tr>
+              <td>
+                <strong>${f.facultad_sigla}</strong>
+                <br><small class="text-muted">${f.facultad}</small>
+              </td>
+              <td class="text-center">
+                <span class="badge bg-primary">${f.total_carreras}</span>
+              </td>
+              <td><small>${f.telefono || '—'}</small></td>
+              <td>
+                <a href="${f.detalle_url}"
+                   class="btn btn-outline-dark btn-sm">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>`;
+
+    document.getElementById('panel-contenido').innerHTML = tabla;
+    document.getElementById('panel-facultades').style.display = 'block';
+
+    // Scroll suave al panel
+    document.getElementById('panel-facultades')
+      .scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function cerrarPanel() {
+    document.getElementById('panel-facultades').style.display = 'none';
+    capaFacultadesDetalle.clearLayers();
+  }
+
+  // ── Reset del mapa ──────────────────────────────────────────────────────
+  function resetMapa() {
+    capaFacultadesDetalle.clearLayers();
+    cerrarPanel();
+    map.flyTo(vistaInicial.center, vistaInicial.zoom, { duration: 1 });
+  }
 </script>
 {% endblock %}

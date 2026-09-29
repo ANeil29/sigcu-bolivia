@@ -298,14 +298,14 @@
   const lat0 = coordsSedes[0].lat;
   const lon0 = coordsSedes[0].lon;
 
-  const map = L.map('mapa-sede').setView([lat0, lon0], 13);
+  const map = L.map('mapa-sede').setView([lat0, lon0], 16);
 
   L.tileLayer(
     'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=cb1_3ni7_1_8c4972bd350b5b36d24741b6',
     {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd',
-        maxZoom: 20
+        maxZoom: 50
     }
 ).addTo(map);
 

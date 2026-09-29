@@ -11,6 +11,8 @@ from django.contrib import messages
 from accounts.decorators import puede_editar, rol_requerido
 from .forms import UniversidadForm, FacultadForm, SedeForm
 
+from django.http import JsonResponse
+from django.db.models import Count, Q
 
 class UniversidadViewSet(viewsets.ModelViewSet):
     queryset         = Universidad.objects.filter(activa=True)
@@ -330,13 +332,56 @@ def editar_sede(request, pk):
 @rol_requerido('SUPERADMIN', 'ADMIN_DSA')
 def eliminar_sede(request, pk):
     sede = get_object_or_404(Sede, pk=pk)
-    ciudad = sede.ciudad
+
     if request.method == 'POST':
-        sede.delete()
-        messages.warning(request, f'Sede {sede.nombre} eliminada.')
-        return redirect('lista-sedes')
-    return render(request, 'universidades/confirmar_eliminar.html',
-                  {'objeto': sede, 'tipo': 'Sede'})
+        from django.db.models.deletion import ProtectedError
+
+        try:
+            nombre_sede = sede.nombre
+            sede.delete()
+
+            messages.success(
+                request,
+                f'Sede "{nombre_sede}" eliminada correctamente.'
+            )
+
+            return redirect('lista-sedes')
+
+        except ProtectedError:
+            cantidad_carreras = sede.carreras.count()
+            cantidad_programas = sede.programas.count()
+
+            dependencias = []
+
+            if cantidad_carreras > 0:
+                dependencias.append(
+                    f'{cantidad_carreras} carrera(s)'
+                )
+
+            if cantidad_programas > 0:
+                dependencias.append(
+                    f'{cantidad_programas} programa(s)'
+                )
+
+            detalle = ' y '.join(dependencias)
+
+            messages.error(
+                request,
+                f'No se puede eliminar la sede "{sede.nombre}" '
+                f'porque tiene {detalle} asociado(s). '
+                f'Primero elimine o reasigne esos registros.'
+            )
+
+            return redirect('lista-sedes')
+
+    return render(
+        request,
+        'universidades/confirmar_eliminar.html',
+        {
+            'objeto': sede,
+            'tipo': 'Sede'
+        }
+    )
 
 
 # ── CRUD Sede (sin cambios) ───────────────────────────────────────────────────
@@ -368,15 +413,102 @@ def editar_sede(request, pk):
                    'accion': 'Guardar cambios',
                    'objeto': sede})
 
+def sedes_mapa_json(request):
+    """
+    Endpoint que devuelve el resumen de sedes para el mapa principal.
+    Agrupa por ciudad y devuelve conteo de facultades y carreras.
+    """
+    from carreras.models import Carrera
 
-@login_required
-@rol_requerido('SUPERADMIN', 'ADMIN_DSA')
-def eliminar_sede(request, pk):
-    sede = get_object_or_404(Sede, pk=pk)
-    ciudad = sede.ciudad
-    if request.method == 'POST':
-        sede.delete()
-        messages.warning(request, f'Sede {sede.nombre} eliminada.')
-        return redirect('lista-sedes')
-    return render(request, 'universidades/confirmar_eliminar.html',
-                  {'objeto': sede, 'tipo': 'Sede'})
+    # Obtenemos sedes únicas con coordenadas
+    sedes = Sede.objects.filter(
+        activa=True,
+        latitud__isnull=False,
+        longitud__isnull=False
+    ).select_related('facultad__universidad')
+
+    # Agrupamos por ciudad para no repetir marcadores
+    ciudades_vistas = set()
+    data = []
+
+    for sede in sedes.order_by('ciudad'):
+        ciudad = sede.ciudad
+        if ciudad in ciudades_vistas:
+            continue
+        ciudades_vistas.add(ciudad)
+
+        # Contar facultades únicas en esa ciudad
+        total_facultades = Sede.objects.filter(
+            activa=True,
+            ciudad=ciudad
+        ).values('facultad').distinct().count()
+
+        # Contar carreras activas en esa ciudad
+        total_carreras = Carrera.objects.filter(
+            sede__ciudad=ciudad,
+            en_funcionamiento=True
+        ).count()
+
+        # Coordenadas de la primera sede de esa ciudad
+        primera = Sede.objects.filter(
+            activa=True,
+            ciudad=ciudad,
+            latitud__isnull=False,
+            longitud__isnull=False
+        ).first()
+
+        data.append({
+            'ciudad':           ciudad,
+            'departamento':     sede.departamento,
+            'universidad':      sede.facultad.universidad.sigla,
+            'universidad_nombre': sede.facultad.universidad.nombre,
+            'lat':              primera.latitud,
+            'lng':              primera.longitud,
+            'total_facultades': total_facultades,
+            'total_carreras':   total_carreras,
+        })
+
+    return JsonResponse(data, safe=False)
+
+
+def facultades_por_sede_json(request):
+    """
+    Endpoint que devuelve el detalle de facultades de una ciudad específica.
+    Se llama al hacer clic en 'Ver facultades' en el popup.
+    """
+    from carreras.models import Carrera
+
+    ciudad = request.GET.get('ciudad', '')
+    if not ciudad:
+        return JsonResponse([], safe=False)
+
+    sedes = Sede.objects.filter(
+        activa=True,
+        ciudad=ciudad,
+        latitud__isnull=False,
+        longitud__isnull=False
+    ).select_related('facultad__universidad')
+
+    data = []
+    for sede in sedes:
+        total_carreras = Carrera.objects.filter(
+            sede=sede,
+            en_funcionamiento=True
+        ).count()
+
+        data.append({
+            'id':           sede.pk,
+            'nombre':       sede.nombre,
+            'facultad':     sede.facultad.nombre,
+            'facultad_sigla': sede.facultad.sigla,
+            'universidad':  sede.facultad.universidad.sigla,
+            'tipo':         sede.get_tipo_display(),
+            'latitud':      sede.latitud,
+            'longitud':     sede.longitud,
+            'telefono':     sede.telefono or '',
+            'direccion':    sede.direccion or '',
+            'total_carreras': total_carreras,
+            'detalle_url':  f'/api/v1/universidades/web/sedes/ciudad/{ciudad}/',
+        })
+
+    return JsonResponse(data, safe=False)

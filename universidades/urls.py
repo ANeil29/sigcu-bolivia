@@ -5,6 +5,7 @@ from .views import (
     lista_universidades, crear_universidad, editar_universidad, eliminar_universidad,
     lista_facultades, crear_facultad, editar_facultad, eliminar_facultad,
     lista_sedes, detalle_sede_ciudad, crear_sede, editar_sede, eliminar_sede,
+    sedes_mapa_json, facultades_por_sede_json,
 )
 
 router = DefaultRouter()
@@ -15,6 +16,9 @@ router.register('sedes',      SedeViewSet,        basename='sede')
 urlpatterns = [
 
     path('sedes/geojson/', sedes_geojson, name='sedes-geojson'),
+
+    path('api/sedes-mapa/',           sedes_mapa_json,         name='sedes-mapa-json'),
+    path('api/facultades-por-sede/',  facultades_por_sede_json, name='facultades-por-sede-json'),
 
     path('web/',                    lista_universidades,  name='lista-universidades'),
     path('web/crear/',              crear_universidad,    name='crear-universidad'),

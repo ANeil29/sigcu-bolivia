@@ -60,9 +60,17 @@
       --sidebar-width: 240px;
     }
 
+    html, body {
+    height: 100%;
+    margin: 0;
+    }
+
     body {
-      background: var(--sigcu-light);
-      font-size: 0.92rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: var(--sigcu-light);
+    font-size: 0.92rem;
     }
 
     /* ── Navbar principal ── */
@@ -138,9 +146,9 @@
 
     /* ── Contenido principal ── */
     .main-content {
-      padding: 1.5rem;
+    flex: 1;
+    padding: 1.5rem;
     }
-
     /* ── Cards ── */
     .card {
       border: none;
@@ -161,13 +169,14 @@
 
     /* ── Footer ── */
     .footer-sigcu {
-      background: var(--sigcu-dark);
-      color: rgba(255,255,255,.5);
-      text-align: center;
-      font-size: .78rem;
-      padding: .75rem;
-      margin-top: 3rem;
-    }
+    background: var(--sigcu-dark);
+    color: rgba(255,255,255,.5);
+    text-align: center;
+    font-size: .78rem;
+    padding: .75rem;
+    margin-top: auto; 
+    flex-shrink: 0;
+    } 
 
     /* ── Alerta flotante arriba ── */
     .alertas-flotantes {
@@ -177,31 +186,109 @@
       z-index: 9999;
       width: 340px;
     }
-  </style>
-</head>
 
+    @media (max-width: 991.98px) {
+
+  /* El menú desplegado ocupa todo el ancho disponible */
+  .navbar-sigcu .navbar-collapse {
+    padding-top: .5rem;
+    padding-bottom: .5rem;
+  }
+
+  /* Cada enlace ocupa su propia fila */
+  .navbar-sigcu .navbar-nav .nav-link {
+    position: relative;
+    padding: .65rem .85rem;
+    margin: 2px 0;
+    border-radius: 6px;
+  }
+
+  /* Estado activo en móvil */
+  .navbar-sigcu .nav-link.nav-active {
+    background: rgba(232, 160, 32, 0.12);
+    color: #e8a020 !important;
+  }
+
+  /* Indicador vertical en lugar de la línea inferior */
+  .navbar-sigcu .nav-link.nav-active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 20%;
+    bottom: 20%;
+    width: 3px;
+    height: auto;
+    background: #e8a020;
+    border-radius: 0 3px 3px 0;
+    transform: none;
+  }
+
+  /* Dropdowns en móvil */
+  .navbar-sigcu .dropdown-menu {
+    border: none;
+    border-left: 2px solid rgba(232, 160, 32, 0.25);
+    border-radius: 0;
+    margin-left: .5rem;
+    padding-left: .25rem;
+  }
+
+  /* Elemento activo dentro del dropdown */
+  .navbar-sigcu .dropdown-item.dropdown-active {
+    border-left: 3px solid #e8a020;
+    border-radius: 0 4px 4px 0;
+  }
+}
+/* ── Botón hamburguesa en dispositivos móviles ── */
+.navbar-sigcu .navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.65) !important;
+  padding: .35rem .55rem;
+}
+
+/* Quitar resaltado al presionar */
+.navbar-sigcu .navbar-toggler:focus,
+.navbar-sigcu .navbar-toggler:active {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+/* Icono hamburguesa blanco */
+.navbar-sigcu .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,0.9)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Información del usuario dentro del menú desplegable */
+.texto-dropdown-info {
+    color: #d9e2ec !important;
+}
+  </style>
+  
+</head>
 <body>
 
 <!-- ═══════════════════════════════════════════════════════ NAVBAR ══ -->
+{% if user.is_authenticated and request.resolver_match.url_name != 'bienvenida' %}
 <nav class="navbar navbar-expand-lg navbar-sigcu">
   <div class="container-fluid px-3">
 
     <!-- Logo -->
-    <a class="navbar-brand me-3" href="{% url 'dashboard' %}">
+
+
+    <a class="navbar-brand me-3" href="{% url 'bienvenida' %}">
       <i class="bi bi-mortarboard-fill me-1" style="color:var(--sigcu-accent)"></i>
       SIGCU <span>Bolivia</span>
     </a>
 
     <!-- Toggler móvil -->
-    <button class="navbar-toggler border-secondary" type="button"
+    <button class="navbar-toggler" type="button"
             data-bs-toggle="collapse" data-bs-target="#navbarMain">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <!-- Menús -->
     <div class="collapse navbar-collapse" id="navbarMain">
+
+
       <ul class="navbar-nav me-auto">
-  {% if user.is_authenticated %}
 
   <!-- Dashboard -->
   <li class="nav-item">
@@ -435,8 +522,8 @@
       </li>
     </ul>
   </li>
-  {% endif %}
 
+  
   {% endif %}
 </ul>
 
@@ -467,14 +554,14 @@
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
             <li>
-              <span class="dropdown-item-text text-muted small">
-                {{ user.email|default:"Sin correo" }}
+              <span class="dropdown-item-text small texto-dropdown-info">
+                 {{ user.email|default:"Sin correo" }}
               </span>
             </li>
             {% if user.universidad %}
             <li>
-              <span class="dropdown-item-text text-muted small">
-                <i class="bi bi-building me-1"></i>{{ user.universidad.sigla }}
+              <span class="dropdown-item-text small texto-dropdown-info">
+                  <i class="bi bi-building me-1"></i>{{ user.universidad.sigla }}
               </span>
             </li>
             {% endif %}
@@ -502,6 +589,7 @@
     </div>
   </div>
 </nav>
+{% endif %}
 
 <!-- ═══════════════════════════════════════════════════ BREADCRUMB ══ -->
 {% block breadcrumb %}{% endblock %}
@@ -524,11 +612,13 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════ FOOTER ═══════ -->
+{% if request.resolver_match.url_name != 'bienvenida' %}
 <footer class="footer-sigcu">
   SIGCU Bolivia &nbsp;·&nbsp; Sistema de Información para la Gestión Curricular Universitaria
   &nbsp;·&nbsp; UATF Potosí &nbsp;·&nbsp;
   {% now "Y" %}
 </footer>
+{% endif %}
 
 <!-- ═══════════════════════════════════════════════════ SCRIPTS ══════ -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

@@ -147,10 +147,9 @@ SIMPLE_JWT = {
 
 CORS_ALLOW_ALL_ORIGINS = True  
 
-LOGIN_URL          = '/auth/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/auth/login/'
-
+LOGIN_URL           = '/auth/login/'
+LOGIN_REDIRECT_URL  = '/inicio/'      
+LOGOUT_REDIRECT_URL = '/'            
 # ── Configuración de correo (Gmail) 
 EMAIL_BACKEND       = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST          = 'smtp.gmail.com'
