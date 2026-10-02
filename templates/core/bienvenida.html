@@ -1,297 +1,279 @@
 {% extends 'base/base.html' %}
+{% load static %}
 {% block title %}Bienvenido — SIGCU Bolivia{% endblock %}
 
 {% block content %}
 <style>
-  /* ── Fondo animado — cubre toda la pantalla ──────────────────────── */
-  .bienvenida-wrap {
-    min-height: calc(100vh - 58px); /* 58px = altura del navbar */
-    margin: -1.5rem -1.5rem 0 -1.5rem; /* cancela el padding del main-content */
+  /* ── Pantalla de transición ─────────────────────────────────────── */
+  .transicion-wrap {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    position: fixed;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    background: linear-gradient(135deg, #0a1628 0%, #0f1f3d 50%, #1a3560 100%);
+    transition: opacity .8s ease, visibility .8s ease;
+  }
+  .transicion-wrap.desvanecer {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  /* Anillo de progreso */
+  .anillo-wrap {
     position: relative;
-    overflow: hidden;
-    background: linear-gradient(135deg, #0a1628 0%, #0f1f3d 40%, #1a3560 70%, #0f1f3d 100%);
-    border-radius: 0;   /* sin bordes redondeados para que tape todo */
-    padding: 3rem 2rem;
+    width: 180px; height: 180px;
+    margin-bottom: 2rem;
+    animation: aparecerArriba .7s ease both;
+  }
+  .anillo-svg {
+    width: 180px; height: 180px;
+    transform: rotate(-90deg);
+  }
+  .anillo-fondo {
+    fill: none;
+    stroke: rgba(255,255,255,.08);
+    stroke-width: 4;
+  }
+  .anillo-progreso {
+    fill: none;
+    stroke: #e8a020;
+    stroke-width: 4;
+    stroke-linecap: round;
+    stroke-dasharray: 502;
+    stroke-dashoffset: 502;
+    animation: llenarAnillo 3.2s ease forwards .5s;
+  }
+  @keyframes llenarAnillo {
+    to { stroke-dashoffset: 0; }
   }
 
-  /* Partículas de fondo animadas */
-  .particula {
+  /* Logo centrado dentro del anillo */
+  .logo-centro {
     position: absolute;
-    border-radius: 50%;
-    background: rgba(232, 160, 32, 0.07);
-    animation: flotar linear infinite;
-  }
-  @keyframes flotar {
-    0%   { transform: translateY(100vh) scale(0);   opacity: 0; }
-    10%  { opacity: 1; }
-    90%  { opacity: 0.5; }
-    100% { transform: translateY(-20vh) scale(1.3); opacity: 0; }
-  }
-
-  /* Logos institucionales */
-  .logos-wrap {
+    inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 3rem;
-    margin-bottom: 1.8rem;
-    animation: aparecerArriba 0.8s ease both;
   }
-
-  /* Contenedor circular con efecto glow */
-  .logo-circulo {
-    width: 130px; height: 130px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255,255,255,0.06);
-    border: 2px solid rgba(232,160,32,0.5);
-    box-shadow: 0 0 20px rgba(232,160,32,0.15),
-                inset 0 0 20px rgba(0,0,0,0.2);
-    backdrop-filter: blur(6px);
-    transition: transform .3s, box-shadow .3s;
-    overflow: hidden;
-    padding: 0;
-  }
-  .logo-circulo:hover {
-    transform: scale(1.08);
-    box-shadow: 0 0 30px rgba(232,160,32,0.35),
-                inset 0 0 20px rgba(0,0,0,0.2);
-  }
-
-  /* Imagen del logo dentro del círculo */
-  .logo-circulo img {
-    width: 110px;
-    height: 110px;
+  .logo-centro img {
+    width: 100px; height: 100px;
     object-fit: contain;
     border-radius: 50%;
+    animation: pulsar 2s ease-in-out infinite;
+  }
+  @keyframes pulsar {
+    0%, 100% { transform: scale(1);    filter: brightness(1); }
+    50%       { transform: scale(1.05); filter: brightness(1.15); }
   }
 
-  /* Logo DSA tiene fondo negro — lo limpiamos visualmente */
-  .logo-circulo.dsa img {
-    width: 105px;
-    height: 105px;
-    filter: brightness(1.1) contrast(1.05);
-  }
-
-  .logo-separador {
-    color: rgba(232,160,32,0.4);
-    font-size: 2.5rem;
-    font-weight: 100;
-    animation: aparecerArriba 1s ease both;
-  }
-
-  /* Texto central */
-  .texto-central {
+  /* Texto de bienvenida */
+  .texto-transicion {
     text-align: center;
     color: white;
-    animation: aparecerAbajo 0.9s ease both;
-    max-width: 700px;
+    animation: aparecerAbajo .8s ease both .3s;
   }
-  .texto-central h1 {
-    font-size: 2.2rem;
-    font-weight: 700;
-    margin-bottom: 0.3rem;
-    letter-spacing: 1.5px;
+  .texto-transicion .saludo {
+    font-size: .85rem;
+    color: rgba(255,255,255,.5);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: .4rem;
   }
-  .texto-central h1 span { color: #e8a020; }
-  .texto-central .subtitulo {
-    font-size: 1rem;
-    color: rgba(255,255,255,.72);
-    margin-bottom: 0.2rem;
+  .texto-transicion .nombre {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #e8a020;
+    margin-bottom: .3rem;
   }
-  .texto-central .inst {
-    font-size: 0.83rem;
-    color: rgba(255,255,255,.45);
-    margin-bottom: 1.8rem;
-  }
-
-  /* Barra decorativa dorada */
-  .barra-deco {
-    width: 90px; height: 3px;
-    background: linear-gradient(90deg, transparent, #e8a020, transparent);
-    margin: 0.8rem auto;
-    border-radius: 2px;
+  .texto-transicion .rol {
+    display: inline-block;
+    background: rgba(232,160,32,.15);
+    border: 1px solid rgba(232,160,32,.3);
+    color: rgba(255,255,255,.75);
+    border-radius: 20px;
+    padding: .25rem 1rem;
+    font-size: .82rem;
+    margin-bottom: 1.5rem;
   }
 
-  /* Saludo usuario */
-  .saludo-usuario {
-    background: rgba(255,255,255,.07);
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 40px;
-    padding: 0.5rem 1.8rem;
-    color: rgba(255,255,255,.85);
-    font-size: 0.9rem;
-    margin-bottom: 1.8rem;
-    backdrop-filter: blur(4px);
-    animation: aparecerAbajo 1s ease both 0.2s;
-  }
-  .saludo-usuario strong { color: #e8a020; }
-
-  /* Botón ingresar */
-  .btn-ingresar {
-    background: linear-gradient(135deg, #e8a020, #c8841a);
-    color: white;
-    border: none;
-    padding: 0.9rem 3rem;
-    font-size: 1rem;
-    font-weight: 700;
-    border-radius: 40px;
-    letter-spacing: 1px;
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    box-shadow: 0 4px 20px rgba(232,160,32,.4);
-    transition: transform .2s, box-shadow .2s;
-    animation: aparecerAbajo 1.1s ease both 0.4s;
-  }
-  .btn-ingresar:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(232,160,32,.5);
-    color: white;
-  }
-  .btn-ingresar i { font-size: 1.1rem; }
-
-  /* Estadísticas rápidas */
-  .stats-bienvenida {
+  /* Estadísticas rápidas en la transición */
+  .stats-trans {
     display: flex;
-    gap: 2.5rem;
-    margin-top: 2.2rem;
-    animation: aparecerAbajo 1.2s ease both 0.6s;
+    gap: 1.8rem;
+    margin-top: 1.2rem;
+    animation: aparecerAbajo .9s ease both .6s;
   }
-  .stat-item {
+  .st-item {
     text-align: center;
-    color: rgba(255,255,255,.55);
+    color: rgba(255,255,255,.5);
   }
-  .stat-item .num {
+  .st-item .num {
     display: block;
-    font-size: 1.7rem;
+    font-size: 1.6rem;
     font-weight: 800;
     color: #e8a020;
     line-height: 1;
   }
-  .stat-item small {
-    font-size: 0.7rem;
+  .st-item small {
+    font-size: .68rem;
     text-transform: uppercase;
-    letter-spacing: .6px;
+    letter-spacing: .5px;
   }
-
-  /* Separador entre stats */
-  .stat-sep {
-    color: rgba(255,255,255,.1);
-    font-size: 2rem;
+  .st-sep {
     align-self: center;
+    color: rgba(255,255,255,.1);
+    font-size: 1.8rem;
   }
 
-  /* Animaciones de entrada */
-  @keyframes aparecerArriba {
-    from { opacity:0; transform:translateY(-30px); }
-    to   { opacity:1; transform:translateY(0); }
-  }
-  @keyframes aparecerAbajo {
-    from { opacity:0; transform:translateY(30px); }
-    to   { opacity:1; transform:translateY(0); }
-  }
-
-  /* Año y versión */
-  .anio-badge {
-    position: absolute;
-    bottom: 1.2rem;
-    right: 1.5rem;
-    color: rgba(255,255,255,.18);
-    font-size: 0.72rem;
-  }
-
-  /* Línea inferior decorativa */
-  .linea-inferior {
+  /* Barra de carga inferior */
+  .barra-carga-wrap {
     position: absolute;
     bottom: 0; left: 0; right: 0;
     height: 3px;
-    background: linear-gradient(90deg,
-      transparent 0%, #e8a020 30%, #e8a020 70%, transparent 100%);
+    background: rgba(255,255,255,.06);
+  }
+  .barra-carga {
+    height: 3px;
+    background: linear-gradient(90deg, #e8a020, #f0c040, #e8a020);
+    width: 0;
+    animation: cargarBarra 3.5s ease forwards .2s;
+  }
+  @keyframes cargarBarra {
+    to { width: 100%; }
+  }
+
+  /* Texto "ingresando" parpadeante */
+  .ingresando {
+    position: absolute;
+    bottom: 1.4rem;
+    font-size: .75rem;
+    color: rgba(255,255,255,.3);
+    letter-spacing: 1.5px;
+    animation: parpadear 1.2s ease-in-out infinite .8s;
+  }
+  @keyframes parpadear {
+    0%, 100% { opacity: .3; }
+    50%       { opacity: .9; }
+  }
+
+  /* Partículas */
+  .ptrans {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(232,160,32,.06);
+    animation: flotarT linear infinite;
+    pointer-events: none;
+  }
+  @keyframes flotarT {
+    0%   { transform: translateY(100vh) scale(0); opacity:0; }
+    10%  { opacity: .8; }
+    90%  { opacity: .3; }
+    100% { transform: translateY(-20vh) scale(1.2); opacity:0; }
+  }
+
+  @keyframes aparecerArriba {
+    from { opacity:0; transform:translateY(-25px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes aparecerAbajo {
+    from { opacity:0; transform:translateY(25px); }
+    to   { opacity:1; transform:translateY(0); }
   }
 </style>
 
-<div class="bienvenida-wrap">
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<!-- PANTALLA DE TRANSICIÓN                                            -->
+<!-- ══════════════════════════════════════════════════════════════════ -->
+<div class="transicion-wrap" id="pantalla-transicion">
 
-  <!-- Partículas animadas de fondo -->
-  {% for i in "123456789" %}
-  <div class="particula" style="
-    width:  {{ forloop.counter|add:20 }}px;
-    height: {{ forloop.counter|add:20 }}px;
-    left:   {{ forloop.counter0 }}0%;
-    animation-duration: {{ forloop.counter|add:8 }}s;
-    animation-delay:    {{ forloop.counter }}s;
+  <!-- Partículas -->
+  {% for i in "12345678" %}
+  <div class="ptrans" style="
+    width:  {{ forloop.counter|add:12 }}px;
+    height: {{ forloop.counter|add:12 }}px;
+    left:   {{ forloop.counter0 }}2%;
+    animation-duration: {{ forloop.counter|add:7 }}s;
+    animation-delay:   -{{ forloop.counter|add:2 }}s;
   "></div>
   {% endfor %}
 
-  <!-- Logos institucionales con imágenes reales -->
-{% load static %}
-<div class="logos-wrap">
-  <div class="logo-circulo" title="Universidad Autónoma Tomás Frías">
-    <img src="{% static 'img/logo_uatf.png' %}"
-         alt="Escudo UATF">
+  <!-- Anillo de progreso con logo -->
+  <div class="anillo-wrap">
+    <svg class="anillo-svg" viewBox="0 0 180 180">
+      <circle class="anillo-fondo"    cx="90" cy="90" r="80"/>
+      <circle class="anillo-progreso" cx="90" cy="90" r="80"/>
+    </svg>
+    <div class="logo-centro">
+      <img src="{% static 'img/logo_uatf.png' %}" alt="UATF">
+    </div>
   </div>
 
-  <div class="logo-separador">·</div>
+  <!-- Texto personalizado -->
+  <div class="texto-transicion">
+    <div class="saludo">Bienvenido al sistema</div>
+    <div class="nombre">
+      {{ user.first_name|default:user.username }}
+      {% if user.last_name %} {{ user.last_name }}{% endif %}
+    </div>
+    <span class="rol">
+      <i class="bi bi-shield-check me-1"></i>
+      {{ user.get_rol_display }}
+    </span>
 
-  <div class="logo-circulo dsa" title="Dirección de Servicios Académicos">
-    <img src="{% static 'img/logo_dsa.jpeg' %}"
-         alt="Logo DSA"
-         style="background:#000; border-radius:50%">
+    <!-- Stats rápidas -->
+    <div class="stats-trans">
+      <div class="st-item">
+        <span class="num">{{ stats.total_carreras }}</span>
+        <small>Carreras</small>
+      </div>
+      <div class="st-sep">·</div>
+      <div class="st-item">
+        <span class="num">{{ stats.total_universidades }}</span>
+        <small>Universidades</small>
+      </div>
+      <div class="st-sep">·</div>
+      <div class="st-item">
+        <span class="num">{{ stats.total_sedes }}</span>
+        <small>Sedes</small>
+      </div>
+      <div class="st-sep">·</div>
+      <div class="st-item">
+        <span class="num">{{ stats.total_procesos }}</span>
+        <small>Procesos</small>
+      </div>
+    </div>
   </div>
+
+  <!-- Texto parpadeante -->
+  <div class="ingresando">
+    <i class="bi bi-circle-fill me-1" style="font-size:.4rem"></i>
+    CARGANDO SISTEMA
+    <i class="bi bi-circle-fill ms-1" style="font-size:.4rem"></i>
+  </div>
+
+  <!-- Barra de carga -->
+  <div class="barra-carga-wrap">
+    <div class="barra-carga" id="barra-progreso"></div>
+  </div>
+
 </div>
 
-  <!-- Texto principal -->
-  <div class="texto-central">
-    <h1>SIGCU <span>Bolivia</span></h1>
-    <p class="subtitulo">Sistema de Información para la Gestión Curricular Universitaria</p>
-    <div class="barra-deco"></div>
-    <p class="inst">Potosí, Bolivia · Sistema de la Universidad Boliviana</p>
-  </div>
 
-  <!-- Saludo personalizado -->
-  <div class="saludo-usuario">
-    <i class="bi bi-person-check me-2"></i>
-    Bienvenido, <strong>{{ user.get_full_name|default:user.username }}</strong>
-    &nbsp;·&nbsp;
-    <span style="color:rgba(255,255,255,.6)">{{ user.get_rol_display }}</span>
-  </div>
+{% endblock %}
 
-  <!-- Botón de ingreso -->
-  <a href="{% url 'dashboard' %}" class="btn-ingresar">
-    <i class="bi bi-grid-1x2"></i>
-    Ingresar al Sistema
-  </a>
+{% block scripts %}
+<script>
+  const DURACION_MS = 3800;
 
-  <!-- Estadísticas rápidas -->
-  <div class="stats-bienvenida">
-    <div class="stat-item">
-      <span class="num">{{ stats.total_carreras }}</span>
-      <small>Carreras</small>
-    </div>
-    <div class="stat-item">
-      <span class="num">{{ stats.total_universidades }}</span>
-      <small>Universidades</small>
-    </div>
-    <div class="stat-item">
-      <span class="num">{{ stats.total_sedes }}</span>
-      <small>Sedes</small>
-    </div>
-    <div class="stat-item">
-      <span class="num">{{ stats.total_procesos }}</span>
-      <small>Procesos</small>
-    </div>
-  </div>
-
-  <div class="anio-badge">{% now "Y" %}</div>
-
-</div>
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      window.location.href = "{% url 'dashboard' %}";
+    }, DURACION_MS);
+  });
+</script>
 {% endblock %}
