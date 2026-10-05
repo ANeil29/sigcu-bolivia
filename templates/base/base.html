@@ -181,16 +181,93 @@
       letter-spacing: .5px;
     }
 
-    /* ── Footer ── */
-    .footer-sigcu {
-    background: var(--sigcu-dark);
-    color: rgba(255,255,255,.5);
+    /* ── Footer mejorado con redes sociales ── */
+.footer-sigcu {
+  background: var(--sigcu-dark);
+  color: rgba(255,255,255,.5);
+  font-size: .78rem;
+  padding: 1rem 1.5rem;
+  flex-shrink: 0;
+  border-top: 2px solid rgba(232,160,32,.25);
+}
+
+.footer-contenido {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.footer-marca {
+  font-size: .88rem;
+  color: rgba(255,255,255,.85);
+  margin-bottom: 2px;
+}
+
+/* Redes sociales */
+.footer-redes { align-items: center; }
+.footer-redes-titulo {
+  color: rgba(255,255,255,.4);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  font-size: .68rem;
+  margin-bottom: 6px;
+}
+
+.redes-wrap {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.red-social {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .95rem;
+  text-decoration: none;
+  color: white;
+  transition: transform .18s ease, opacity .18s ease;
+  opacity: .75;
+}
+.red-social:hover {
+  transform: translateY(-3px) scale(1.1);
+  opacity: 1;
+  color: white;
+}
+
+/* Colores de cada red */
+.rs-facebook  { background: #1877f2; }
+.rs-twitter   { background: #14171a; }
+.rs-instagram { background: linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); }
+.rs-youtube   { background: #ff0000; }
+.rs-web       { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); }
+
+/* Versión */
+.footer-version { align-items: flex-end; text-align: right; }
+
+/* En móvil el footer se apila */
+@media (max-width: 768px) {
+  .footer-contenido {
+    flex-direction: column;
+    align-items: center;
     text-align: center;
-    font-size: .78rem;
-    padding: .75rem;
-    margin-top: auto; 
-    flex-shrink: 0;
-    } 
+    gap: .8rem;
+  }
+  .footer-col { align-items: center; }
+  .footer-version { align-items: center; text-align: center; }
+}
 
     /* ── Alerta flotante arriba ── */
     .alertas-flotantes {
@@ -201,72 +278,171 @@
       width: 340px;
     }
 
- @media (max-width: 991.98px) {
+ @media (max-width: 991px) {
 
-  /* Navbar por encima del contenido */
-  .navbar-sigcu {
-    position: relative;
-    z-index: 1050;
-  }
+/* Dentro del bloque <style> de base.html — reemplaza la sección del navbar */
 
-  /* Menú móvil */
-  .navbar-sigcu .navbar-collapse {
-    background: var(--sigcu-dark) !important;
-    padding: .5rem .25rem .75rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    position: relative;
-    z-index: 1051;
-  }
+/* ── Navbar principal ── */
+.navbar-sigcu {
+  background: var(--sigcu-dark);
+  min-height: 56px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+}
+.navbar-sigcu .navbar-brand {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #fff !important;
+  letter-spacing: .5px;
+}
+.navbar-sigcu .navbar-brand span { color: var(--sigcu-accent); }
 
-  /* Enlaces del menú móvil */
-  .navbar-sigcu .navbar-nav .nav-link {
-    position: relative;
-    padding: .65rem .85rem;
-    margin: 2px 0;
-    border-radius: 6px;
-  }
+.navbar-sigcu .nav-link {
+  color: rgba(255,255,255,.85) !important;
+  font-size: 0.88rem;
+  padding: .5rem .75rem;
+  border-radius: 4px;
+  transition: background .15s;
+}
+.navbar-sigcu .nav-link:hover,
+.navbar-sigcu .nav-link.active {
+  background: var(--sigcu-mid);
+  color: #fff !important;
+}
+.navbar-sigcu .dropdown-menu {
+  background: var(--sigcu-dark);
+  border: 1px solid var(--sigcu-mid);
+  min-width: 210px;
+}
+.navbar-sigcu .dropdown-item {
+  color: rgba(255,255,255,.8);
+  font-size: 0.87rem;
+  padding: .45rem 1rem;
+}
+.navbar-sigcu .dropdown-item:hover {
+  background: var(--sigcu-mid);
+  color: #fff;
+}
+.navbar-sigcu .dropdown-divider  { border-color: var(--sigcu-mid); }
+.navbar-sigcu .dropdown-header {
+  color: var(--sigcu-accent);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  padding: .5rem 1rem .25rem;
+}
 
-  /* Sección activa en móvil */
-  .navbar-sigcu .nav-link.nav-active {
-    background: rgba(232, 160, 32, 0.12);
-    color: #e8a020 !important;
-  }
+/* ── Toggler sin demora ── */
+.navbar-toggler {
+  border: 1px solid rgba(255,255,255,.25) !important;
+  padding: .3rem .5rem;
+  transition: none !important;   /* ← elimina la demora */
+}
+.navbar-toggler:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255%2c255%2c255%2c.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
 
-  /* Línea vertical en móvil */
-@media (max-width: 991.98px) {
+/* ── Menú colapsado en móvil — sin demora, cubre toda la pantalla ── */
+@media (max-width: 991px) {
 
-  .navbar-sigcu .navbar-nav .nav-link.nav-active::before {
-    content: '';
+  /* ── Menú móvil desplegable ── */
+.navbar-sigcu .navbar-collapse {
     position: absolute;
+    top: 100%;
     left: 0;
-    top: 20%;
-    bottom: 20%;
-    width: 2px;
-    background: #e8a020;
-    border-radius: 0 2px 2px 0;
+    right: 0;
+    background:  #0f1f3d;
+    z-index: 1025;
+    border-top: 2px solid var(--sigcu-accent);
+    overflow: hidden;
+    padding: 0.1rem 1rem !important;
   }
 
-  .navbar-sigcu .navbar-nav .nav-link.nav-active:not(.dropdown-toggle)::after {
-    display: none !important;
-  }
+  .navbar-sigcu .navbar-collapse.show {
+    padding: 1rem;
   }
 
-  /* Dropdowns */
+  .navbar-sigcu .navbar-collapse.collapsing {
+    overflow: hidden;
+    padding: 1rem;
+  }
+
+}
+
+  /* Dropdowns en móvil abren hacia abajo sin posicionamiento absoluto */
   .navbar-sigcu .dropdown-menu {
-    background: var(--sigcu-dark) !important;
+    position: static !important;
+    background: rgba(255,255,255,.04);
     border: none;
-    border-left: 2px solid rgba(232, 160, 32, 0.25);
+    border-left: 3px solid var(--sigcu-accent);
     border-radius: 0;
-    margin-left: .5rem;
-    padding-left: .25rem;
+    margin: 4px 0 4px 1rem;
+    padding: .25rem 0;
+    box-shadow: none;
+  }
+  .navbar-sigcu .dropdown-item {
+    padding: .55rem 1rem;
+    font-size: .95rem;
+  }
+  .navbar-sigcu .dropdown-header {
+    font-size: .7rem;
+    padding: .5rem 1rem .2rem;
   }
 
-  /* Elemento activo dentro del dropdown */
-  .navbar-sigcu .dropdown-item.dropdown-active {
+  /* Badge de rol y perfil al final del menú móvil */
+  .navbar-nav.ms-auto {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,.1);
+  }
+
+  /* Botón de cerrar sesión más visible en móvil */
+  .nav-link.text-danger {
+    color: #ff6b6b !important;
+    font-weight: 600;
+  }
+
+/* ── Indicador de página activa ── */
+.navbar-sigcu .nav-link.nav-active {
+  background: rgba(232,160,32,.15);
+  color: #e8a020 !important;
+  border-radius: 6px;
+  position: relative;
+}
+.navbar-sigcu .nav-link.nav-active::after {
+  content: '';
+  position: absolute;
+  bottom: 2px; left: 50%;
+  transform: translateX(-50%);
+  width: 60%; height: 2px;
+  background: #e8a020;
+  border-radius: 2px;
+}
+}
+
+@media (max-width: 991px) {
+  .navbar-sigcu .nav-link.nav-active::after {
+    display: none;   /* en móvil no necesita la línea */
+  }
+  .navbar-sigcu .nav-link.nav-active {
     border-left: 3px solid #e8a020;
-    border-radius: 0 4px 4px 0;
+    padding-left: calc(.75rem - 3px) !important;
   }
-  }
+}
+.navbar-sigcu .dropdown-item.dropdown-active {
+  background: rgba(232,160,32,.12);
+  color: #e8a020 !important;
+  font-weight: 600;
+  border-left: 3px solid #e8a020;
+  padding-left: calc(1rem - 3px);
+}
+  
   /* ── Botón hamburguesa en dispositivos móviles ── */
   .navbar-sigcu .navbar-toggler {
     border-color: rgba(255, 255, 255, 0.65) !important;
@@ -639,10 +815,75 @@
 
 <!-- ═══════════════════════════════════════════════════ FOOTER ═══════ -->
 {% if request.resolver_match.url_name != 'bienvenida' %}
+<!-- ═══════════════════════════════════════════════════ FOOTER ═══ -->
 <footer class="footer-sigcu">
-  SIGCU Bolivia &nbsp;·&nbsp; Sistema de Información para la Gestión Curricular Universitaria
-  &nbsp;·&nbsp; UATF Potosí &nbsp;·&nbsp;
-  {% now "Y" %}
+  <div class="footer-contenido">
+
+    <!-- Columna izquierda: info del sistema -->
+    <div class="footer-col">
+      <div class="footer-marca">
+        <i class="bi bi-mortarboard-fill me-1" style="color:#e8a020"></i>
+        <strong>SIGCU Bolivia</strong>
+      </div>
+      <small>
+        Sistema de Información para la Gestión Curricular Universitaria
+      </small><br>
+      <small>Universidad Autónoma Tomás Frías · Potosí, Bolivia</small>
+    </div>
+
+    <!-- Columna central: redes sociales UATF -->
+    <div class="footer-col footer-redes">
+      <small class="footer-redes-titulo">Síguenos en redes</small>
+      <div class="redes-wrap">
+
+        <a href="https://www.facebook.com/uatfoficial"
+           target="_blank" rel="noopener"
+           class="red-social rs-facebook"
+           title="Facebook UATF">
+          <i class="bi bi-facebook"></i>
+        </a>
+
+        <a href="https://twitter.com/uatf_oficial"
+           target="_blank" rel="noopener"
+           class="red-social rs-twitter"
+           title="X / Twitter UATF">
+          <i class="bi bi-twitter-x"></i>
+        </a>
+
+        <a href="https://www.instagram.com/uatf.bolivia"
+           target="_blank" rel="noopener"
+           class="red-social rs-instagram"
+           title="Instagram UATF">
+          <i class="bi bi-instagram"></i>
+        </a>
+
+        <a href="https://www.youtube.com/@uatfoficial"
+           target="_blank" rel="noopener"
+           class="red-social rs-youtube"
+           title="YouTube UATF">
+          <i class="bi bi-youtube"></i>
+        </a>
+
+        <a href="https://www.uatf.edu.bo"
+           target="_blank" rel="noopener"
+           class="red-social rs-web"
+           title="Sitio web UATF">
+          <i class="bi bi-globe"></i>
+        </a>
+
+      </div>
+    </div>
+
+    <!-- Columna derecha: año y versión -->
+    <div class="footer-col footer-version">
+      <small>DSA · Dirección de Servicios Académicos</small><br>
+      <small>
+        <i class="bi bi-c-circle me-1"></i>
+        {% now "Y" %} · Versión 1.0
+      </small>
+    </div>
+
+  </div>
 </footer>
 {% endif %}
 
@@ -653,12 +894,37 @@
 
 <!-- Auto-cerrar alertas después de 4 segundos -->
 <script>
+   // Cierra el menú móvil inmediatamente al hacer clic en cualquier link
+  document.querySelectorAll('.navbar-nav .nav-link:not(.dropdown-toggle)').forEach(link => {
+    link.addEventListener('click', function() {
+      const collapse = document.getElementById('navbarMain');
+      if (collapse && collapse.classList.contains('show')) {
+        // Cierra sin animación
+        collapse.classList.remove('show');
+        collapse.style.display = '';
+      }
+    });
+  });
+
+  // También cierra al hacer clic en un dropdown-item
+  document.querySelectorAll('.dropdown-item').forEach(item => {
+    item.addEventListener('click', function() {
+      const collapse = document.getElementById('navbarMain');
+      if (collapse && collapse.classList.contains('show')) {
+        collapse.classList.remove('show');
+        collapse.style.display = '';
+      }
+    });
+  });
+
+  // Auto-cerrar alertas
   setTimeout(() => {
     document.querySelectorAll('.alertas-flotantes .alert').forEach(el => {
       const bsAlert = bootstrap.Alert.getOrCreateInstance(el);
       bsAlert.close();
     });
   }, 4000);
+  
 </script>
 
 {% block scripts %}{% endblock %}

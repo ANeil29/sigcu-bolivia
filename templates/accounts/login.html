@@ -1,48 +1,412 @@
-{% extends 'base/base.html' %}
-{% block title %}Iniciar Sesión — SIGCU Bolivia{% endblock %}
+<!DOCTYPE html>
+<html lang="es" style="height:100%">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Iniciar Sesión — SIGCU Bolivia</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  {% load static %}
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
 
-{% block content %}
-<div class="row justify-content-center mt-5">
-  <div class="col-md-4">
-    <div class="card shadow">
-      <p class="text-center mt-2 mb-0">
-  <a href="{% url 'bienvenida-publica' %}" class="text-muted small">
-    <i class="bi bi-arrow-left me-1"></i>Volver al inicio
-  </a>
-</p>
-      <div class="card-body p-4">
-        <h4 class="text-center mb-1"><strong>SIGCU Bolivia</strong></h4>
-        <p class="text-center text-muted mb-4">Sistema de Gestión Curricular</p>
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, #0a1628 0%, #0f1f3d 45%, #1a3560 100%);
+      font-family: Arial, sans-serif;
+    }
+
+    /* ── Partículas ── */
+    .particula {
+      position: fixed;
+      border-radius: 50%;
+      background: rgba(232,160,32,.06);
+      animation: flotar linear infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes flotar {
+      0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 0.4; }
+      100% { transform: translateY(-20vh) scale(1.2); opacity: 0; }
+    }
+
+    /* ── Contenedor principal ── */
+    .login-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── Card del login ── */
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 16px;
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,.4);
+      animation: aparecerAbajo .6s ease both;
+    }
+    @keyframes aparecerAbajo {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Encabezado de la card ── */
+    .login-header {
+      background: linear-gradient(135deg, #0f1f3d, #1a3560);
+      padding: 2rem 2rem 1.5rem;
+      text-align: center;
+      border-bottom: 2px solid rgba(232,160,32,.3);
+      position: relative;
+    }
+
+    /* Logos en el header */
+    .login-logos {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.2rem;
+      margin-bottom: 1.2rem;
+    }
+    .login-logo-img {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      object-fit: contain;
+      border: 2px solid rgba(232,160,32,.5);
+      background: rgba(255,255,255,.06);
+      padding: 4px;
+      transition: transform .3s;
+    }
+    .login-logo-img:hover { transform: scale(1.08); }
+    .login-logo-sep {
+      color: rgba(232,160,32,.4);
+      font-size: 1.5rem;
+      font-weight: 100;
+    }
+
+    .login-header h2 {
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin-bottom: .2rem;
+    }
+    .login-header h2 span { color: #e8a020; }
+    .login-header p {
+      color: rgba(255,255,255,.5);
+      font-size: .78rem;
+      margin: 0;
+    }
+
+    /* Línea decorativa dorada */
+    .linea-deco {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #e8a020, transparent);
+      margin: .8rem auto 0;
+      width: 60px;
+      border-radius: 2px;
+    }
+
+    /* ── Cuerpo del formulario ── */
+    .login-body {
+      padding: 1.8rem 2rem 1.5rem;
+    }
+
+    /* Labels */
+    .login-body .form-label {
+      color: rgba(255,255,255,.75);
+      font-size: .82rem;
+      font-weight: 600;
+      margin-bottom: .4rem;
+    }
+
+    /* Inputs */
+    .login-body .form-control {
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.15);
+      color: white;
+      border-radius: 8px;
+      padding: .65rem 1rem .65rem 2.6rem;
+      font-size: .9rem;
+      transition: border-color .2s, background .2s;
+    }
+    .login-body .form-control::placeholder {
+      color: rgba(255,255,255,.25);
+    }
+    .login-body .form-control:focus {
+      background: rgba(255,255,255,.11);
+      border-color: #e8a020;
+      box-shadow: 0 0 0 3px rgba(232,160,32,.15);
+      color: white;
+      outline: none;
+    }
+
+    /* Ícono dentro del input */
+    .input-wrap {
+      position: relative;
+    }
+    .input-wrap .input-icono {
+      position: absolute;
+      left: .85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: rgba(255,255,255,.35);
+      font-size: .95rem;
+      pointer-events: none;
+      transition: color .2s;
+    }
+    .input-wrap:focus-within .input-icono {
+      color: #e8a020;
+    }
+
+    /* Alerta de error */
+    .login-alerta {
+      background: rgba(220,53,69,.15);
+      border: 1px solid rgba(220,53,69,.35);
+      border-radius: 8px;
+      color: #ff8a9a;
+      font-size: .82rem;
+      padding: .6rem .9rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    /* Alerta de advertencia (cuenta pendiente) */
+    .login-warning {
+      background: rgba(232,160,32,.12);
+      border: 1px solid rgba(232,160,32,.3);
+      border-radius: 8px;
+      color: #e8c97a;
+      font-size: .82rem;
+      padding: .6rem .9rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    /* Botón principal */
+    .btn-login {
+      width: 100%;
+      padding: .75rem;
+      background: linear-gradient(135deg, #e8a020, #c8841a);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: .95rem;
+      font-weight: 700;
+      letter-spacing: .5px;
+      cursor: pointer;
+      transition: transform .18s, box-shadow .18s, filter .18s;
+      box-shadow: 0 4px 16px rgba(232,160,32,.35);
+      margin-top: .5rem;
+    }
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(232,160,32,.45);
+      filter: brightness(1.05);
+    }
+    .btn-login:active {
+      transform: translateY(0);
+    }
+
+    /* ── Footer de la card ── */
+    .login-footer {
+      padding: 1rem 2rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: .7rem;
+      border-top: 1px solid rgba(255,255,255,.07);
+    }
+
+    /* Enlace recuperar contraseña */
+    .link-recuperar {
+      text-align: center;
+      color: rgba(255,255,255,.45);
+      font-size: .8rem;
+      text-decoration: none;
+      transition: color .18s;
+    }
+    .link-recuperar:hover { color: #e8a020; }
+
+    /* Enlace solicitar acceso */
+    .link-registro {
+      text-align: center;
+      color: rgba(255,255,255,.45);
+      font-size: .8rem;
+    }
+    .link-registro a {
+      color: #e8a020;
+      text-decoration: none;
+      font-weight: 600;
+      transition: opacity .18s;
+    }
+    .link-registro a:hover { opacity: .8; }
+
+    /* ── Botón volver al inicio — fuera de la card ── */
+    .btn-volver {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      color: rgba(255,255,255,.45);
+      font-size: .8rem;
+      text-decoration: none;
+      padding: .5rem 1rem;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 30px;
+      transition: color .18s, border-color .18s, background .18s;
+      margin-top: 1.2rem;
+    }
+    .btn-volver:hover {
+      color: white;
+      border-color: rgba(255,255,255,.35);
+      background: rgba(255,255,255,.06);
+    }
+    .btn-volver i { font-size: .85rem; }
+
+    /* ── Pie de página ── */
+    .login-pie {
+      text-align: center;
+      padding: .8rem;
+      color: rgba(255,255,255,.18);
+      font-size: .7rem;
+      position: relative;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Partículas animadas -->
+<div class="particula" style="width:18px;height:18px;left:5%;animation-duration:12s;animation-delay:-2s"></div>
+<div class="particula" style="width:25px;height:25px;left:15%;animation-duration:15s;animation-delay:-5s"></div>
+<div class="particula" style="width:14px;height:14px;left:30%;animation-duration:10s;animation-delay:-8s"></div>
+<div class="particula" style="width:22px;height:22px;left:55%;animation-duration:14s;animation-delay:-3s"></div>
+<div class="particula" style="width:16px;height:16px;left:70%;animation-duration:11s;animation-delay:-7s"></div>
+<div class="particula" style="width:28px;height:28px;left:85%;animation-duration:16s;animation-delay:-1s"></div>
+<div class="particula" style="width:12px;height:12px;left:92%;animation-duration:9s;animation-delay:-9s"></div>
+
+<!-- Contenedor principal -->
+<div class="login-wrap">
+  <div class="d-flex flex-column align-items-center w-100">
+
+    <!-- Card del login -->
+    <div class="login-card">
+
+      <!-- Encabezado con logos -->
+      <div class="login-header">
+        <div class="login-logos">
+          <img src="{% static 'img/logo_uatf.png' %}"
+               class="login-logo-img" alt="UATF">
+          <span class="login-logo-sep">·</span>
+          <img src="{% static 'img/logo_dsa.jpeg' %}"
+               class="login-logo-img"
+               style="background:#000"
+               alt="DSA">
+        </div>
+        <h2>SIGCU <span>Bolivia</span></h2>
+        <p>Sistema de Gestión Curricular Universitaria</p>
+        <div class="linea-deco"></div>
+      </div>
+
+      <!-- Formulario -->
+      <div class="login-body">
+
+        {% for message in messages %}
+        <div class="login-warning">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          {{ message }}
+        </div>
+        {% endfor %}
+
+        {% if form.errors %}
+        <div class="login-alerta">
+          <i class="bi bi-x-circle-fill"></i>
+          Usuario o contraseña incorrectos. Intenta de nuevo.
+        </div>
+        {% endif %}
+
         <form method="post">
           {% csrf_token %}
+
           <div class="mb-3">
-            <label class="form-label">Usuario</label>
-            {{ form.username }}
+            <label class="form-label">
+              <i class="bi bi-person me-1"></i>Usuario
+            </label>
+            <div class="input-wrap">
+              <i class="bi bi-person input-icono"></i>
+              <input type="text"
+                     name="username"
+                     class="form-control"
+                     placeholder="Tu nombre de usuario"
+                     autofocus
+                     required
+                     value="{{ form.username.value|default:'' }}">
+            </div>
           </div>
-          <div class="mb-3">
-            <label class="form-label">Contraseña</label>
-            {{ form.password }}
+
+          <div class="mb-1">
+            <label class="form-label">
+              <i class="bi bi-lock me-1"></i>Contraseña
+            </label>
+            <div class="input-wrap">
+              <i class="bi bi-lock input-icono"></i>
+              <input type="password"
+                     name="password"
+                     class="form-control"
+                     placeholder="Tu contraseña"
+                     required>
+            </div>
           </div>
-          {% if form.errors %}
-            <div class="alert alert-danger py-2">Usuario o contraseña incorrectos.</div>
-          {% endif %}
-          {% for message in messages %}
-            <div class="alert alert-warning py-2">{{ message }}</div>
-          {% endfor %}
-          <button type="submit" class="btn btn-dark w-100">Ingresar</button>
-          <p class="text-center mt-3 mb-0">
-  <a href="{% url 'recuperar-contrasena' %}" class="text-muted small">
-    <i class="bi bi-key me-1"></i>¿Olvidaste tu contraseña?
-  </a>
-</p>
+
+          <button type="submit" class="btn-login">
+            <i class="bi bi-box-arrow-in-right me-2"></i>
+            Iniciar Sesión
+          </button>
         </form>
-        <hr>
-        <p class="text-center mb-0">
-          ¿No tienes acceso?
-          <a href="{% url 'registro' %}">Solicitar acceso</a>
-        </p>
       </div>
+
+      <!-- Footer de la card -->
+      <div class="login-footer">
+        <a href="{% url 'recuperar-contrasena' %}" class="link-recuperar">
+          <i class="bi bi-key me-1"></i>¿Olvidaste tu contraseña?
+        </a>
+        <div class="link-registro">
+          ¿No tienes acceso?
+          <a href="{% url 'registro' %}">Solicitar acceso al sistema</a>
+        </div>
+      </div>
+
     </div>
+
+    <!-- Botón volver al inicio — fuera de la card, debajo -->
+    <a href="{% url 'bienvenida-publica' %}" class="btn-volver">
+      <i class="bi bi-arrow-left-circle"></i>
+      Volver a la página de inicio
+    </a>
+
   </div>
 </div>
-{% endblock %}
+
+<!-- Pie -->
+<div class="login-pie">
+  UATF · Potosí, Bolivia · {% now "Y" %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

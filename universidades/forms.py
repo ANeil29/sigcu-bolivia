@@ -60,6 +60,11 @@ class FacultadForm(forms.ModelForm):
 
 
 class SedeForm(forms.ModelForm):
+    eliminar_imagen = forms.BooleanField(
+        required=False,
+        label='Eliminar imagen actual',
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
     class Meta:
         model  = Sede
         fields = ['facultad', 'nombre', 'tipo', 'departamento', 'ciudad',
@@ -103,7 +108,7 @@ class SedeForm(forms.ModelForm):
             'nombre':      'Nombre de la Sede *',
             'tipo':        'Tipo *',
             'departamento': 'Departamento *',
-            'ciudad':      'Ciudad *',
+            'ciudad':      'Municipio / Localidad *',
             'direccion':   'Dirección',
             'telefono':    'Teléfono',
             'latitud':     'Latitud (coordenada Y)',

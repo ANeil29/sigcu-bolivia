@@ -318,6 +318,14 @@ def editar_sede(request, pk):
     sede = get_object_or_404(Sede, pk=pk)
     form = SedeForm(request.POST or None, request.FILES or None, instance=sede)
     if request.method == 'POST' and form.is_valid():
+        # Si marcó eliminar imagen y no subió una nueva
+        if form.cleaned_data.get('eliminar_imagen'):
+            if sede.imagen_referencia:
+                import os
+                if os.path.isfile(sede.imagen_referencia.path):
+                    os.remove(sede.imagen_referencia.path)
+                sede.imagen_referencia = None
+                sede.save()
         form.save()
         messages.success(request, '✅ Sede actualizada.')
         return redirect('detalle-sede-ciudad', ciudad=sede.ciudad)

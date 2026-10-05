@@ -105,32 +105,56 @@
 
             <!-- Imagen de referencia -->
             <div class="col-12">
-              <label class="form-label">
-                <i class="bi bi-image me-1"></i>{{ form.imagen_referencia.label }}
-              </label>
-              {{ form.imagen_referencia }}
-              <small class="text-muted d-block mt-1">
-                Formatos aceptados: JPG, PNG, WEBP. Recomendado: foto del edificio
-                o campus de la sede.
-              </small>
-              {% if objeto.imagen_referencia %}
-              <div class="mt-2 p-2 bg-light rounded d-flex align-items-center gap-3">
-                <img src="{{ objeto.imagen_referencia.url }}"
-                     style="max-height:100px; border-radius:6px; object-fit:cover"
-                     alt="Imagen actual">
-                <div>
-                  <small class="text-muted d-block">Imagen actual</small>
-                  <a href="{{ objeto.imagen_referencia.url }}"
-                     target="_blank" class="btn btn-outline-secondary btn-sm mt-1">
-                    <i class="bi bi-eye me-1"></i>Ver imagen completa
-                  </a>
-                  <small class="text-muted d-block mt-1">
-                    Sube una nueva imagen para reemplazarla.
-                  </small>
-                </div>
-              </div>
-              {% endif %}
-            </div>
+  <label class="form-label">
+    <i class="bi bi-image me-1"></i>{{ form.imagen_referencia.label }}
+  </label>
+  {{ form.imagen_referencia }}
+  <small class="text-muted d-block mt-1">
+    Formatos aceptados: JPG, PNG, WEBP.
+  </small>
+
+  {% if objeto.imagen_referencia %}
+  <div class="mt-2 p-3 rounded d-flex align-items-center gap-3"
+       style="background:#f8f9fa; border:1px solid #dee2e6">
+
+    <!-- Miniatura -->
+    <img src="{{ objeto.imagen_referencia.url }}"
+         style="width:80px; height:80px; object-fit:cover;
+                border-radius:8px; border:1px solid #ccc"
+         alt="Imagen actual">
+
+    <!-- Info y acciones -->
+    <div class="flex-grow-1">
+      <small class="text-muted d-block mb-1">
+        <i class="bi bi-image me-1"></i>Imagen actual
+      </small>
+      <a href="{{ objeto.imagen_referencia.url }}"
+         target="_blank"
+         class="btn btn-outline-secondary btn-sm me-2">
+        <i class="bi bi-eye me-1"></i>Ver completa
+      </a>
+      <small class="text-muted">
+        Sube una nueva imagen para reemplazarla.
+      </small>
+    </div>
+
+    <!-- Checkbox eliminar -->
+    <div class="d-flex flex-column align-items-center gap-1">
+      <div class="form-check">
+        {{ form.eliminar_imagen }}
+        <label class="form-check-label text-danger fw-bold"
+               for="{{ form.eliminar_imagen.id_for_label }}">
+          <i class="bi bi-trash me-1"></i>Eliminar
+        </label>
+      </div>
+      <small class="text-muted" style="font-size:.68rem">
+        Marca para borrar<br>sin reemplazar
+      </small>
+    </div>
+
+  </div>
+  {% endif %}
+</div>
 
             <!-- Activa -->
             <div class="col-12">
