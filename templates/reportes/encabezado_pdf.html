@@ -1,0 +1,46 @@
+<div class="encabezado-inst">
+  <table style="width:100%; border-collapse:collapse">
+    <tr>
+      <!-- Logo UATF -->
+      <td style="width:80px; text-align:center; vertical-align:middle">
+        {% if logo_uatf %}
+        <img src="{{ logo_uatf }}"
+             style="width:70px; height:70px; object-fit:contain; border-radius:50%">
+        {% endif %}
+      </td>
+      <!-- Texto central -->
+      <td style="text-align:center; vertical-align:middle; padding:0 12px">
+        <div style="font-size:9pt; color:#555; letter-spacing:.5px;
+                    text-transform:uppercase; margin-bottom:2px">
+          Universidad Autónoma Tomás Frías
+        </div>
+        <div style="font-size:14pt; font-weight:bold; color:#0f1f3d;
+                    margin-bottom:2px">
+          Dirección de Servicios Académicos
+        </div>
+        <div style="font-size:8.5pt; color:#555">
+          Sistema de Información para la Gestión Curricular Universitaria
+        </div>
+        <div style="height:2px; background:linear-gradient(90deg,transparent,#0f1f3d,transparent);
+                    margin:5px auto; width:80%"></div>
+        <div style="font-size:8pt; color:#888">
+          Potosí — Bolivia &nbsp;·&nbsp; {{ fecha|date:"d/m/Y" }}
+        </div>
+      </td>
+      <!-- Logo DSA -->
+      <td style="width:80px; text-align:center; vertical-align:middle">
+        {% if logo_dsa %}
+        <img src="{{ logo_dsa }}"
+             style="width:70px; height:70px; object-fit:contain;
+                    border-radius:50%; background:#000">
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+
+  <!-- Línea decorativa -->
+  <div style="height:3px; background:#0f1f3d; margin-top:8px;
+              border-radius:2px"></div>
+  <div style="height:2px; background:#e8a020; margin-top:2px;
+              border-radius:2px; width:40%; margin-left:auto; margin-right:auto"></div>
+</div>

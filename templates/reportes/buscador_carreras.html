@@ -41,11 +41,21 @@
         </select>
       </div>
       <div class="col-md-4">
-        <label class="form-label fw-bold">Nombre de carrera</label>
-        <input type="text" name="carrera" value="{{ q_carrera }}"
-               class="form-control"
-               placeholder="Ej: Derecho, Informática, Medicina...">
-      </div>
+  <label class="form-label fw-bold">Nombre de carrera</label>
+  <input type="text"
+         name="carrera"
+         id="input-carrera"
+         value="{{ q_carrera }}"
+         class="form-control"
+         placeholder="Ej: Derecho, Informática..."
+         autocomplete="off">
+  <!-- Lista de sugerencias -->
+  <ul id="sugerencias-lista"
+      class="list-group position-absolute shadow"
+      style="z-index:1000; width:100%; display:none; max-height:220px;
+             overflow-y:auto; border-radius:0 0 8px 8px">
+  </ul>
+</div>
       <div class="col-md-4">
         <label class="form-label fw-bold">Estado del proceso</label>
         <select name="estado_proceso" class="form-select">
@@ -221,3 +231,85 @@
 {% endif %}
 
 {% endblock %}
+// ── Autocompletador de carreras ───────────────────────────────────
+const inputCarrera  = document.getElementById('input-carrera');
+const listaSuger    = document.getElementById('sugerencias-lista');
+let timeoutBusqueda = null;
+
+if (inputCarrera) {
+  inputCarrera.addEventListener('input', function() {
+    const q = this.value.trim();
+    clearTimeout(timeoutBusqueda);
+
+    if (q.length < 2) {
+      listaSuger.style.display = 'none';
+      listaSuger.innerHTML = '';
+      return;
+    }
+
+    timeoutBusqueda = setTimeout(() => {
+      fetch(`/api/v1/carreras/autocomplete/?q=${encodeURIComponent(q)}`)
+        .then(r => r.json())
+        .then(data => {
+          if (!data.length) {
+            listaSuger.style.display = 'none';
+            return;
+          }
+          listaSuger.innerHTML = data.map(item => `
+            <li class="list-group-item list-group-item-action py-2"
+                style="cursor:pointer; font-size:.85rem"
+                data-nombre="${item.nombre}">
+              <strong>${item.nombre}</strong>
+              <small class="text-muted ms-2">${item.universidad} · ${item.ciudad}</small>
+            </li>
+          `).join('');
+          listaSuger.style.display = 'block';
+
+          // Al hacer clic en una sugerencia
+          listaSuger.querySelectorAll('li').forEach(li => {
+            li.addEventListener('click', function() {
+              inputCarrera.value = this.dataset.nombre;
+              listaSuger.style.display = 'none';
+              // Auto-submit
+              inputCarrera.closest('form').submit();
+            });
+          });
+        })
+        .catch(() => { listaSuger.style.display = 'none'; });
+    }, 300);
+  });
+
+  // Cerrar sugerencias al hacer clic afuera
+  document.addEventListener('click', function(e) {
+    if (!inputCarrera.contains(e.target) && !listaSuger.contains(e.target)) {
+      listaSuger.style.display = 'none';
+    }
+  });
+
+  // Navegar con teclado
+  inputCarrera.addEventListener('keydown', function(e) {
+    const items = listaSuger.querySelectorAll('li');
+    const activo = listaSuger.querySelector('li.active');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (!activo) items[0]?.classList.add('active');
+      else {
+        activo.classList.remove('active');
+        (activo.nextElementSibling || items[0]).classList.add('active');
+      }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (activo) {
+        activo.classList.remove('active');
+        (activo.previousElementSibling || items[items.length-1]).classList.add('active');
+      }
+    } else if (e.key === 'Enter' && activo) {
+      e.preventDefault();
+      inputCarrera.value = activo.dataset.nombre;
+      listaSuger.style.display = 'none';
+      inputCarrera.closest('form').submit();
+    } else if (e.key === 'Escape') {
+      listaSuger.style.display = 'none';
+    }
+  });
+}

@@ -24,6 +24,9 @@
     <a href="{% url 'reporte-carreras-excel' %}" class="btn btn-success btn-sm">
       <i class="bi bi-file-earmark-excel me-1"></i>Exportar Excel
     </a>
+    <a href="{% url 'pdf-carreras' %}" class="btn btn-danger btn-sm">
+  <i class="bi bi-file-earmark-pdf me-1"></i>PDF Carreras
+</a>
   </div>
 </div>
 
@@ -237,4 +240,67 @@
     </div>
   </div>
 </div>
+
+<!-- ── Carreras Inactivas / No en funcionamiento ─────────────────── -->
+{% if carreras_inactivas %}
+<div class="card mt-4 border-warning">
+  <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+    <span>
+      <i class="bi bi-pause-circle me-2"></i>
+      Carreras no activas / Sin funcionamiento
+      <span class="badge bg-dark ms-2">{{ carreras_inactivas.count }}</span>
+    </span>
+    
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm table-hover mb-0">
+        <thead style="background:#fff3cd">
+          <tr>
+            <th>N°</th>
+            <th>Universidad</th>
+            <th>Facultad</th>
+            <th>Ciudad</th>
+            <th>Carrera</th>
+            <th>Grado</th>
+            <th>Estado</th>
+            {% if user.puede_editar %}<th>Acciones</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for carrera in carreras_inactivas %}
+          <tr style="opacity:.75">
+            <td>{{ forloop.counter }}</td>
+            <td>
+              <span class="badge bg-secondary">
+                {{ carrera.sede.facultad.universidad.sigla }}
+              </span>
+            </td>
+            <td>{{ carrera.sede.facultad.nombre }}</td>
+            <td>{{ carrera.sede.ciudad }}</td>
+            <td>
+              <span class="text-muted">{{ carrera.nombre }}</span>
+            </td>
+            <td><small>{{ carrera.get_grado_display }}</small></td>
+            <td>
+              <span class="badge bg-warning text-dark">
+                <i class="bi bi-pause-circle me-1"></i>Inactiva
+              </span>
+            </td>
+            {% if user.puede_editar %}
+            <td>
+              <a href="{% url 'editar-carrera' carrera.pk %}"
+                 class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-pencil"></i> Reactivar/Editar
+              </a>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
 {% endblock %}

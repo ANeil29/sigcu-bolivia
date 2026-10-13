@@ -36,37 +36,47 @@ class PlanEstudioViewSet(viewsets.ModelViewSet):
 @login_required
 def lista_carreras(request):
     from seguimiento.models import ProcesoCurricular
-    from django.db.models import Count
 
-    carreras = Carrera.objects.select_related(
+    # Carreras ACTIVAS
+    carreras_activas = Carrera.objects.select_related(
         'sede__facultad__universidad'
-    ).prefetch_related('procesos').filter(en_funcionamiento=True).order_by(
-        'sede__facultad__universidad__sigla', 'nombre'
-    )
+    ).prefetch_related('procesos').filter(
+        en_funcionamiento=True
+    ).order_by('sede__facultad__universidad__sigla', 'nombre')
 
-    ids_con_rediseno       = set(ProcesoCurricular.objects.filter(
+    # Carreras INACTIVAS
+    carreras_inactivas = Carrera.objects.select_related(
+        'sede__facultad__universidad'
+    ).prefetch_related('procesos').filter(
+        en_funcionamiento=False
+    ).order_by('sede__facultad__universidad__sigla', 'nombre')
+
+    # Contadores para las barras
+    ids_con_rediseno = set(ProcesoCurricular.objects.filter(
         tipo_proceso='REDISENO').values_list('carrera_id', flat=True))
-    ids_con_diseno         = set(ProcesoCurricular.objects.filter(
+    ids_con_diseno   = set(ProcesoCurricular.objects.filter(
         tipo_proceso='DISENO').values_list('carrera_id', flat=True))
-    ids_con_ajuste         = set(ProcesoCurricular.objects.filter(
+    ids_con_ajuste   = set(ProcesoCurricular.objects.filter(
         tipo_proceso='AJUSTE').values_list('carrera_id', flat=True))
-    ids_con_complementacion = set(ProcesoCurricular.objects.filter(
+    ids_con_compl    = set(ProcesoCurricular.objects.filter(
         tipo_proceso='COMPLEMENTACION').values_list('carrera_id', flat=True))
 
-    todos_ids = set(carreras.values_list('id', flat=True))
-    ids_con_proceso = ids_con_rediseno | ids_con_diseno | ids_con_ajuste | ids_con_complementacion
+    todos_ids       = set(carreras_activas.values_list('id', flat=True))
+    ids_con_proceso = (ids_con_rediseno | ids_con_diseno |
+                       ids_con_ajuste   | ids_con_compl)
 
     conteo = {
         'rediseno':        len(ids_con_rediseno & todos_ids),
-        'diseno':          len(ids_con_diseno & todos_ids),
-        'ajuste':          len(ids_con_ajuste & todos_ids),
-        'complementacion': len(ids_con_complementacion & todos_ids),
+        'diseno':          len(ids_con_diseno   & todos_ids),
+        'ajuste':          len(ids_con_ajuste   & todos_ids),
+        'complementacion': len(ids_con_compl    & todos_ids),
         'sin_proceso':     len(todos_ids - ids_con_proceso),
     }
 
     return render(request, 'carreras/lista.html', {
-        'carreras': carreras,
-        'conteo':   conteo,
+        'carreras':          carreras_activas,
+        'carreras_inactivas': carreras_inactivas,
+        'conteo':            conteo,
     })
 
 
@@ -150,3 +160,31 @@ def eliminar_plan(request, pk):
         return redirect('editar-carrera', pk=carrera_pk)
     return render(request, 'carreras/confirmar_eliminar.html',
                   {'objeto': plan, 'tipo': 'Plan de Estudio'})
+
+from django.http import JsonResponse
+
+def autocomplete_carreras(request):
+    q = request.GET.get('q', '').strip()
+    if len(q) < 2:
+        return JsonResponse([], safe=False)
+
+    carreras = Carrera.objects.select_related(
+        'sede__facultad__universidad'
+    ).filter(
+        nombre__icontains=q,
+        en_funcionamiento=True
+    ).values(
+        'nombre',
+        'sede__facultad__universidad__sigla',
+        'sede__ciudad'
+    ).distinct()[:10]
+
+    data = [
+        {
+            'nombre':      c['nombre'],
+            'universidad': c['sede__facultad__universidad__sigla'],
+            'ciudad':      c['sede__ciudad'],
+        }
+        for c in carreras
+    ]
+    return JsonResponse(data, safe=False)

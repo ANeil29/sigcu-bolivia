@@ -17,6 +17,8 @@ from programas.models import Programa
 from universidades.models import Universidad, Sede, Facultad
 from seguimiento.models import ProcesoCurricular, FaseProceso, TipoFase
 from formularios.models import FormularioValoracion
+from programas.models import Programa
+
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -370,10 +372,14 @@ def exportar_carreras_excel(request):
 
     carreras = Carrera.objects.select_related(
         'sede__facultad__universidad'
-    ).prefetch_related('procesos', 'planes_estudio').filter(
-        en_funcionamiento=True
-    ).order_by('sede__facultad__universidad__sigla',
-               'sede__facultad__nombre', 'nombre')
+    ).prefetch_related(
+        'procesos',
+        'planes_estudio'
+    ).order_by(
+        'sede__facultad__universidad__sigla',
+        'sede__facultad__nombre',
+        'nombre'
+    )
 
     for i, c in enumerate(carreras, 1):
         par = i % 2 == 0
@@ -393,6 +399,24 @@ def exportar_carreras_excel(request):
             'Sí' if c.en_funcionamiento else 'No',
             c.estado_rediseno,
         ], par=par)
+                # Colorear en gris las carreras que no están funcionando
+        if not c.en_funcionamiento:
+            for col in range(1, 15):
+                ws2.cell(
+                    row=i + 2,
+                    column=col
+                ).fill = PatternFill(
+                    'solid',
+                    fgColor='E8E8E8'
+                )
+
+                ws2.cell(
+                    row=i + 2,
+                    column=col
+                ).font = Font(
+                    color='888888',
+                    italic=True
+                )
 
     anchos2 = [5,10,40,35,14,14,45,14,40,10,8,14,12,16]
     for col, ancho in enumerate(anchos2, 1):
@@ -401,26 +425,89 @@ def exportar_carreras_excel(request):
     ws2.freeze_panes = 'A3'
 
     # ════════════════════════════════════════════════════
-    # HOJA 3 — Procesos y Fases
+    # HOJA 3 — Detalle Programas (NUEVA)
     # ════════════════════════════════════════════════════
-    ws3 = wb.create_sheet('3. Procesos y Fases')
+    ws3 = wb.create_sheet('3. Detalle Programas')
     ws3.sheet_view.showGridLines = False
 
-    ws3.merge_cells('A1:M1')
+    ws3.merge_cells('A1:L1')
     c = ws3['A1']
-    c.value     = 'SIGCU Bolivia — Seguimiento de Procesos Curriculares y Fases'
+    c.value     = 'SIGCU Bolivia — Detalle Completo de Programas Académicos'
     c.font      = Font(bold=True, size=13, color=COLOR_CABECERA)
     c.alignment = centro
     ws3.row_dimensions[1].height = 24
 
-    cols3 = [
+    cols3_prog = [
+        'N°', 'Universidad', 'Facultad', 'Sede', 'Ciudad',
+        'Programa', 'Grado previsto', 'Estado',
+        'Responsable', 'Fecha inicio', 'Fecha aprob. prevista', 'Activo'
+    ]
+    aplicar_cabecera(ws3, 2, cols3_prog)
+    ws3.row_dimensions[2].height = 30
+
+    programas = Programa.objects.select_related(
+        'sede__facultad__universidad'
+    ).order_by(
+        'sede__facultad__universidad__sigla',
+        'sede__facultad__nombre', 'nombre'
+    )
+
+    for i, p in enumerate(programas, 1):
+        par      = i % 2 == 0
+        inactivo = not p.activo
+        row      = i + 2
+
+        valores = [
+            i,
+            p.sede.facultad.universidad.sigla,
+            p.sede.facultad.nombre,
+            p.sede.nombre,
+            p.sede.ciudad,
+            p.nombre,
+            p.get_grado_previsto_display() if p.grado_previsto else '—',
+            p.get_estado_display(),
+            p.responsable or '—',
+            p.fecha_inicio.strftime('%d/%m/%Y') if p.fecha_inicio else '—',
+            p.fecha_prevista_aprobacion.strftime('%d/%m/%Y')
+                if p.fecha_prevista_aprobacion else '—',
+            'Sí' if p.activo else 'No',
+        ]
+        for col, val in enumerate(valores, 1):
+            c = ws3.cell(row=row, column=col, value=val)
+            c.alignment = izquierda
+            c.border    = borde_fino
+            if inactivo:
+                c.fill = PatternFill('solid', fgColor='E8E8E8')
+                c.font = Font(color='888888', italic=True)
+            elif par:
+                c.fill = fill_par
+
+    anchos3_prog = [5, 12, 38, 32, 14, 42, 16, 18, 22, 12, 18, 8]
+    for col, ancho in enumerate(anchos3_prog, 1):
+        ws3.column_dimensions[get_column_letter(col)].width = ancho
+    ws3.freeze_panes = 'A3'
+
+    # ════════════════════════════════════════════════════
+    # HOJA 4 — Procesos y Fases (antes era Hoja 3)
+    # ════════════════════════════════════════════════════
+    ws4 = wb.create_sheet('4. Procesos y Fases')
+    ws4.sheet_view.showGridLines = False
+
+    ws4.merge_cells('A1:M1')
+    c = ws4['A1']
+    c.value     = 'SIGCU Bolivia — Seguimiento de Procesos Curriculares y Fases'
+    c.font      = Font(bold=True, size=13, color=COLOR_CABECERA)
+    c.alignment = centro
+    ws4.row_dimensions[1].height = 24
+
+    cols4 = [
         'N°', 'Universidad', 'Carrera', 'Ciudad', 'Tipo de Proceso',
         'Año Inicio', 'Año Conclusión', 'Estado Proceso',
         'Fases Completadas', 'Total Fases', '% Avance',
         'Fase Actual', 'Resolución HCU/RAN'
     ]
-    aplicar_cabecera(ws3, 2, cols3)
-    ws3.row_dimensions[2].height = 32
+    aplicar_cabecera(ws4, 2, cols4)
+    ws4.row_dimensions[2].height = 32
 
     procesos = ProcesoCurricular.objects.select_related(
         'carrera__sede__facultad__universidad'
@@ -446,7 +533,7 @@ def exportar_carreras_excel(request):
         resolucion = (f"HCU: {plan.resolucion_hcu} / RAN: {plan.resolucion_ran}"
                       if plan and (plan.resolucion_hcu or plan.resolucion_ran)
                       else '—')
-        fila_datos(ws3, i + 2, [
+        fila_datos(ws4, i + 2, [
             i,
             p.carrera.sede.facultad.universidad.sigla,
             p.carrera.nombre,
@@ -462,11 +549,11 @@ def exportar_carreras_excel(request):
             resolucion,
         ], par=par)
 
-    anchos3 = [5,12,42,14,22,10,14,14,16,12,10,30,30]
-    for col, ancho in enumerate(anchos3, 1):
-        ws3.column_dimensions[get_column_letter(col)].width = ancho
+    anchos4 = [5,12,42,14,22,10,14,14,16,12,10,30,30]
+    for col, ancho in enumerate(anchos4, 1):
+        ws4.column_dimensions[get_column_letter(col)].width = ancho
 
-    ws3.freeze_panes = 'A3'
+    ws4.freeze_panes = 'A3'
 
     # Guardar y devolver
     response = HttpResponse(
@@ -701,6 +788,143 @@ def exportar_estadisticas_pdf(request):
     response['Content-Disposition'] = 'attachment; filename=estadisticas_sigcu.pdf'
     return response
 
+@login_required
+def pdf_carreras(request):
+    from xhtml2pdf import pisa
+    from django.utils import timezone
+    from reportes.utils_pdf import logo_base64
+
+    carreras_activas   = Carrera.objects.select_related(
+        'sede__facultad__universidad'
+    ).prefetch_related('procesos').filter(
+        en_funcionamiento=True
+    ).order_by('sede__facultad__universidad__sigla', 'nombre')
+
+    carreras_inactivas = Carrera.objects.select_related(
+        'sede__facultad__universidad'
+    ).filter(en_funcionamiento=False).order_by(
+        'sede__facultad__universidad__sigla', 'nombre')
+
+    total_int = carreras_activas.count() or 1
+
+    stats = {
+        'total_carreras': carreras_activas.count(),
+        'vigentes':  sum(1 for c in carreras_activas if c.estado_rediseno == 'VIGENTE'),
+        'proximas':  sum(1 for c in carreras_activas if c.estado_rediseno == 'PROXIMO'),
+        'vencidas':  sum(1 for c in carreras_activas if c.estado_rediseno == 'VENCIDO'),
+        'sin_datos': sum(1 for c in carreras_activas if c.estado_rediseno == 'SIN_DATOS'),
+        'con_proceso': carreras_activas.filter(procesos__isnull=False).distinct().count(),
+    }
+
+    html = render_to_string('reportes/pdf_carreras.html', {
+        'carreras_activas':   carreras_activas,
+        'carreras_inactivas': carreras_inactivas,
+        'stats':              stats,
+        'fecha':              timezone.now(),
+        'logo_uatf':          logo_base64('logo_uatf.png'),
+        'logo_dsa':           logo_base64('logo_dsa.jpg'),
+    })
+    buf = BytesIO()
+    pisa.CreatePDF(html, dest=buf, encoding='utf-8')
+    buf.seek(0)
+    response = HttpResponse(buf, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename=informe_carreras.pdf'
+    return response
+
+
+@login_required
+def pdf_programas(request):
+    from xhtml2pdf import pisa
+    from django.utils import timezone
+    from programas.models import Programa
+    from reportes.utils_pdf import logo_base64
+
+    programas_activos   = Programa.objects.select_related(
+        'sede__facultad__universidad'
+    ).filter(activo=True).order_by(
+        'sede__facultad__universidad__sigla', 'nombre')
+
+    programas_inactivos = Programa.objects.select_related(
+        'sede__facultad__universidad'
+    ).filter(activo=False).order_by(
+        'sede__facultad__universidad__sigla', 'nombre')
+
+    html = render_to_string('reportes/pdf_programas.html', {
+        'programas_activos':   programas_activos,
+        'programas_inactivos': programas_inactivos,
+        'total_programas':     Programa.objects.count(),
+        'activos':             programas_activos.count(),
+        'inactivos':           programas_inactivos.count(),
+        'en_formulacion':      programas_activos.filter(estado='FORMULACION').count(),
+        'en_aprobacion':       programas_activos.filter(estado='APROBACION').count(),
+        'en_implementacion':   programas_activos.filter(estado='IMPLEMENTACION').count(),
+        'fecha':               timezone.now(),
+        'logo_uatf':           logo_base64('logo_uatf.png'),
+        'logo_dsa':            logo_base64('logo_dsa.jpeg'),
+    })
+    buf = BytesIO()
+    pisa.CreatePDF(html, dest=buf, encoding='utf-8')
+    buf.seek(0)
+    response = HttpResponse(buf, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename=informe_programas.pdf'
+    return response
+
+
+@login_required
+def pdf_informe_completo(request):
+    from xhtml2pdf import pisa
+    from django.utils import timezone
+    from programas.models import Programa
+    from seguimiento.models import ProcesoCurricular as PC
+    from reportes.utils_pdf import logo_base64
+
+    data  = _stats_base()
+    stats = data['stats']
+
+    carreras_activas   = Carrera.objects.select_related(
+        'sede__facultad__universidad'
+    ).prefetch_related('procesos').filter(
+        en_funcionamiento=True
+    ).order_by('sede__facultad__universidad__sigla', 'nombre')
+
+    carreras_inactivas = Carrera.objects.select_related(
+        'sede__facultad__universidad'
+    ).filter(en_funcionamiento=False)
+
+    programas_activos  = Programa.objects.select_related(
+        'sede__facultad__universidad'
+    ).filter(activo=True).order_by(
+        'sede__facultad__universidad__sigla', 'nombre')
+    programas_inactivos = Programa.objects.select_related(
+        'sede__facultad__universidad'
+    ).filter(activo=False).order_by(
+        'sede__facultad__universidad__sigla', 'nombre')
+
+    procesos = PC.objects.select_related(
+        'carrera__sede__facultad__universidad'
+    ).prefetch_related('fases').order_by(
+        'carrera__sede__facultad__universidad__sigla',
+        '-anio_inicio')
+
+    stats['total_programas'] = Programa.objects.filter(activo=True).count()
+
+    html = render_to_string('reportes/pdf_informe_completo.html', {
+        'stats':               stats,
+        'carreras_activas':    carreras_activas,
+        'carreras_inactivas':  carreras_inactivas,
+        'programas_activos':   programas_activos,
+        'programas_inactivos': programas_inactivos,
+        'procesos':            procesos,
+        'fecha':               timezone.now(),
+        'logo_uatf':           logo_base64('logo_uatf.png'),
+        'logo_dsa':            logo_base64('logo_dsa.jpeg'),
+    })
+    buf = BytesIO()
+    pisa.CreatePDF(html, dest=buf, encoding='utf-8')
+    buf.seek(0)
+    response = HttpResponse(buf, content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename=informe_completo_sigcu.pdf'
+    return response
 
 # ── Endpoint JSON ─────────────────────────────────────────────────────────────
 

@@ -84,13 +84,42 @@
     min-height: 100vh;
     background: var(--sigcu-light);
     font-size: 0.92rem;
+    padding-top: 56px;
     }
 
-    /* ── Navbar principal ── */
+    /* ── Navbar principal — sticky al hacer scroll ── */
     .navbar-sigcu {
-      background: var(--sigcu-dark);
+      background: linear-gradient(135deg, #0a1628 0%, #0f1f3d 50%, #1a3560 100%);
       min-height: 56px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 12px rgba(0,0,0,.35);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      z-index: 1030;
+      border-bottom: 2px solid rgba(232,160,32,.2);
+      transition: box-shadow .2s ease;
+    }
+
+    /* Cuando el usuario hace scroll se refuerza la sombra */
+    .navbar-sigcu.scrolled {
+      box-shadow: 0 4px 20px rgba(0,0,0,.5);
+      background: linear-gradient(135deg,
+        rgba(10,22,40,.97) 0%,
+        rgba(15,31,61,.97) 50%,
+        rgba(26,53,96,.97) 100%);
+      backdrop-filter: blur(8px);
+    }
+    /* Línea dorada inferior del navbar */
+    .navbar-sigcu::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg,
+        transparent 0%, #e8a020 30%, #e8a020 70%, transparent 100%);
+      pointer-events: none;
     }
     .navbar-sigcu .navbar-brand {
       font-weight: 700;
@@ -181,15 +210,15 @@
       letter-spacing: .5px;
     }
 
-    /* ── Footer mejorado con redes sociales ── */
-.footer-sigcu {
-  background: var(--sigcu-dark);
-  color: rgba(255,255,255,.5);
-  font-size: .78rem;
-  padding: 1rem 1.5rem;
-  flex-shrink: 0;
-  border-top: 2px solid rgba(232,160,32,.25);
-}
+   /* ── Footer con degradado ── */
+    .footer-sigcu {
+      background: linear-gradient(135deg, #0a1628 0%, #0f1f3d 50%, #1a3560 100%);
+      color: rgba(255,255,255,.5);
+      font-size: .78rem;
+      padding: 1rem 1.5rem;
+      flex-shrink: 0;
+      border-top: 2px solid rgba(232,160,32,.25);
+    } 
 
 .footer-contenido {
   display: flex;
@@ -284,12 +313,17 @@
 
 /* ── Navbar principal ── */
 .navbar-sigcu {
-  background: var(--sigcu-dark);
+  background: linear-gradient(135deg, #0a1628 0%, #0f1f3d 50%, #1a3560 100%);
   min-height: 56px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  position: sticky;
-  top: 0;
+  box-shadow: 0 2px 12px rgba(0,0,0,.35);
+  position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
   z-index: 1030;
+  border-bottom: 2px solid rgba(232,160,32,.2);
+  transition: box-shadow .2s ease;
 }
 .navbar-sigcu .navbar-brand {
   font-weight: 700;
@@ -465,6 +499,27 @@
   .texto-dropdown-info {
       color: #d9e2ec !important;
   }
+  /* ── Tablas — cabeceras centradas y ajustadas ── */
+.table thead th {
+  text-align: justify !important;
+  vertical-align: middle !important;
+  font-size: .78rem !important;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  white-space: nowrap;
+  padding: .6rem .5rem !important;
+}
+
+/* Celdas de datos alineadas al centro vertical */
+.table td {
+  vertical-align: middle !important;
+}
+
+/* Tablas dentro de cards sin bordes externos */
+.card > .card-body > .table-responsive .table,
+.card .table-responsive .table {
+  margin-bottom: 0;
+}
   </style>
   
 </head>
@@ -925,8 +980,21 @@
     });
   }, 4000);
   
+  // Navbar: efecto al hacer scroll
+window.addEventListener('scroll', function() {
+  const navbar = document.querySelector('.navbar-sigcu');
+  if (!navbar) return;
+  if (window.scrollY > 10) {
+    navbar.classList.add('scrolled');
+  } else {
+    navbar.classList.remove('scrolled');
+  }
+}, { passive: true });
+
 </script>
 
-{% block scripts %}{% endblock %}
+{% block scripts %}
+
+{% endblock %}
 </body>
 </html>

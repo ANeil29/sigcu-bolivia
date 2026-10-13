@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     CarreraViewSet, PlanEstudioViewSet,
     lista_carreras, crear_carrera, editar_carrera, eliminar_carrera,
-    crear_plan, editar_plan, eliminar_plan,
+    crear_plan, editar_plan, eliminar_plan, autocomplete_carreras,
 )
 
 router = DefaultRouter()
@@ -20,4 +20,5 @@ urlpatterns = [
     path('web/plan/<int:pk>/editar/',   editar_plan,     name='editar-plan'),
     path('web/plan/<int:pk>/eliminar/', eliminar_plan,   name='eliminar-plan'),
     path('', include(router.urls)),
+    path('autocomplete/', autocomplete_carreras, name='autocomplete-carreras'),
 ]

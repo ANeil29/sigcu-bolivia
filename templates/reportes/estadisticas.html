@@ -19,11 +19,15 @@
   <div class="col-auto d-flex gap-2">
   <a href="{% url 'reporte-carreras-excel' %}"
      class="btn btn-success btn-sm">
-    <i class="bi bi-file-earmark-excel me-1"></i>Exportar Excel
+    <i class="bi bi-file-earmark-excel me-1"></i>Excel Completo
   </a>
   <a href="{% url 'reporte-estadisticas-pdf' %}"
      class="btn btn-danger btn-sm">
-    <i class="bi bi-file-earmark-pdf me-1"></i>Descargar PDF
+    <i class="bi bi-file-earmark-pdf me-1"></i>PDF Estadísticas
+  </a>
+  <a href="{% url 'pdf-informe-completo' %}"
+     class="btn btn-danger btn-sm">
+    <i class="bi bi-file-earmark-pdf me-1"></i>Informe Completo PDF
   </a>
   <button onclick="window.print()"
           class="btn btn-outline-secondary btn-sm">

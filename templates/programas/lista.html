@@ -24,6 +24,15 @@
       <i class="bi bi-plus-circle me-1"></i>Nuevo Programa
     </a>
     {% endif %}
+    <!-- ← BOTÓN EXCEL NUEVO -->
+    <a href="{% url 'programas-excel' %}" class="btn btn-success btn-sm">
+      <i class="bi bi-file-earmark-excel me-1"></i>Exportar Excel
+    </a>
+    <a href="{% url 'pdf-programas' %}" class="btn btn-danger btn-sm">
+  <i class="bi bi-file-earmark-pdf me-1"></i>PDF Programas
+</a>
+  </div>
+</div>
   </div>
 </div>
 
@@ -229,4 +238,55 @@
     </div>
   </div>
 </div>
+
+<!-- ── Programas Inactivos ───────────────────────────────────────── -->
+{% if programas_inactivos %}
+<div class="card mt-4 border-warning">
+  <div class="card-header bg-warning text-dark d-flex justify-content-between">
+    <span>
+      <i class="bi bi-pause-circle me-2"></i>
+      Programas inactivos
+      <span class="badge bg-dark ms-2">{{ programas_inactivos.count }}</span>
+    </span>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm mb-0">
+        <thead style="background:#fff3cd">
+          <tr>
+            <th>N°</th><th>Universidad</th><th>Programa</th>
+            <th>Estado</th>{% if user.puede_editar %}<th>Acción</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in programas_inactivos %}
+          <tr style="opacity:.75">
+            <td>{{ forloop.counter }}</td>
+            <td>
+              <span class="badge bg-secondary">
+                {{ p.sede.facultad.universidad.sigla }}
+              </span>
+            </td>
+            <td><span class="text-muted">{{ p.nombre }}</span></td>
+            <td>
+              <span class="badge bg-warning text-dark">
+                <i class="bi bi-pause-circle me-1"></i>Inactivo
+              </span>
+            </td>
+            {% if user.puede_editar %}
+            <td>
+              <a href="{% url 'editar-programa' p.pk %}"
+                 class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-pencil"></i> Editar/Reactivar
+              </a>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
 {% endblock %}

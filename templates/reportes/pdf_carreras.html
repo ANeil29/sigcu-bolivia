@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 1.5cm 1.2cm 2cm 1.2cm;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:Arial,sans-serif; font-size:8.5pt; color:#1a1a1a; }
+
+    .encabezado-inst { margin-bottom:14px; }
+
+    /* Título del informe */
+    .titulo-informe {
+      text-align: center;
+      margin: 10px 0;
+    }
+    .titulo-informe h1 {
+      font-size: 13pt;
+      color: #0f1f3d;
+      font-weight: bold;
+      margin-bottom: 3px;
+    }
+    .titulo-informe .subtitulo {
+      font-size: 9pt;
+      color: #555;
+    }
+    .titulo-informe .gestion {
+      display: inline-block;
+      background: #0f1f3d;
+      color: white;
+      padding: 2px 12px;
+      border-radius: 10px;
+      font-size: 8pt;
+      margin-top: 4px;
+    }
+
+    /* Resumen estadístico */
+    .resumen-stats {
+      display: table;
+      width: 100%;
+      margin: 10px 0;
+      border-collapse: separate;
+      border-spacing: 4px;
+    }
+    .res-cel {
+      display: table-cell;
+      text-align: center;
+      background: #f0f4ff;
+      border-top: 3px solid #0f1f3d;
+      border-radius: 4px;
+      padding: 6px 4px;
+    }
+    .res-num { font-size:14pt; font-weight:bold; color:#0f1f3d; display:block; }
+    .res-lbl { font-size:7pt; color:#666; }
+
+    /* Tabla */
+    table.datos {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 7.5pt;
+      margin-top: 10px;
+    }
+    table.datos th {
+      background: #0f1f3d;
+      color: white;
+      padding: 5px 4px;
+      text-align: left;
+      font-size: 7pt;
+    }
+    table.datos td {
+      padding: 4px;
+      border-bottom: 1px solid #e8e8e8;
+      vertical-align: middle;
+    }
+    table.datos tr:nth-child(even) td { background: #f5f7ff; }
+    table.datos tr.inactiva td { background: #f0f0f0; color: #888; }
+
+    /* Badges */
+    .b-success  { color:#0a3622; background:#d1e7dd; padding:1px 5px; border-radius:6px; font-size:7pt; }
+    .b-warning  { color:#664d03; background:#fff3cd; padding:1px 5px; border-radius:6px; font-size:7pt; }
+    .b-danger   { color:#58151c; background:#f8d7da; padding:1px 5px; border-radius:6px; font-size:7pt; }
+    .b-secondary{ color:#fff;    background:#6c757d; padding:1px 5px; border-radius:6px; font-size:7pt; }
+    .b-dark     { color:#fff;    background:#212529; padding:1px 5px; border-radius:6px; font-size:7pt; }
+    .b-muted    { color:#555;    background:#e8e8e8; padding:1px 5px; border-radius:6px; font-size:7pt; }
+
+    /* Sección de inactivas */
+    .seccion-titulo {
+      background: #0f1f3d;
+      color: white;
+      padding: 4px 8px;
+      font-size: 8pt;
+      font-weight: bold;
+      margin-top: 12px;
+      border-radius: 4px 4px 0 0;
+    }
+
+    .firma-bloque { margin-top: 30px; }
+  </style>
+</head>
+<body>
+
+  {% include 'reportes/encabezado_pdf.html' %}
+
+  <!-- Título -->
+  <div class="titulo-informe">
+    <h1>Informe de Carreras Universitarias</h1>
+    <div class="subtitulo">
+      Listado oficial de carreras — Universidad Autónoma Tomás Frías
+    </div>
+    <span class="gestion">Generado: {{ fecha|date:"d/m/Y H:i" }} hrs</span>
+  </div>
+
+  <!-- Resumen -->
+  <table class="resumen-stats">
+    <tr>
+      <td class="res-cel">
+        <span class="res-num">{{ stats.total_carreras }}</span>
+        <span class="res-lbl">Total carreras</span>
+      </td>
+      <td class="res-cel">
+        <span class="res-num" style="color:#198754">{{ stats.vigentes }}</span>
+        <span class="res-lbl">Vigentes</span>
+      </td>
+      <td class="res-cel">
+        <span class="res-num" style="color:#e6a800">{{ stats.proximas }}</span>
+        <span class="res-lbl">Próximos a vencer</span>
+      </td>
+      <td class="res-cel">
+        <span class="res-num" style="color:#dc3545">{{ stats.vencidas }}</span>
+        <span class="res-lbl">Vencidos</span>
+      </td>
+      <td class="res-cel">
+        <span class="res-num" style="color:#6c757d">{{ stats.sin_datos }}</span>
+        <span class="res-lbl">Sin datos</span>
+      </td>
+      <td class="res-cel">
+        <span class="res-num">{{ stats.con_proceso }}</span>
+        <span class="res-lbl">Con proceso</span>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Tabla carreras activas -->
+  <div class="seccion-titulo">
+    ✓ Carreras en Funcionamiento ({{ carreras_activas|length }})
+  </div>
+  <table class="datos">
+    <thead>
+      <tr>
+        <th style="width:3%">N°</th>
+        <th style="width:7%">Univ.</th>
+        <th style="width:20%">Facultad</th>
+        <th style="width:10%">Ciudad</th>
+        <th style="width:22%">Carrera</th>
+        <th style="width:10%">Grado</th>
+        <th style="width:8%">N° SUB</th>
+        <th style="width:11%">Título</th>
+        <th style="width:9%">Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in carreras_activas %}
+      <tr>
+        <td style="text-align:center">{{ forloop.counter }}</td>
+        <td style="text-align:center">
+          <span class="b-dark">{{ c.sede.facultad.universidad.sigla }}</span>
+        </td>
+        <td>{{ c.sede.facultad.nombre }}</td>
+        <td>{{ c.sede.ciudad }}</td>
+        <td><strong>{{ c.nombre }}</strong></td>
+        <td>{{ c.get_grado_display }}</td>
+        <td style="text-align:center">{{ c.numero_sub|default:"—" }}</td>
+        <td>{{ c.titulo_profesional|default:"—"|truncatechars:25 }}</td>
+        <td style="text-align:center">
+          {% if c.estado_rediseno == 'VIGENTE' %}
+            <span class="b-success">Vigente</span>
+          {% elif c.estado_rediseno == 'PROXIMO' %}
+            <span class="b-warning">Próximo</span>
+          {% elif c.estado_rediseno == 'VENCIDO' %}
+            <span class="b-danger">Vencido</span>
+          {% else %}
+            <span class="b-secondary">Sin datos</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if carreras_inactivas %}
+  <!-- Tabla carreras inactivas -->
+  <div class="seccion-titulo" style="background:#6c757d; margin-top:16px">
+    ✗ Carreras No Activas / Sin Funcionamiento ({{ carreras_inactivas|length }})
+  </div>
+  <table class="datos">
+    <thead>
+      <tr>
+        <th style="width:3%">N°</th>
+        <th style="width:7%">Univ.</th>
+        <th style="width:22%">Facultad</th>
+        <th style="width:10%">Ciudad</th>
+        <th style="width:25%">Carrera</th>
+        <th style="width:10%">Grado</th>
+        <th style="width:8%">N° SUB</th>
+        <th style="width:15%">Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in carreras_inactivas %}
+      <tr class="inactiva">
+        <td style="text-align:center">{{ forloop.counter }}</td>
+        <td style="text-align:center">{{ c.sede.facultad.universidad.sigla }}</td>
+        <td>{{ c.sede.facultad.nombre }}</td>
+        <td>{{ c.sede.ciudad }}</td>
+        <td>{{ c.nombre }}</td>
+        <td>{{ c.get_grado_display }}</td>
+        <td style="text-align:center">{{ c.numero_sub|default:"—" }}</td>
+        <td style="text-align:center">
+          <span class="b-muted">No activa</span>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  {% include 'reportes/firma_pdf.html' %}
+
+</body>
+</html>

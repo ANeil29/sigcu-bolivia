@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @page {
+      size: A4 landscape;
+      margin: 1.5cm 1.2cm 2cm 1.2cm;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:Arial,sans-serif; font-size:8.5pt; color:#1a1a1a; }
+    .encabezado-inst { margin-bottom:14px; }
+
+    .titulo-informe { text-align:center; margin:10px 0; }
+    .titulo-informe h1 { font-size:13pt; color:#0f1f3d; font-weight:bold; margin-bottom:3px; }
+    .titulo-informe .subtitulo { font-size:9pt; color:#555; }
+    .titulo-informe .gestion {
+      display:inline-block; background:#0f1f3d; color:white;
+      padding:2px 12px; border-radius:10px; font-size:8pt; margin-top:4px;
+    }
+
+    .resumen-stats { display:table; width:100%; margin:10px 0; border-collapse:separate; border-spacing:4px; }
+    .res-cel { display:table-cell; text-align:center; background:#f0f4ff; border-top:3px solid #0f1f3d; border-radius:4px; padding:6px 4px; }
+    .res-num { font-size:14pt; font-weight:bold; color:#0f1f3d; display:block; }
+    .res-lbl { font-size:7pt; color:#666; }
+
+    table.datos { width:100%; border-collapse:collapse; font-size:7.5pt; margin-top:10px; }
+    table.datos th { background:#0f1f3d; color:white; padding:5px 4px; text-align:left; font-size:7pt; }
+    table.datos td { padding:4px; border-bottom:1px solid #e8e8e8; vertical-align:middle; }
+    table.datos tr:nth-child(even) td { background:#f5f7ff; }
+    table.datos tr.inactiva td { background:#f0f0f0; color:#888; }
+
+    .seccion-titulo { background:#0f1f3d; color:white; padding:4px 8px; font-size:8pt; font-weight:bold; margin-top:12px; border-radius:4px 4px 0 0; }
+
+    .b-secondary{ color:#fff; background:#6c757d; padding:1px 5px; border-radius:6px; font-size:7pt; }
+    .b-warning  { color:#664d03; background:#fff3cd; padding:1px 5px; border-radius:6px; font-size:7pt; }
+    .b-success  { color:#0a3622; background:#d1e7dd; padding:1px 5px; border-radius:6px; font-size:7pt; }
+    .b-danger   { color:#58151c; background:#f8d7da; padding:1px 5px; border-radius:6px; font-size:7pt; }
+    .b-dark     { color:#fff;    background:#212529; padding:1px 5px; border-radius:6px; font-size:7pt; }
+    .b-muted    { color:#555;    background:#e8e8e8; padding:1px 5px; border-radius:6px; font-size:7pt; }
+
+    .firma-bloque { margin-top:30px; }
+  </style>
+</head>
+<body>
+
+  {% include 'reportes/encabezado_pdf.html' %}
+
+  <div class="titulo-informe">
+    <h1>Informe de Programas Académicos en Proceso</h1>
+    <div class="subtitulo">
+      Programas académicos registrados — Universidad Autónoma Tomás Frías
+    </div>
+    <span class="gestion">Generado: {{ fecha|date:"d/m/Y H:i" }} hrs</span>
+  </div>
+
+  <!-- Resumen -->
+  <table class="resumen-stats">
+    <tr>
+      <td class="res-cel">
+        <span class="res-num">{{ total_programas }}</span>
+        <span class="res-lbl">Total programas</span>
+      </td>
+      <td class="res-cel">
+        <span class="res-num" style="color:#198754">{{ activos }}</span>
+        <span class="res-lbl">Activos</span>
+      </td>
+      <td class="res-cel">
+        <span class="res-num" style="color:#6c757d">{{ inactivos }}</span>
+        <span class="res-lbl">Inactivos</span>
+      </td>
+      <td class="res-cel">
+        <span class="res-num" style="color:#6c757d">{{ en_formulacion }}</span>
+        <span class="res-lbl">En Formulación</span>
+      </td>
+      <td class="res-cel">
+        <span class="res-num" style="color:#e6a800">{{ en_aprobacion }}</span>
+        <span class="res-lbl">En Aprobación</span>
+      </td>
+      <td class="res-cel">
+        <span class="res-num" style="color:#198754">{{ en_implementacion }}</span>
+        <span class="res-lbl">En Implementación</span>
+      </td>
+    </tr>
+  </table>
+
+  <!-- Programas activos -->
+  <div class="seccion-titulo">
+    ✓ Programas Activos ({{ programas_activos|length }})
+  </div>
+  <table class="datos">
+    <thead>
+      <tr>
+        <th style="width:3%">N°</th>
+        <th style="width:7%">Univ.</th>
+        <th style="width:18%">Facultad</th>
+        <th style="width:8%">Ciudad</th>
+        <th style="width:22%">Programa</th>
+        <th style="width:10%">Grado previsto</th>
+        <th style="width:12%">Estado</th>
+        <th style="width:11%">Responsable</th>
+        <th style="width:9%">F. Prevista</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in programas_activos %}
+      <tr>
+        <td style="text-align:center">{{ forloop.counter }}</td>
+        <td style="text-align:center">
+          <span class="b-dark">{{ p.sede.facultad.universidad.sigla }}</span>
+        </td>
+        <td>{{ p.sede.facultad.nombre }}</td>
+        <td>{{ p.sede.ciudad }}</td>
+        <td><strong>{{ p.nombre }}</strong></td>
+        <td>{{ p.get_grado_previsto_display|default:"—" }}</td>
+        <td style="text-align:center">
+          {% if p.estado == 'FORMULACION' %}
+            <span class="b-secondary">Formulación</span>
+          {% elif p.estado == 'APROBACION' %}
+            <span class="b-warning">Aprobación</span>
+          {% elif p.estado == 'IMPLEMENTACION' %}
+            <span class="b-success">Implementación</span>
+          {% elif p.estado == 'SUSPENDIDO' %}
+            <span class="b-danger">Suspendido</span>
+          {% endif %}
+        </td>
+        <td>{{ p.responsable|default:"—"|truncatechars:18 }}</td>
+        <td style="text-align:center">
+          {{ p.fecha_prevista_aprobacion|date:"d/m/Y"|default:"—" }}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if programas_inactivos %}
+  <div class="seccion-titulo" style="background:#6c757d; margin-top:14px">
+    ✗ Programas Inactivos ({{ programas_inactivos|length }})
+  </div>
+  <table class="datos">
+    <thead>
+      <tr>
+        <th>N°</th><th>Univ.</th><th>Facultad</th><th>Ciudad</th>
+        <th>Programa</th><th>Estado</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in programas_inactivos %}
+      <tr class="inactiva">
+        <td>{{ forloop.counter }}</td>
+        <td>{{ p.sede.facultad.universidad.sigla }}</td>
+        <td>{{ p.sede.facultad.nombre }}</td>
+        <td>{{ p.sede.ciudad }}</td>
+        <td>{{ p.nombre }}</td>
+        <td><span class="b-muted">Inactivo</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+
+  {% include 'reportes/firma_pdf.html' %}
+
+</body>
+</html>

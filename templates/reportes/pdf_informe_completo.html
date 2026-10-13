@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 2cm 1.5cm 2.5cm 1.5cm;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:Arial,sans-serif; font-size:9pt; color:#1a1a1a; }
+
+    .encabezado-inst { margin-bottom:16px; }
+
+    /* Portada */
+    .portada {
+      text-align: center;
+      padding: 20px 0 16px;
+      border-bottom: 3px solid #0f1f3d;
+      margin-bottom: 16px;
+    }
+    .portada h1 { font-size:16pt; color:#0f1f3d; font-weight:bold; margin-bottom:5px; }
+    .portada h2 { font-size:11pt; color:#444; font-weight:normal; margin-bottom:8px; }
+    .portada .meta {
+      display:inline-block; background:#f0f4ff;
+      border:1px solid #0f1f3d; border-radius:6px;
+      padding:6px 16px; font-size:8.5pt; color:#0f1f3d; margin-top:6px;
+    }
+
+    /* Secciones */
+    .seccion { margin-top:20px; margin-bottom:12px; }
+    .seccion-titulo-ppal {
+      background: linear-gradient(135deg, #0f1f3d, #1a3560);
+      color: white;
+      padding: 7px 12px;
+      font-size: 10pt;
+      font-weight: bold;
+      border-radius: 5px;
+      margin-bottom: 8px;
+    }
+    .seccion-sub {
+      background: #e8eef8;
+      color: #0f1f3d;
+      padding: 4px 10px;
+      font-size: 8.5pt;
+      font-weight: bold;
+      border-left: 4px solid #0f1f3d;
+      margin: 8px 0 5px;
+    }
+
+    /* Estadísticas en bloque */
+    .stats-grid { display:table; width:100%; border-collapse:separate; border-spacing:5px; margin:8px 0; }
+    .stats-cel {
+      display:table-cell; text-align:center; padding:8px 5px;
+      background:#f5f8ff; border-top:3px solid #0f1f3d;
+      border-radius:4px;
+    }
+    .stats-num { font-size:16pt; font-weight:bold; color:#0f1f3d; display:block; }
+    .stats-lbl { font-size:7pt; color:#666; text-transform:uppercase; letter-spacing:.3px; }
+
+    /* Tabla compacta */
+    table.t { width:100%; border-collapse:collapse; font-size:7.5pt; }
+    table.t th { background:#0f1f3d; color:white; padding:4px 5px; text-align:left; }
+    table.t td { padding:3px 5px; border-bottom:1px solid #eee; }
+    table.t tr:nth-child(even) td { background:#f9f9ff; }
+    table.t tr.inact td { background:#f0f0f0; color:#888; font-style:italic; }
+
+    /* Progreso */
+    .prog-item { margin:5px 0; }
+    .prog-label { display:table; width:100%; }
+    .prog-label td { font-size:8pt; }
+    .prog-label td:last-child { text-align:right; color:#666; }
+    .prog-bg { background:#e9ecef; height:10px; border-radius:4px; margin-top:2px; }
+    .prog-fill { height:10px; border-radius:4px; }
+
+    /* Badges */
+    .b-s { color:#0a3622; background:#d1e7dd; padding:1px 5px; border-radius:5px; }
+    .b-w { color:#664d03; background:#fff3cd; padding:1px 5px; border-radius:5px; }
+    .b-d { color:#58151c; background:#f8d7da; padding:1px 5px; border-radius:5px; }
+    .b-m { color:#fff;    background:#6c757d; padding:1px 5px; border-radius:5px; }
+    .b-k { color:#fff;    background:#212529; padding:1px 5px; border-radius:5px; }
+
+    .firma-bloque { margin-top:30px; }
+
+    /* Página nueva para secciones grandes */
+    .nueva-pagina { page-break-before: always; }
+  </style>
+</head>
+<body>
+
+  {% include 'reportes/encabezado_pdf.html' %}
+
+  <!-- Portada del informe -->
+  <div class="portada">
+    <h1>INFORME INTEGRAL DE GESTIÓN CURRICULAR</h1>
+    <h2>Universidad Autónoma Tomás Frías — Potosí, Bolivia</h2>
+    <h2>Dirección de Servicios Académicos (DSA)</h2>
+    <div class="meta">
+      Generado el {{ fecha|date:"d/m/Y" }} a las {{ fecha|date:"H:i" }} hrs
+    </div>
+  </div>
+
+  <!-- ══════════════ SECCIÓN 1: RESUMEN EJECUTIVO ══════════════ -->
+  <div class="seccion">
+    <div class="seccion-titulo-ppal">
+      1. Resumen Ejecutivo — Estado General del Sistema
+    </div>
+
+    <table class="stats-grid">
+      <tr>
+        <td class="stats-cel">
+          <span class="stats-num">{{ stats.total_universidades }}</span>
+          <span class="stats-lbl">Universidades</span>
+        </td>
+        <td class="stats-cel">
+          <span class="stats-num">{{ stats.total_sedes }}</span>
+          <span class="stats-lbl">Sedes</span>
+        </td>
+        <td class="stats-cel">
+          <span class="stats-num">{{ stats.total_carreras }}</span>
+          <span class="stats-lbl">Carreras</span>
+        </td>
+        <td class="stats-cel">
+          <span class="stats-num">{{ stats.total_programas }}</span>
+          <span class="stats-lbl">Programas</span>
+        </td>
+        <td class="stats-cel">
+          <span class="stats-num">{{ stats.total_procesos }}</span>
+          <span class="stats-lbl">Procesos</span>
+        </td>
+        <td class="stats-cel">
+          <span class="stats-num">{{ stats.formularios_total }}</span>
+          <span class="stats-lbl">Formularios</span>
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- ══════════════ SECCIÓN 2: ESTADO DE REDISEÑO ══════════════ -->
+  <div class="seccion">
+    <div class="seccion-titulo-ppal">
+      2. Estado de Rediseño Curricular
+    </div>
+
+    <table style="width:100%"><tr>
+      <td style="width:55%; vertical-align:top; padding-right:10px">
+        <div class="prog-item">
+          <table class="prog-label"><tr>
+            <td><strong>Vigentes</strong></td>
+            <td>{{ stats.vigentes }} ({{ stats.pct_rediseno }}%)</td>
+          </tr></table>
+          <div class="prog-bg">
+            <div class="prog-fill" style="width:{{ stats.pct_rediseno }}%; background:#198754"></div>
+          </div>
+        </div>
+        <div class="prog-item">
+          <table class="prog-label"><tr>
+            <td><strong>Próximos a vencer</strong></td>
+            <td>{{ stats.proximas }}</td>
+          </tr></table>
+          <div class="prog-bg">
+            <div class="prog-fill" style="width:{% widthratio stats.proximas stats.total_carreras_int 100 %}%; background:#ffc107"></div>
+          </div>
+        </div>
+        <div class="prog-item">
+          <table class="prog-label"><tr>
+            <td><strong>Vencidos</strong></td>
+            <td>{{ stats.vencidas }}</td>
+          </tr></table>
+          <div class="prog-bg">
+            <div class="prog-fill" style="width:{% widthratio stats.vencidas stats.total_carreras_int 100 %}%; background:#dc3545"></div>
+          </div>
+        </div>
+        <div class="prog-item">
+          <table class="prog-label"><tr>
+            <td><strong>Sin datos</strong></td>
+            <td>{{ stats.sin_datos }}</td>
+          </tr></table>
+          <div class="prog-bg">
+            <div class="prog-fill" style="width:{% widthratio stats.sin_datos stats.total_carreras_int 100 %}%; background:#6c757d"></div>
+          </div>
+        </div>
+      </td>
+      <td style="width:45%; vertical-align:top">
+        <table class="t">
+          <tr><th>Tipo de Innovación</th><th>Carreras</th><th>%</th></tr>
+          <tr><td>Rediseño Curricular</td>
+              <td>{{ stats.con_rediseno }}</td>
+              <td>{{ stats.pct_rediseno }}%</td></tr>
+          <tr><td>Diseño Curricular</td>
+              <td>{{ stats.con_diseno }}</td>
+              <td>{{ stats.pct_diseno }}%</td></tr>
+          <tr><td>Ajuste Curricular</td>
+              <td>{{ stats.con_ajuste }}</td>
+              <td>{{ stats.pct_ajuste }}%</td></tr>
+          <tr><td>Complementación</td>
+              <td>{{ stats.con_complementacion }}</td>
+              <td>{{ stats.pct_complementacion }}%</td></tr>
+          <tr><td>Sin proceso</td>
+              <td>{{ stats.sin_proceso }}</td>
+              <td>{{ stats.pct_sin_proceso }}%</td></tr>
+        </table>
+      </td>
+    </tr></table>
+  </div>
+
+  <!-- ══════════════ SECCIÓN 3: CARRERAS ══════════════ -->
+  <div class="seccion nueva-pagina">
+    <div class="seccion-titulo-ppal">
+      3. Detalle de Carreras ({{ carreras_activas|length }} activas
+      / {{ carreras_inactivas|length }} inactivas)
+    </div>
+
+    <div class="seccion-sub">Carreras en Funcionamiento</div>
+    <table class="t">
+      <thead>
+        <tr>
+          <th>N°</th><th>Univ.</th><th>Facultad</th>
+          <th>Ciudad</th><th>Carrera</th><th>Grado</th>
+          <th>N°SUB</th><th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in carreras_activas %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td><span class="b-k">{{ c.sede.facultad.universidad.sigla }}</span></td>
+          <td>{{ c.sede.facultad.nombre }}</td>
+          <td>{{ c.sede.ciudad }}</td>
+          <td><strong>{{ c.nombre }}</strong></td>
+          <td>{{ c.get_grado_display }}</td>
+          <td>{{ c.numero_sub|default:"—" }}</td>
+          <td>
+            {% if c.estado_rediseno == 'VIGENTE' %}<span class="b-s">Vigente</span>
+            {% elif c.estado_rediseno == 'PROXIMO' %}<span class="b-w">Próximo</span>
+            {% elif c.estado_rediseno == 'VENCIDO' %}<span class="b-d">Vencido</span>
+            {% else %}<span class="b-m">Sin datos</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if carreras_inactivas %}
+    <div class="seccion-sub" style="border-left-color:#6c757d; background:#f0f0f0; margin-top:10px">
+      Carreras No Activas
+    </div>
+    <table class="t">
+      <thead>
+        <tr><th>N°</th><th>Univ.</th><th>Facultad</th><th>Ciudad</th><th>Carrera</th></tr>
+      </thead>
+      <tbody>
+        {% for c in carreras_inactivas %}
+        <tr class="inact">
+          <td>{{ forloop.counter }}</td>
+          <td>{{ c.sede.facultad.universidad.sigla }}</td>
+          <td>{{ c.sede.facultad.nombre }}</td>
+          <td>{{ c.sede.ciudad }}</td>
+          <td>{{ c.nombre }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+
+  <!-- ══════════════ SECCIÓN 4: PROGRAMAS ══════════════ -->
+  <div class="seccion nueva-pagina">
+    <div class="seccion-titulo-ppal">
+      4. Programas Académicos en Proceso ({{ programas_activos|length }} activos)
+    </div>
+    <table class="t">
+      <thead>
+        <tr>
+          <th>N°</th><th>Univ.</th><th>Facultad</th>
+          <th>Ciudad</th><th>Programa</th>
+          <th>Grado prev.</th><th>Estado</th><th>F. Prevista</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in programas_activos %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td><span class="b-k">{{ p.sede.facultad.universidad.sigla }}</span></td>
+          <td>{{ p.sede.facultad.nombre }}</td>
+          <td>{{ p.sede.ciudad }}</td>
+          <td><strong>{{ p.nombre }}</strong></td>
+          <td>{{ p.get_grado_previsto_display|default:"—" }}</td>
+          <td>
+            {% if p.estado == 'FORMULACION' %}<span class="b-m">Formulación</span>
+            {% elif p.estado == 'APROBACION' %}<span class="b-w">Aprobación</span>
+            {% elif p.estado == 'IMPLEMENTACION' %}<span class="b-s">Implementación</span>
+            {% else %}<span class="b-d">Suspendido</span>{% endif %}
+          </td>
+          <td>{{ p.fecha_prevista_aprobacion|date:"d/m/Y"|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+    {% if programas_inactivos %}
+    <div class="seccion-sub"
+        style="border-left-color:#6c757d; background:#f0f0f0; margin-top:10px">
+    Programas Inactivos ({{ programas_inactivos|length }})
+    </div>
+    <table class="t">
+    <thead>
+        <tr>
+        <th>N°</th><th>Univ.</th><th>Facultad</th>
+        <th>Ciudad</th><th>Programa</th><th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in programas_inactivos %}
+        <tr class="inact">
+        <td>{{ forloop.counter }}</td>
+        <td>{{ p.sede.facultad.universidad.sigla }}</td>
+        <td>{{ p.sede.facultad.nombre }}</td>
+        <td>{{ p.sede.ciudad }}</td>
+        <td>{{ p.nombre }}</td>
+        <td><span class="b-m">Inactivo</span></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+    {% endif %}
+
+  <!-- ══════════════ SECCIÓN 5: PROCESOS CURRICULARES ══════════════ -->
+  <div class="seccion nueva-pagina">
+    <div class="seccion-titulo-ppal">
+      5. Seguimiento de Procesos Curriculares
+    </div>
+    <table class="t">
+      <thead>
+        <tr>
+          <th>N°</th><th>Universidad</th><th>Carrera</th>
+          <th>Tipo</th><th>Inicio</th><th>Conclusión</th>
+          <th>Estado</th><th>Avance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in procesos %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ p.carrera.sede.facultad.universidad.sigla }}</td>
+          <td>{{ p.carrera.nombre|truncatechars:28 }}</td>
+          <td>{{ p.get_tipo_proceso_display }}</td>
+          <td>{{ p.anio_inicio }}</td>
+          <td>{{ p.anio_conclusion|default:"En proceso" }}</td>
+          <td>
+            {% if p.estado == 'CONCLUIDO' %}<span class="b-s">Concluido</span>
+            {% elif p.estado == 'EN_PROCESO' %}<span class="b-w">En Proceso</span>
+            {% else %}<span class="b-m">Archivado</span>{% endif %}
+          </td>
+          <td>
+            {% with tf=p.fases.count %}
+            {% if tf > 0 %}
+              {% with comp=p.fases.all %}
+              {{ tf }} fases
+              {% endwith %}
+            {% else %}—{% endif %}
+            {% endwith %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% include 'reportes/firma_pdf.html' %}
+
+</body>
+</html>
