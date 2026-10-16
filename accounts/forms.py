@@ -15,6 +15,16 @@ class FormularioRegistro(forms.ModelForm):
         widget=forms.PasswordInput(attrs={'class': 'form-control',
                                           'placeholder': 'Repite la contraseña'})
     )
+    # ── Campo extra para cargo personalizado ──────────────────────────
+    otro_cargo = forms.CharField(
+        label='Especifica tu cargo',
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class':       'form-control',
+            'placeholder': 'Escribe tu cargo o función...',
+            'id':          'id_otro_cargo',
+        })
+    )
 
     class Meta:
         model  = Usuario
@@ -24,24 +34,28 @@ class FormularioRegistro(forms.ModelForm):
             'universidad', 'documento_identidad', 'motivo_solicitud',
         ]
         widgets = {
-            'first_name':          forms.TextInput(attrs={'class': 'form-control'}),
-            'last_name':           forms.TextInput(attrs={'class': 'form-control'}),
-            'username':            forms.TextInput(attrs={'class': 'form-control'}),
-            'email':               forms.EmailInput(attrs={'class': 'form-control'}),
-            'cargo':               forms.Select(attrs={'class': 'form-select'}),
-            'departamento':        forms.Select(attrs={'class': 'form-select'},
-                                                choices=[
-                                                    ('', '-- Selecciona --'),
-                                                    ('Potosí',       'Potosí'),
-                                                    ('La Paz',       'La Paz'),
-                                                    ('Cochabamba',   'Cochabamba'),
-                                                    ('Santa Cruz',   'Santa Cruz'),
-                                                    ('Oruro',        'Oruro'),
-                                                    ('Sucre',        'Sucre'),
-                                                    ('Tarija',       'Tarija'),
-                                                    ('Beni',         'Beni'),
-                                                    ('Pando',        'Pando'),
-                                                ]),
+            'first_name':   forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name':    forms.TextInput(attrs={'class': 'form-control'}),
+            'username':     forms.TextInput(attrs={'class': 'form-control'}),
+            'email':        forms.EmailInput(attrs={'class': 'form-control'}),
+            'cargo':        forms.Select(attrs={
+                                'class':    'form-select',
+                                'id':       'id_cargo',
+                                'onchange': 'toggleOtroCargo(this)',
+                            }),
+            'departamento': forms.Select(attrs={'class': 'form-select'},
+                                         choices=[
+                                             ('', '-- Selecciona --'),
+                                             ('Potosí',     'Potosí'),
+                                             ('La Paz',     'La Paz'),
+                                             ('Cochabamba', 'Cochabamba'),
+                                             ('Santa Cruz', 'Santa Cruz'),
+                                             ('Oruro',      'Oruro'),
+                                             ('Sucre',      'Sucre'),
+                                             ('Tarija',     'Tarija'),
+                                             ('Beni',       'Beni'),
+                                             ('Pando',      'Pando'),
+                                         ]),
             'telefono':            forms.TextInput(attrs={'class': 'form-control'}),
             'universidad':         forms.Select(attrs={'class': 'form-select'}),
             'documento_identidad': forms.TextInput(attrs={'class': 'form-control'}),
@@ -61,21 +75,39 @@ class FormularioRegistro(forms.ModelForm):
             'motivo_solicitud':    '¿Por qué solicita acceso al sistema?',
         }
 
+    def clean(self):
+        cleaned = super().clean()
+        cargo = cleaned.get('cargo')
+        otro  = cleaned.get('otro_cargo', '').strip()
+        if cargo == 'OTRO' and not otro:
+            self.add_error('otro_cargo',
+                'Por favor especifica tu cargo cuando seleccionas "Otro".')
+        return cleaned
+
     def clean_password2(self):
         p1 = self.cleaned_data.get('password1')
         p2 = self.cleaned_data.get('password2')
         if p1 and p2 and p1 != p2:
             raise forms.ValidationError('Las contraseñas no coinciden.')
         if p1 and len(p1) < 8:
-            raise forms.ValidationError('La contraseña debe tener al menos 8 caracteres.')
+            raise forms.ValidationError('Mínimo 8 caracteres.')
         return p2
 
     def save(self, commit=True):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data['password1'])
+        # Si eligió "Otro" guarda el texto personalizado en observaciones
+        if self.cleaned_data.get('cargo') == 'OTRO':
+            otro = self.cleaned_data.get('otro_cargo', '').strip()
+            if otro:
+                user.cargo = 'OTRO'
+                # Guarda el cargo personalizado en motivo_solicitud como referencia
+                user.motivo_solicitud = (
+                    f"[Cargo: {otro}]\n{self.cleaned_data.get('motivo_solicitud','')}"
+                )
         user.rol            = 'PENDIENTE'
         user.activo_sistema = False
-        user.is_active      = False  
+        user.is_active      = False
         if commit:
             user.save()
         return user

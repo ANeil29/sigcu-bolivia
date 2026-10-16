@@ -45,9 +45,20 @@
               {{ form.password2 }}
             </div>
             <div class="col-md-6">
-              <label class="form-label">Cargo o función *</label>
-              {{ form.cargo }}
-            </div>
+  <label class="form-label">{{ form.cargo.label }} *</label>
+  {{ form.cargo }}
+</div>
+
+<!-- Campo que aparece solo cuando se elige "Otro" -->
+<div class="col-md-6" id="div-otro-cargo" style="display:none">
+  <label class="form-label">{{ form.otro_cargo.label }} *</label>
+  {{ form.otro_cargo }}
+  {% if form.otro_cargo.errors %}
+  <div class="text-danger" style="font-size:.82rem">
+    {{ form.otro_cargo.errors|join:", " }}
+  </div>
+  {% endif %}
+</div>
             <div class="col-md-6">
               <label class="form-label">Departamento *</label>
               {{ form.departamento }}
@@ -81,6 +92,25 @@
           <div class="mt-4 d-grid">
             <button type="submit" class="btn btn-dark">Enviar solicitud</button>
           </div>
+          <script>
+function toggleOtroCargo(select) {
+  const div = document.getElementById('div-otro-cargo');
+  const input = document.getElementById('id_otro_cargo');
+  if (select.value === 'OTRO') {
+    div.style.display = 'block';
+    input.required = true;
+  } else {
+    div.style.display = 'none';
+    input.required = false;
+    input.value = '';
+  }
+}
+// Al cargar la página verifica si ya estaba seleccionado "Otro"
+document.addEventListener('DOMContentLoaded', function() {
+  const sel = document.getElementById('id_cargo');
+  if (sel) toggleOtroCargo(sel);
+});
+</script>
         </form>
         <p class="text-center mt-3 mb-0">
           ¿Ya tienes acceso? <a href="{% url 'login' %}">Ingresar</a>

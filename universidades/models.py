@@ -96,7 +96,10 @@ class Sede(models.Model):
     @property
     def google_maps_url(self):
         if self.tiene_coordenadas:
-            return f"https://www.google.com/maps?q={self.latitud},{self.longitud}"
+            # Fuerza punto decimal con formato explícito
+            lat = f"{self.latitud:.6f}"
+            lon = f"{self.longitud:.6f}"
+            return f"https://www.google.com/maps?q={lat},{lon}"
         return None
 
     @property

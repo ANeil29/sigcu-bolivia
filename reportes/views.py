@@ -860,7 +860,7 @@ def pdf_programas(request):
         'en_implementacion':   programas_activos.filter(estado='IMPLEMENTACION').count(),
         'fecha':               timezone.now(),
         'logo_uatf':           logo_base64('logo_uatf.png'),
-        'logo_dsa':            logo_base64('logo_dsa.jpeg'),
+        'logo_dsa':            logo_base64('logo_dsa.jpg'),
     })
     buf = BytesIO()
     pisa.CreatePDF(html, dest=buf, encoding='utf-8')
@@ -917,7 +917,7 @@ def pdf_informe_completo(request):
         'procesos':            procesos,
         'fecha':               timezone.now(),
         'logo_uatf':           logo_base64('logo_uatf.png'),
-        'logo_dsa':            logo_base64('logo_dsa.jpeg'),
+        'logo_dsa':            logo_base64('logo_dsa.jpg'),
     })
     buf = BytesIO()
     pisa.CreatePDF(html, dest=buf, encoding='utf-8')
