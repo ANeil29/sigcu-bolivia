@@ -30,12 +30,20 @@ class Facultad(models.Model):
     sigla    = models.CharField(max_length=30, blank=True)
     decano   = models.CharField(max_length=200, blank=True)
     telefono = models.CharField(max_length=50, blank=True)
+
+    # ── NUEVO ────────────────────────────────────────────────────────
+    imagen_referencia = models.ImageField(
+        upload_to='facultades/imagenes/%Y/',
+        null=True, blank=True,
+        help_text='Foto del edificio o referencia visual de la facultad'
+    )
+
     history  = HistoricalRecords()
 
     class Meta:
-        verbose_name = 'Facultad'
+        verbose_name        = 'Facultad'
         verbose_name_plural = 'Facultades'
-        ordering = ['universidad', 'nombre']
+        ordering            = ['universidad', 'nombre']
 
     def __str__(self):
         return f"{self.nombre} — {self.universidad.sigla}"

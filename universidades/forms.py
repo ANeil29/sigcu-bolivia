@@ -42,20 +42,26 @@ class UniversidadForm(forms.ModelForm):
 class FacultadForm(forms.ModelForm):
     class Meta:
         model  = Facultad
-        fields = ['universidad', 'nombre', 'sigla', 'decano', 'telefono']
+        fields = ['universidad', 'nombre', 'sigla', 'decano',
+                  'telefono', 'imagen_referencia']
         widgets = {
-            'universidad': forms.Select(attrs={'class': 'form-select'}),
-            'nombre':      forms.TextInput(attrs={'class': 'form-control'}),
-            'sigla':       forms.TextInput(attrs={'class': 'form-control'}),
-            'decano':      forms.TextInput(attrs={'class': 'form-control'}),
-            'telefono':    forms.TextInput(attrs={'class': 'form-control'}),
+            'universidad':       forms.Select(attrs={'class': 'form-select'}),
+            'nombre':            forms.TextInput(attrs={'class': 'form-control'}),
+            'sigla':             forms.TextInput(attrs={'class': 'form-control'}),
+            'decano':            forms.TextInput(attrs={'class': 'form-control'}),
+            'telefono':          forms.TextInput(attrs={'class': 'form-control'}),
+            'imagen_referencia': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
+            }),
         }
         labels = {
-            'universidad': 'Universidad',
-            'nombre':      'Nombre de la Facultad',
-            'sigla':       'Sigla',
-            'decano':      'Decano actual',
-            'telefono':    'Teléfono',
+            'universidad':       'Universidad *',
+            'nombre':            'Nombre de la Facultad *',
+            'sigla':             'Sigla',
+            'decano':            'Decano actual',
+            'telefono':          'Teléfono',
+            'imagen_referencia': 'Imagen de referencia',
         }
 
 

@@ -132,7 +132,7 @@ def lista_facultades(request):
 @login_required
 @puede_editar
 def crear_facultad(request):
-    form = FacultadForm(request.POST or None)
+    form = FacultadForm(request.POST or None, request.FILES or None)
     if request.method == 'POST' and form.is_valid():
         form.save()
         messages.success(request, '✅ Facultad creada correctamente.')
@@ -145,14 +145,20 @@ def crear_facultad(request):
 @puede_editar
 def editar_facultad(request, pk):
     facultad = get_object_or_404(Facultad, pk=pk)
-    form = FacultadForm(request.POST or None, instance=facultad)
+    form = FacultadForm(
+        request.POST or None,
+        request.FILES or None,
+        instance=facultad
+    )
     if request.method == 'POST' and form.is_valid():
         form.save()
         messages.success(request, '✅ Facultad actualizada.')
         return redirect('lista-facultades')
     return render(request, 'universidades/form_facultad.html',
-                  {'form': form, 'titulo': f'Editar — {facultad.nombre}',
-                   'accion': 'Guardar cambios', 'objeto': facultad})
+                  {'form': form,
+                   'titulo': f'Editar — {facultad.nombre}',
+                   'accion': 'Guardar cambios',
+                   'objeto': facultad})
 
 
 @login_required
@@ -175,10 +181,6 @@ from django.db.models import Count
 
 @login_required
 def lista_sedes(request):
-    """
-    Muestra UNA entrada por ciudad — agrupa sedes duplicadas.
-    """
-    # Ciudades únicas con conteo de carreras y facultades
     ciudades = Sede.objects.filter(activa=True).values(
         'ciudad', 'departamento'
     ).distinct().order_by('departamento', 'ciudad')
@@ -192,20 +194,21 @@ def lista_sedes(request):
         ).select_related('facultad__universidad')
 
         from carreras.models import Carrera
-        total_carreras = Carrera.objects.filter(
+        total_carreras   = Carrera.objects.filter(
             sede__ciudad=c['ciudad'],
             sede__departamento=c['departamento'],
             en_funcionamiento=True
         ).count()
-
         total_facultades = sedes.values('facultad').distinct().count()
-        universidad = sedes.first().facultad.universidad if sedes.exists() else None
-        tiene_coords = sedes.filter(
+        universidad      = sedes.first().facultad.universidad \
+                           if sedes.exists() else None
+        tiene_coords     = sedes.filter(
             latitud__isnull=False, longitud__isnull=False
         ).exists()
 
-        # Imagen representativa: primera sede que tenga imagen
-        imagen = sedes.filter(
+        # ── Imagen: de la sede (no de la facultad) ──────────────────
+        # Busca la primera sede de esa ciudad que tenga imagen subida
+        sede_con_imagen = sedes.filter(
             imagen_referencia__isnull=False
         ).exclude(imagen_referencia='').first()
 
@@ -216,7 +219,7 @@ def lista_sedes(request):
             'total_carreras':   total_carreras,
             'total_facultades': total_facultades,
             'tiene_coords':     tiene_coords,
-            'imagen':           imagen,
+            'imagen':           sede_con_imagen,   # ← imagen de la sede
             'total_sedes':      sedes.count(),
         })
 
@@ -230,11 +233,8 @@ def lista_sedes(request):
 
 @login_required
 def detalle_sede_ciudad(request, ciudad):
-    """
-    Muestra el detalle completo de todas las sedes de una ciudad:
-    mapa, carreras, facultades, imágenes.
-    """
     from carreras.models import Carrera
+    from collections import defaultdict
 
     sedes = Sede.objects.filter(
         activa=True, ciudad=ciudad
@@ -244,7 +244,6 @@ def detalle_sede_ciudad(request, ciudad):
         from django.http import Http404
         raise Http404
 
-    # Carreras en esta ciudad agrupadas por facultad
     carreras = Carrera.objects.filter(
         sede__ciudad=ciudad,
         en_funcionamiento=True
@@ -254,45 +253,62 @@ def detalle_sede_ciudad(request, ciudad):
         'sede__facultad__nombre', 'nombre'
     )
 
-    # Coordenadas de sedes para el mapa
-    coords_sedes = [
-        {
-            'nombre':    s.nombre,
-            'facultad':  s.facultad.nombre,
-            'lat':       s.latitud,
-            'lon':       s.longitud,
-            'direccion': s.direccion,
-            'telefono':  s.telefono,
-        }
-        for s in sedes if s.tiene_coordenadas
-    ]
+    # Coordenadas para el mapa
+    coords_sedes = []
+    for s in sedes:
+        if s.tiene_coordenadas:
+            # Contar carreras de esta sede específica
+            total_carr_sede = Carrera.objects.filter(
+                sede=s, en_funcionamiento=True
+            ).count()
+            coords_sedes.append({
+                'nombre':         s.nombre,
+                'facultad':       s.facultad.nombre,
+                'facultad_sigla': s.facultad.sigla or s.facultad.nombre[:4].upper(),
+                'lat':            s.latitud,
+                'lon':            s.longitud,
+                'direccion':      s.direccion,
+                'telefono':       s.telefono,
+                'total_carreras': total_carr_sede,
+            })
 
-    # Primera sede con coordenadas para centrar el mapa
     sede_con_coords = sedes.filter(
         latitud__isnull=False, longitud__isnull=False
     ).first()
 
-    # Agrupar carreras por sede/facultad
-    from collections import defaultdict
+    # Agrupar carreras por sede
     carreras_por_sede = defaultdict(list)
     for c in carreras:
-        carreras_por_sede[c.sede.nombre].append(c)
+        carreras_por_sede[c.sede.pk].append(c)
 
-    # Imágenes disponibles
-    imagenes = sedes.filter(
-        imagen_referencia__isnull=False
-    ).exclude(imagen_referencia='')
+    # Enriquecer sedes con datos de carreras e imagen
+    sedes_detalle = []
+    for s in sedes:
+        lista_carreras = carreras_por_sede.get(s.pk, [])
+        sedes_detalle.append({
+            'sede':          s,
+            'carreras':      lista_carreras,
+            'total_carreras': len(lista_carreras),
+        })
 
     universidad = sedes.first().facultad.universidad
+    imagenes_sedes     = sedes.filter(
+        imagen_referencia__isnull=False
+    ).exclude(imagen_referencia='')
+    imagenes_facultades = Facultad.objects.filter(
+        sedes__ciudad=ciudad,
+        imagen_referencia__isnull=False
+    ).exclude(imagen_referencia='').distinct()
 
     return render(request, 'universidades/detalle_sede.html', {
         'ciudad':           ciudad,
         'sedes':            sedes,
+        'sedes_detalle':    sedes_detalle,
         'carreras':         carreras,
-        'carreras_por_sede': dict(carreras_por_sede),
         'coords_sedes':     coords_sedes,
         'sede_con_coords':  sede_con_coords,
-        'imagenes':         imagenes,
+        'imagenes_sedes':   imagenes_sedes,
+        'imagenes_facultades': imagenes_facultades,
         'universidad':      universidad,
         'total_carreras':   carreras.count(),
     })

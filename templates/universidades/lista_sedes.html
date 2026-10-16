@@ -5,7 +5,6 @@
 <nav class="breadcrumb-sigcu">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
-    <li class="breadcrumb-item">Institucional</li>
     <li class="breadcrumb-item active">Sedes</li>
   </ol>
 </nav>
@@ -17,7 +16,7 @@
     <h4><i class="bi bi-geo-alt me-2"></i>Sedes Universitarias</h4>
     <p class="text-muted mb-0">
       {{ total_ciudades }} sede{{ total_ciudades|pluralize }} registrada{{ total_ciudades|pluralize }}.
-      Haz clic en una sede para ver su información detallada.
+      Haz clic para ver el detalle.
     </p>
   </div>
   <div class="col-auto d-flex gap-2">
@@ -38,37 +37,56 @@
 </div>
 {% endfor %}
 
-<!-- Tarjetas de sedes por ciudad -->
 <div class="row g-3">
   {% for s in sedes_por_ciudad %}
   <div class="col-md-6 col-lg-4">
     <a href="{% url 'detalle-sede-ciudad' s.ciudad %}"
        class="text-decoration-none">
-      <div class="card h-100 shadow-sm sede-card"
-           style="transition: transform .15s, box-shadow .15s; cursor:pointer">
+      <div class="card h-100 shadow-sm sede-card">
 
-        <!-- Imagen de referencia o placeholder -->
+        <!-- Imagen de la sede -->
         {% if s.imagen and s.imagen.imagen_referencia %}
-        <img src="{{ s.imagen.imagen_referencia.url }}"
-             class="card-img-top"
-             style="height:160px; object-fit:cover"
-             alt="Sede {{ s.ciudad }}">
+        <div style="position:relative; overflow:hidden; height:160px">
+          <img src="{{ s.imagen.imagen_referencia.url }}"
+               style="width:100%; height:160px; object-fit:cover;
+                      transition: transform .3s ease"
+               class="sede-img"
+               alt="Sede {{ s.ciudad }}">
+          <!-- Overlay con ciudad -->
+          <div style="position:absolute; bottom:0; left:0; right:0;
+                      background:linear-gradient(transparent,rgba(10,22,40,.75));
+                      padding:.6rem .8rem">
+            <span style="color:white; font-weight:700; font-size:.95rem">
+              {{ s.ciudad }}
+            </span>
+          </div>
+        </div>
         {% else %}
-        <div class="d-flex align-items-center justify-content-center bg-dark"
-             style="height:160px">
-          <i class="bi bi-building text-white opacity-25"
-             style="font-size:4rem"></i>
+        <!-- Placeholder cuando no hay imagen -->
+        <div style="height:160px; background:linear-gradient(135deg,#0f1f3d,#1a3560);
+                    display:flex; flex-direction:column; align-items:center;
+                    justify-content:center; position:relative">
+          <i class="bi bi-geo-alt-fill text-white opacity-25"
+             style="font-size:3.5rem"></i>
+          <span style="color:white; font-weight:700; font-size:1rem;
+                       margin-top:.5rem; opacity:.9">
+            {{ s.ciudad }}
+          </span>
+          {% if user.puede_editar %}
+          <span style="position:absolute; bottom:.5rem; right:.6rem;
+                       font-size:.65rem; color:rgba(255,255,255,.35)">
+            <i class="bi bi-camera me-1"></i>Sin imagen
+          </span>
+          {% endif %}
         </div>
         {% endif %}
 
         <div class="card-body">
-          <!-- Ciudad y departamento -->
           <div class="d-flex justify-content-between align-items-start mb-2">
             <div>
-              <h5 class="card-title mb-0 text-dark">{{ s.ciudad }}</h5>
-              <small class="text-muted">
+              <p class="text-muted mb-0" style="font-size:.8rem">
                 <i class="bi bi-geo me-1"></i>{{ s.departamento }}, Bolivia
-              </small>
+              </p>
             </div>
             <span class="badge bg-dark">{{ s.universidad.sigla }}</span>
           </div>
@@ -76,15 +94,25 @@
           <!-- Estadísticas -->
           <div class="row g-2 mb-2">
             <div class="col-6">
-              <div class="p-2 bg-light rounded text-center">
-                <div class="fw-bold text-primary fs-5">{{ s.total_carreras }}</div>
-                <small class="text-muted">Carrera{{ s.total_carreras|pluralize }}</small>
+              <div class="p-2 rounded text-center"
+                   style="background:#f0f4ff">
+                <div class="fw-bold text-primary" style="font-size:1.3rem">
+                  {{ s.total_carreras }}
+                </div>
+                <small class="text-muted" style="font-size:.72rem">
+                  Carrera{{ s.total_carreras|pluralize }}
+                </small>
               </div>
             </div>
             <div class="col-6">
-              <div class="p-2 bg-light rounded text-center">
-                <div class="fw-bold text-secondary fs-5">{{ s.total_facultades }}</div>
-                <small class="text-muted">Facultad{{ s.total_facultades|pluralize }}</small>
+              <div class="p-2 rounded text-center"
+                   style="background:#f0f4ff">
+                <div class="fw-bold text-secondary" style="font-size:1.3rem">
+                  {{ s.total_facultades }}
+                </div>
+                <small class="text-muted" style="font-size:.72rem">
+                  Facultad{{ s.total_facultades|pluralize }}
+                </small>
               </div>
             </div>
           </div>
@@ -92,23 +120,25 @@
           <!-- Indicadores -->
           <div class="d-flex gap-2 flex-wrap">
             {% if s.tiene_coords %}
-            <span class="badge bg-success">
+            <span class="badge bg-success" style="font-size:.7rem">
               <i class="bi bi-geo-alt me-1"></i>Georreferenciada
             </span>
             {% else %}
-            <span class="badge bg-warning text-dark">
+            <span class="badge bg-warning text-dark" style="font-size:.7rem">
               <i class="bi bi-geo me-1"></i>Sin coordenadas
             </span>
             {% endif %}
-            <span class="badge bg-secondary">
-              {{ s.total_sedes }} registro{{ s.total_sedes|pluralize }}
+            {% if not s.imagen or not s.imagen.imagen_referencia %}
+            <span class="badge bg-light text-muted border" style="font-size:.7rem">
+              <i class="bi bi-camera me-1"></i>Sin imagen
             </span>
+            {% endif %}
           </div>
         </div>
 
-        <div class="card-footer bg-transparent border-0 text-end">
-          <small class="text-primary">
-            Ver detalle <i class="bi bi-arrow-right"></i>
+        <div class="card-footer bg-transparent border-0 text-end pb-2">
+          <small class="text-primary fw-bold" style="font-size:.78rem">
+            Ver detalle <i class="bi bi-arrow-right ms-1"></i>
           </small>
         </div>
       </div>
@@ -129,9 +159,19 @@
 
 {% block scripts %}
 <style>
+  .sede-card {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform .18s ease, box-shadow .18s ease;
+    cursor: pointer;
+  }
   .sede-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(15,31,61,.15) !important;
+    box-shadow: 0 10px 28px rgba(15,31,61,.18) !important;
+  }
+  .sede-card:hover .sede-img {
+    transform: scale(1.04);
   }
 </style>
 {% endblock %}

@@ -18,33 +18,16 @@
   <div class="col">
     <h4><i class="bi bi-geo-alt me-2"></i>Sede — {{ ciudad }}</h4>
     <p class="text-muted mb-0">
-      {{ universidad.nombre }} ·
-      <span class="badge bg-dark">{{ universidad.sigla }}</span>
+      {{ universidad.nombre }}
+      <span class="badge bg-dark ms-1">{{ universidad.sigla }}</span>
     </p>
   </div>
-  <div class="col-auto d-flex gap-2">
+  <div class="col-auto d-flex gap-2 flex-wrap">
     {% if sede_con_coords %}
-    <a href="{{ sede_con_coords.google_maps_url }}"
-       target="_blank"
-       class="btn btn-outline-danger btn-sm">
-      <i class="bi bi-map me-1"></i>Abrir en Google Maps
+    <a href="https://www.google.com/maps?q={{ sede_con_coords.latitud }},{{ sede_con_coords.longitud }}"
+       target="_blank" class="btn btn-outline-danger btn-sm">
+      <i class="bi bi-map me-1"></i>Google Maps
     </a>
-    {% endif %}
-    {% if user.puede_editar %}
-    <div class="dropdown">
-      <button class="btn btn-dark btn-sm dropdown-toggle" data-bs-toggle="dropdown">
-        <i class="bi bi-pencil me-1"></i>Editar
-      </button>
-      <ul class="dropdown-menu dropdown-menu-end">
-        {% for sede in sedes %}
-        <li>
-          <a class="dropdown-item" href="{% url 'editar-sede' sede.pk %}">
-            <i class="bi bi-building me-2"></i>{{ sede.facultad.sigla }} — {{ sede.nombre }}
-          </a>
-        </li>
-        {% endfor %}
-      </ul>
-    </div>
     {% endif %}
     <a href="{% url 'lista-sedes' %}" class="btn btn-secondary btn-sm">
       <i class="bi bi-arrow-left me-1"></i>Volver
@@ -52,138 +35,37 @@
   </div>
 </div>
 
-<!-- Fila principal: info + mapa -->
+<!-- Fila: mapa + imágenes de la sede -->
 <div class="row g-3 mb-4">
 
-  <!-- Columna izquierda: datos de la sede -->
-  <div class="col-md-5">
-
-    <!-- Tarjetas estadísticas -->
-    <div class="row g-2 mb-3">
-      <div class="col-6">
-        <div class="card text-center border-0 bg-primary bg-opacity-10">
-          <div class="card-body py-2">
-            <div class="fs-2 fw-bold text-primary">{{ total_carreras }}</div>
-            <small class="text-muted">Carrera{{ total_carreras|pluralize }}</small>
-          </div>
-        </div>
-      </div>
-      <div class="col-6">
-        <div class="card text-center border-0 bg-secondary bg-opacity-10">
-          <div class="card-body py-2">
-            <div class="fs-2 fw-bold text-secondary">{{ sedes.count }}</div>
-            <small class="text-muted">Facultad{{ sedes.count|pluralize }}</small>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Registros de sede por facultad -->
-    {% for sede in sedes %}
-    <div class="card mb-2">
-      <div class="card-header bg-dark text-white py-2">
-        <small class="fw-bold">
-          <i class="bi bi-building me-1"></i>
-          {{ sede.facultad.nombre }}
-        </small>
-        <span class="badge bg-secondary float-end">{{ sede.get_tipo_display }}</span>
-      </div>
-      <div class="card-body py-2">
-        <div class="row g-1">
-          {% if sede.direccion %}
-          <div class="col-12">
-            <small class="text-muted">
-              <i class="bi bi-pin-map me-1"></i>{{ sede.direccion }}
-            </small>
-          </div>
-          {% endif %}
-          {% if sede.telefono %}
-          <div class="col-12">
-            <small class="text-muted">
-              <i class="bi bi-telephone me-1"></i>{{ sede.telefono }}
-            </small>
-          </div>
-          {% endif %}
-          {% if sede.latitud and sede.longitud %}
-          <div class="col-12">
-            <small class="text-success">
-              <i class="bi bi-geo-alt me-1"></i>
-              {{ sede.latitud|floatformat:4 }}, {{ sede.longitud|floatformat:4 }}
-            </small>
-          </div>
-          {% endif %}
-        </div>
-      </div>
-      {% if user.puede_editar %}
-      <div class="card-footer bg-transparent py-1 text-end">
-        <a href="{% url 'editar-sede' sede.pk %}"
-           class="btn btn-outline-primary btn-sm">
-          <i class="bi bi-pencil"></i> Editar
-        </a>
-      </div>
-      {% endif %}
-    </div>
-    {% endfor %}
-
-    <!-- Imágenes de referencia -->
-    {% if imagenes %}
-    <div class="card mt-2">
-      <div class="card-header bg-dark text-white py-2">
-        <small class="fw-bold">
-          <i class="bi bi-images me-1"></i>Imágenes de referencia
-        </small>
-      </div>
-      <div class="card-body p-2">
-        <div class="row g-2">
-          {% for img in imagenes %}
-          <div class="col-6">
-            <a href="{{ img.imagen_referencia.url }}" target="_blank">
-              <img src="{{ img.imagen_referencia.url }}"
-                   class="img-fluid rounded"
-                   style="height:100px; width:100%; object-fit:cover"
-                   alt="{{ img.nombre }}">
-            </a>
-            <small class="text-muted d-block text-center mt-1"
-                   style="font-size:.7rem">
-              {{ img.facultad.sigla }}
-            </small>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-    {% endif %}
-
-  </div>
-
-  <!-- Columna derecha: mapa -->
-  <div class="col-md-7">
-    <div class="card h-100">
-      <div class="card-header bg-dark text-white d-flex justify-content-between">
+  <!-- Mapa -->
+  <div class="col-md-8">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
         <span>
           <i class="bi bi-map me-2"></i>Georreferenciación — {{ ciudad }}
         </span>
         {% if sede_con_coords %}
-        <a href="{{ sede_con_coords.google_maps_url }}"
-           target="_blank"
-           class="btn btn-outline-light btn-sm">
+        <a href="https://www.google.com/maps?q={{ sede_con_coords.latitud }},{{ sede_con_coords.longitud }}"
+           target="_blank" class="btn btn-outline-light btn-sm">
           <i class="bi bi-box-arrow-up-right me-1"></i>Google Maps
         </a>
         {% endif %}
       </div>
       <div class="card-body p-0">
         {% if coords_sedes %}
-        <div id="mapa-sede" style="height:420px; border-radius:0 0 10px 10px"></div>
+        <div id="mapa-sede"
+             style="height:380px; border-radius:0 0 10px 10px"></div>
         {% else %}
         <div class="d-flex flex-column align-items-center justify-content-center
-                    text-muted" style="height:420px">
-          <i class="bi bi-geo" style="font-size:3rem"></i>
-          <p class="mt-2">Esta sede no tiene coordenadas registradas.</p>
+                    text-muted p-4" style="height:380px">
+          <i class="bi bi-geo" style="font-size:3rem; opacity:.3"></i>
+          <p class="mt-2">Sin coordenadas registradas para esta sede.</p>
           {% if user.puede_editar %}
-          {% for sede in sedes %}
-          <a href="{% url 'editar-sede' sede.pk %}"
+          {% for sd in sedes %}
+          <a href="{% url 'editar-sede' sd.pk %}"
              class="btn btn-outline-dark btn-sm mt-1">
-            Agregar coordenadas — {{ sede.facultad.sigla }}
+            Agregar coordenadas — {{ sd.facultad.sigla }}
           </a>
           {% endfor %}
           {% endif %}
@@ -193,55 +75,273 @@
     </div>
   </div>
 
+  <!-- Imágenes de la sede + estadísticas rápidas -->
+  <div class="col-md-4">
+
+    <!-- Estadísticas -->
+    <div class="row g-2 mb-3">
+      <div class="col-6">
+        <div class="card border-0 text-center py-2"
+             style="background:linear-gradient(135deg,#0f1f3d,#1a3560)">
+          <div class="fs-2 fw-bold text-white">{{ total_carreras }}</div>
+          <small class="text-white opacity-75">Carreras</small>
+        </div>
+      </div>
+      <div class="col-6">
+        <div class="card border-0 text-center py-2"
+             style="background:linear-gradient(135deg,#1565c0,#1e88e5)">
+          <div class="fs-2 fw-bold text-white">{{ sedes.count }}</div>
+          <small class="text-white opacity-75">Facultades</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Imágenes de referencia de la sede -->
+    {% if imagenes_sedes %}
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-dark text-white py-2">
+        <small class="fw-bold">
+          <i class="bi bi-images me-1"></i>Imágenes de la Sede
+        </small>
+      </div>
+      <div class="card-body p-2">
+        <div class="row g-2">
+          {% for img in imagenes_sedes %}
+          <div class="col-6">
+            <a href="{{ img.imagen_referencia.url }}" target="_blank">
+              <img src="{{ img.imagen_referencia.url }}"
+                   style="width:100%; height:90px; object-fit:cover;
+                          border-radius:6px; transition:transform .2s"
+                   onmouseover="this.style.transform='scale(1.04)'"
+                   onmouseout="this.style.transform='scale(1)'"
+                   alt="{{ img.nombre }}">
+            </a>
+            <small class="text-muted d-block text-center mt-1"
+                   style="font-size:.68rem">
+              {{ img.facultad.sigla }}
+            </small>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="card border-0 border-dashed mb-3"
+         style="border:2px dashed #dee2e6 !important">
+      <div class="card-body text-center text-muted py-3">
+        <i class="bi bi-camera" style="font-size:2rem; opacity:.3"></i>
+        <p class="mt-2 mb-0" style="font-size:.8rem">
+          Sin imágenes de referencia
+        </p>
+        {% if user.puede_editar %}
+        <small>
+          Edita una sede para subir una imagen
+        </small>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
 </div>
 
-<!-- Carreras en esta sede -->
-<div class="card">
-  <div class="card-header bg-dark text-white">
-    <i class="bi bi-journal-bookmark me-2"></i>
-    Carreras en {{ ciudad }}
-    <span class="badge bg-secondary ms-2">{{ total_carreras }}</span>
+<!-- Recuadros de facultades con imagen, info y carreras -->
+<h5 class="mb-3">
+  <i class="bi bi-building me-2"></i>
+  Facultades en {{ ciudad }}
+  <span class="badge bg-secondary ms-2">{{ sedes.count }}</span>
+</h5>
+
+<div class="row g-3 mb-4">
+  {% for item in sedes_detalle %}
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm h-100">
+
+      <!-- Imagen de la facultad o placeholder -->
+      {% if item.sede.facultad.imagen_referencia %}
+      <div style="position:relative; overflow:hidden; height:140px">
+        <img src="{{ item.sede.facultad.imagen_referencia.url }}"
+             style="width:100%; height:140px; object-fit:cover"
+             alt="{{ item.sede.facultad.nombre }}">
+        <div style="position:absolute; inset:0;
+                    background:linear-gradient(transparent 40%,rgba(10,22,40,.8));
+                    display:flex; align-items:flex-end; padding:.6rem .8rem">
+          <div>
+            <span class="badge bg-warning text-dark me-1">
+              {{ item.sede.facultad.sigla|default:"FAC" }}
+            </span>
+            <span style="color:white; font-size:.82rem; font-weight:600">
+              {{ item.sede.facultad.nombre|truncatechars:35 }}
+            </span>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <!-- Placeholder con color y sigla -->
+      <div style="height:90px;
+                  background:linear-gradient(135deg,#0f1f3d,#1a3560);
+                  display:flex; align-items:center; justify-content:center;
+                  gap:.8rem; padding:1rem">
+        <div style="width:50px; height:50px; border-radius:50%;
+                    background:rgba(255,255,255,.1);
+                    border:2px solid rgba(232,160,32,.4);
+                    display:flex; align-items:center; justify-content:center">
+          <span style="color:#e8a020; font-weight:800; font-size:.8rem">
+            {{ item.sede.facultad.sigla|default:"FAC"|truncatechars:4 }}
+          </span>
+        </div>
+        <div>
+          <div style="color:white; font-weight:700; font-size:.85rem">
+            {{ item.sede.facultad.nombre|truncatechars:35 }}
+          </div>
+          {% if user.puede_editar %}
+          <small style="color:rgba(255,255,255,.4); font-size:.68rem">
+            <i class="bi bi-camera me-1"></i>Sin imagen —
+            <a href="{% url 'editar-facultad' item.sede.facultad.pk %}"
+               style="color:rgba(232,160,32,.7)">subir imagen</a>
+          </small>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="card-header py-2"
+           style="background:#f8f9fa; border-bottom:1px solid #e9ecef">
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="badge"
+                style="background:#0f1f3d; font-size:.75rem">
+            {{ item.sede.get_tipo_display }}
+          </span>
+          <!-- Contador de carreras -->
+          <span style="font-size:.8rem; color:#0f1f3d; font-weight:700">
+            <i class="bi bi-journal-bookmark me-1 text-primary"></i>
+            {{ item.total_carreras }}
+            carrera{{ item.total_carreras|pluralize }}
+          </span>
+        </div>
+      </div>
+
+      <div class="card-body py-2">
+        <!-- Datos de contacto -->
+        {% if item.sede.direccion %}
+        <div class="mb-1">
+          <small class="text-muted">
+            <i class="bi bi-pin-map me-1"></i>{{ item.sede.direccion }}
+          </small>
+        </div>
+        {% endif %}
+        {% if item.sede.telefono %}
+        <div class="mb-1">
+          <small class="text-muted">
+            <i class="bi bi-telephone me-1"></i>{{ item.sede.telefono }}
+          </small>
+        </div>
+        {% endif %}
+        {% if item.sede.latitud and item.sede.longitud %}
+        <div class="mb-2">
+          <small class="text-success">
+            <i class="bi bi-geo-alt me-1"></i>
+            {{ item.sede.latitud|floatformat:4 }},
+            {{ item.sede.longitud|floatformat:4 }}
+          </small>
+        </div>
+        {% endif %}
+
+        <!-- Listado compacto de carreras -->
+        {% if item.carreras %}
+        <details>
+          <summary style="cursor:pointer; font-size:.8rem; color:#0f1f3d;
+                          font-weight:600; list-style:none; outline:none">
+            <i class="bi bi-list-ul me-1"></i>
+            Ver {{ item.total_carreras }} carrera{{ item.total_carreras|pluralize }}
+            <i class="bi bi-chevron-down ms-1" style="font-size:.7rem"></i>
+          </summary>
+          <div class="mt-2">
+            {% for carrera in item.carreras %}
+            <div class="d-flex justify-content-between align-items-center
+                        py-1 border-bottom" style="font-size:.78rem">
+              <span>{{ carrera.nombre }}</span>
+              <span class="badge bg-light text-dark border ms-2"
+                    style="font-size:.65rem; white-space:nowrap">
+                {{ carrera.get_grado_display }}
+              </span>
+            </div>
+            {% endfor %}
+          </div>
+        </details>
+        {% else %}
+        <small class="text-muted">
+          <i class="bi bi-dash me-1"></i>Sin carreras registradas
+        </small>
+        {% endif %}
+      </div>
+
+      {% if user.puede_editar %}
+      <div class="card-footer bg-transparent py-2 d-flex gap-2">
+        <a href="{% url 'editar-sede' item.sede.pk %}"
+           class="btn btn-outline-primary btn-sm flex-fill">
+          <i class="bi bi-pencil me-1"></i>Editar sede
+        </a>
+        <a href="{% url 'editar-facultad' item.sede.facultad.pk %}"
+           class="btn btn-outline-secondary btn-sm flex-fill">
+          <i class="bi bi-building me-1"></i>Editar facultad
+        </a>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Tabla completa de carreras -->
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+    <span>
+      <i class="bi bi-journal-bookmark me-2"></i>
+      Todas las Carreras en {{ ciudad }}
+    </span>
+    <span class="badge bg-secondary">{{ total_carreras }}</span>
   </div>
   <div class="card-body p-0">
     <div class="table-responsive">
       <table class="table table-hover table-sm mb-0">
-        <thead class="table-light">
+        <thead class="table-dark">
           <tr>
             <th>Facultad</th>
             <th>Carrera</th>
             <th>Grado</th>
-            <th>Dirección sede</th>
+            <th>Dirección</th>
             <th>Teléfono</th>
             <th>Estado rediseño</th>
             {% if user.puede_editar %}<th></th>{% endif %}
           </tr>
         </thead>
         <tbody>
-          {% for nombre_sede, lista in carreras_por_sede.items %}
-            <!-- Separador por facultad -->
+          {% for item in sedes_detalle %}
+            {% if item.carreras %}
             <tr class="table-secondary">
               <td colspan="{% if user.puede_editar %}7{% else %}6{% endif %}"
                   class="py-1">
                 <small class="fw-bold text-dark">
-                  <i class="bi bi-building me-1"></i>{{ nombre_sede }}
+                  <i class="bi bi-building me-1"></i>
+                  {{ item.sede.facultad.nombre }}
+                  <span class="badge bg-primary ms-1">
+                    {{ item.total_carreras }} carrera{{ item.total_carreras|pluralize }}
+                  </span>
                 </small>
               </td>
             </tr>
-            {% for carrera in lista %}
+            {% for carrera in item.carreras %}
             <tr>
               <td>
-                <small>{{ carrera.sede.facultad.sigla }}</small>
+                <small class="badge bg-secondary">
+                  {{ carrera.sede.facultad.sigla|default:"FAC" }}
+                </small>
               </td>
-              <td>
-                <strong>{{ carrera.nombre }}</strong>
-                {% if carrera.programa %}
-                <br><small class="text-muted">{{ carrera.programa }}</small>
-                {% endif %}
-              </td>
+              <td><strong>{{ carrera.nombre }}</strong></td>
               <td>{{ carrera.get_grado_display }}</td>
-              <td>
-                <small>{{ carrera.sede.direccion|default:"—" }}</small>
-              </td>
+              <td><small>{{ carrera.sede.direccion|default:"—" }}</small></td>
               <td>
                 {% if carrera.sede.telefono %}
                 <small>
@@ -272,11 +372,12 @@
               {% endif %}
             </tr>
             {% endfor %}
+            {% endif %}
           {% empty %}
           <tr>
             <td colspan="{% if user.puede_editar %}7{% else %}6{% endif %}"
                 class="text-center text-muted py-4">
-              No hay carreras registradas en esta sede.
+              No hay carreras registradas en {{ ciudad }}.
             </td>
           </tr>
           {% endfor %}
@@ -291,64 +392,76 @@
 {% block scripts %}
 {% if coords_sedes %}
 <script>
-  // Datos de coordenadas pasados desde Django
   const coordsSedes = {{ coords_sedes|safe }};
-
-  // Centrar el mapa en la primera sede con coordenadas
   const lat0 = coordsSedes[0].lat;
   const lon0 = coordsSedes[0].lon;
 
-  const map = L.map('mapa-sede').setView([lat0, lon0], 16);
-
+  const map = L.map('mapa-sede').setView([lat0, lon0], 14);
   L.tileLayer(
     'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png?key=cb1_3ni7_1_8c4972bd350b5b36d24741b6',
     {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
         subdomains: 'abcd',
-        maxZoom: 50
+        maxZoom: 20
     }
-).addTo(map);
+  ).addTo(map);
 
-  // Marcador personalizado
-  const iconoSede = L.divIcon({
-    className: '',
-    html: `<div style="
-      background:#0f1f3d; color:white; border-radius:50%;
-      width:32px; height:32px; display:flex; align-items:center;
-      justify-content:center; font-size:1rem; border:2px solid #e8a020;
-      box-shadow:0 2px 6px rgba(0,0,0,.4)">
-      <i class="bi bi-building"></i>
-    </div>`,
-    iconSize: [32, 32],
-    iconAnchor: [16, 16],
-  });
+  // Icono personalizado por facultad
+  function iconoFacultad(sigla) {
+    return L.divIcon({
+      className: '',
+      html: `<div style="
+        background:linear-gradient(135deg,#0f1f3d,#1a3560);
+        color:white; border-radius:8px;
+        width:auto; min-width:36px; height:36px;
+        display:flex; align-items:center; justify-content:center;
+        font-size:.65rem; font-weight:800;
+        border:2px solid #e8a020;
+        padding:0 6px;
+        box-shadow:0 2px 8px rgba(0,0,0,.4);
+        white-space:nowrap;
+      ">${sigla}</div>`,
+      iconAnchor: [18, 18],
+      popupAnchor: [0, -22],
+    });
+  }
 
-  // Agregar marcador por cada sede con coords
   const bounds = [];
   coordsSedes.forEach(s => {
-    if (s.lat && s.lon) {
-      const marker = L.marker([s.lat, s.lon], {icon: iconoSede}).addTo(map);
-      marker.bindPopup(`
-        <div style="min-width:200px">
-          <strong style="color:#0f1f3d">${s.facultad}</strong><br>
-          <small>${s.nombre}</small><br>
-          ${s.direccion ? `<small><i class="bi bi-pin-map"></i> ${s.direccion}</small><br>` : ''}
-          ${s.telefono ? `<small><i class="bi bi-telephone"></i> ${s.telefono}</small><br>` : ''}
-          <small style="color:#888">${s.lat.toFixed(4)}, ${s.lon.toFixed(4)}</small><br>
-          <a href="https://www.google.com/maps?q=${s.lat},${s.lon}"
-             target="_blank"
-             style="color:#dc3545; font-size:.8rem">
-            Abrir en Google Maps →
-          </a>
-        </div>
-      `);
-      bounds.push([s.lat, s.lon]);
-    }
+    const marker = L.marker(
+      [s.lat, s.lon],
+      { icon: iconoFacultad(s.facultad_sigla || 'FAC') }
+    ).addTo(map);
+
+    marker.bindPopup(`
+      <div style="min-width:200px">
+        <strong style="color:#0f1f3d">${s.facultad}</strong><br>
+        <small>${s.nombre}</small><br>
+        <span style="background:#e8a020;color:white;padding:1px 7px;
+                     border-radius:8px;font-size:.75rem;margin-top:4px;
+                     display:inline-block">
+          <i class="bi bi-journal-bookmark"></i>
+          ${s.total_carreras} carrera${s.total_carreras !== 1 ? 's' : ''}
+        </span><br>
+        ${s.direccion
+          ? `<small style="color:#666;margin-top:4px;display:block">
+               📍 ${s.direccion}</small>`
+          : ''}
+        ${s.telefono
+          ? `<small style="color:#666">📞 ${s.telefono}</small><br>`
+          : ''}
+        <a href="https://www.google.com/maps?q=${s.lat},${s.lon}"
+           target="_blank"
+           style="color:#dc3545;font-size:.78rem;margin-top:4px;display:block">
+          Abrir en Google Maps →
+        </a>
+      </div>
+    `);
+    bounds.push([s.lat, s.lon]);
   });
 
-  // Ajustar zoom para mostrar todos los marcadores
   if (bounds.length > 1) {
-    map.fitBounds(bounds, {padding: [30, 30]});
+    map.fitBounds(bounds, { padding: [40, 40] });
   }
 </script>
 {% endif %}
