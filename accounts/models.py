@@ -55,6 +55,11 @@ class Usuario(AbstractUser):
         return f"{self.get_full_name() or self.username} ({self.get_rol_display()})"
 
     @property
+    def es_usuario_protegido_sistema(self):
+        from .proteccion import es_usuario_protegido
+        return es_usuario_protegido(self)
+    
+    @property
     def es_superadmin(self):
         return self.rol == 'SUPERADMIN'
 

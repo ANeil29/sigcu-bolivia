@@ -1,3 +1,4 @@
+from .proteccion import es_usuario_protegido, puede_gestionar
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
@@ -78,9 +79,22 @@ def vista_logout(request):
 @login_required
 @rol_requerido('SUPERADMIN')
 def panel_admin_usuarios(request):
-    """Lista todos los usuarios: pendientes primero, luego el resto."""
-    pendientes = Usuario.objects.filter(rol='PENDIENTE').order_by('date_joined')
-    activos    = Usuario.objects.exclude(rol='PENDIENTE').order_by('rol', 'last_name')
+    from .models import SesionActiva, RegistroActividad
+
+    pendientes = Usuario.objects.filter(
+        rol='PENDIENTE'
+    ).order_by('date_joined')
+
+    # ── El usuario protegido NO aparece en la lista para otros admins ──
+    activos = Usuario.objects.exclude(rol='PENDIENTE').order_by(
+        'rol', 'last_name'
+    )
+    if not es_usuario_protegido(request.user):
+        # Si quien ve el panel NO es el usuario protegido,
+        # ocultamos al protegido de la lista
+        from .proteccion import USUARIO_PROTEGIDO_ID
+        activos = activos.exclude(pk=USUARIO_PROTEGIDO_ID)
+
     return render(request, 'accounts/panel_usuarios.html', {
         'pendientes': pendientes,
         'activos':    activos,
@@ -90,9 +104,15 @@ def panel_admin_usuarios(request):
 @login_required
 @rol_requerido('SUPERADMIN')
 def aprobar_usuario(request, pk):
-    """Aprueba un usuario y le asigna rol."""
     usuario = get_object_or_404(Usuario, pk=pk)
-    form    = FormularioAsignarRol(request.POST or None, instance=usuario)
+
+    # Protección
+    if not puede_gestionar(request.user, usuario):
+        messages.error(request,
+            'No tienes permiso para modificar este usuario.')
+        return redirect('panel-admin-usuarios')
+
+    form = FormularioAsignarRol(request.POST or None, instance=usuario)
     if request.method == 'POST':
         if form.is_valid():
             u = form.save(commit=False)
@@ -102,11 +122,10 @@ def aprobar_usuario(request, pk):
             u.fecha_aprobacion = timezone.now()
             u.save()
             messages.success(request,
-                f'✅ Usuario {u.get_full_name()} aprobado con rol {u.get_rol_display()}.')
+                f'✅ Usuario {u.get_full_name()} aprobado.')
             return redirect('panel-admin-usuarios')
     return render(request, 'accounts/aprobar_usuario.html', {
-        'usuario': usuario,
-        'form':    form,
+        'usuario': usuario, 'form': form,
     })
 
 
@@ -114,27 +133,49 @@ def aprobar_usuario(request, pk):
 @rol_requerido('SUPERADMIN')
 def rechazar_usuario(request, pk):
     usuario = get_object_or_404(Usuario, pk=pk)
+
+    if not puede_gestionar(request.user, usuario):
+        messages.error(request,
+            'No tienes permiso para eliminar este usuario.')
+        return redirect('panel-admin-usuarios')
+
     if request.method == 'POST':
         nombre = usuario.get_full_name()
         usuario.delete()
-        messages.warning(request, f'Usuario {nombre} rechazado y eliminado.')
+        messages.warning(request, f'Usuario {nombre} rechazado.')
         return redirect('panel-admin-usuarios')
-    return render(request, 'accounts/confirmar_rechazo.html', {'usuario': usuario})
+    return render(request, 'accounts/confirmar_rechazo.html',
+                  {'usuario': usuario})
 
 
 @login_required
 @rol_requerido('SUPERADMIN')
 def editar_rol_usuario(request, pk):
     usuario = get_object_or_404(Usuario, pk=pk)
-    form    = FormularioAsignarRol(request.POST or None, instance=usuario)
+
+    if not puede_gestionar(request.user, usuario):
+        # Registrar intento bloqueado
+        RegistroActividad.objects.create(
+            usuario=request.user,
+            accion='OTRO',
+            modulo='Seguridad',
+            descripcion=f'Intento bloqueado: {request.user.username} '
+                        f'intentó modificar al usuario protegido.',
+            ip=get_ip(request),
+        )
+        messages.error(request,
+            'No tienes permiso para modificar este usuario.')
+        return redirect('panel-admin-usuarios')
+
+    form = FormularioAsignarRol(request.POST or None, instance=usuario)
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-            messages.success(request, f'Rol actualizado para {usuario.get_full_name()}.')
+            messages.success(request,
+                f'Rol actualizado para {usuario.get_full_name()}.')
             return redirect('panel-admin-usuarios')
     return render(request, 'accounts/editar_rol.html', {
-        'usuario': usuario,
-        'form':    form,
+        'usuario': usuario, 'form': form,
     })
 
 
@@ -142,20 +183,80 @@ def editar_rol_usuario(request, pk):
 @rol_requerido('SUPERADMIN')
 def desactivar_usuario(request, pk):
     usuario = get_object_or_404(Usuario, pk=pk)
+
+    if not puede_gestionar(request.user, usuario):
+        messages.error(request,
+            'No tienes permiso para desactivar este usuario.')
+        return redirect('panel-admin-usuarios')
+
     if request.method == 'POST':
         usuario.is_active      = False
         usuario.activo_sistema = False
         usuario.save()
-        messages.warning(request, f'Usuario {usuario.get_full_name()} desactivado.')
+        messages.warning(request,
+            f'Usuario {usuario.get_full_name()} desactivado.')
         return redirect('panel-admin-usuarios')
-    return render(request, 'accounts/confirmar_desactivar.html', {'usuario': usuario})
+    return render(request, 'accounts/confirmar_desactivar.html',
+                  {'usuario': usuario})
+
+
+@login_required
+@rol_requerido('SUPERADMIN')
+def restablecer_contrasena_admin(request, pk):
+    usuario = get_object_or_404(Usuario, pk=pk)
+
+    if not puede_gestionar(request.user, usuario):
+        messages.error(request,
+            'No tienes permiso para cambiar la contraseña de este usuario.')
+        return redirect('panel-admin-usuarios')
+
+    form = CambiarContrasenaAdminForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        usuario.set_password(form.cleaned_data['nueva_contrasena'])
+        usuario.save()
+        messages.success(request,
+            f'✅ Contraseña de {usuario.get_full_name()} restablecida.')
+        return redirect('panel-admin-usuarios')
+    return render(request, 'accounts/restablecer_contrasena_admin.html', {
+        'usuario': usuario, 'form': form,
+    })
 
 
 
 class UsuarioViewSet(viewsets.ModelViewSet):
-    queryset         = Usuario.objects.all()
-    serializer_class = UsuarioSerializer
+    queryset           = Usuario.objects.all()
+    serializer_class   = UsuarioSerializer
     permission_classes = [permissions.IsAdminUser]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # Oculta al usuario protegido en la API si no eres tú
+        if not es_usuario_protegido(self.request.user):
+            from .proteccion import USUARIO_PROTEGIDO_ID
+            qs = qs.exclude(pk=USUARIO_PROTEGIDO_ID)
+        return qs
+
+    def update(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if not puede_gestionar(request.user, obj):
+            from rest_framework.response import Response
+            from rest_framework import status
+            return Response(
+                {'detail': 'No tienes permiso para modificar este usuario.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if not puede_gestionar(request.user, obj):
+            from rest_framework.response import Response
+            from rest_framework import status
+            return Response(
+                {'detail': 'No tienes permiso para eliminar este usuario.'},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        return super().destroy(request, *args, **kwargs)
 
 from django.contrib.auth.views import (
     PasswordResetView, PasswordResetDoneView,

@@ -127,27 +127,24 @@
               {% endif %}
             </td>
 
-            <td class="d-flex gap-1 flex-wrap">
-
-              <a href="{% url 'editar-rol-usuario' u.pk %}"
-                 class="btn btn-outline-primary btn-sm">
-                Editar rol
-              </a>
-
-              <a href="{% url 'restablecer-contrasena-admin' u.pk %}"
-                 class="btn btn-outline-warning btn-sm"
-                 title="Restablecer contraseña">
-                <i class="bi bi-key"></i>
-              </a>
-
-              {% if u.is_active and u.pk != request.user.pk %}
-              <a href="{% url 'desactivar-usuario' u.pk %}"
-                 class="btn btn-outline-danger btn-sm">
-                Desactivar
-              </a>
-              {% endif %}
-
-            </td>
+            <td>
+  {% if not usuario.es_usuario_protegido_sistema %}
+    <a href="{% url 'editar-rol-usuario' u.pk %}"
+       class="btn btn-outline-primary btn-sm">Editar rol</a>
+    {% if u.is_active and u.pk != request.user.pk %}
+    <a href="{% url 'desactivar-usuario' u.pk %}"
+       class="btn btn-outline-danger btn-sm">Desactivar</a>
+    {% endif %}
+    <a href="{% url 'restablecer-contrasena-admin' u.pk %}"
+       class="btn btn-outline-warning btn-sm">
+      <i class="bi bi-key"></i>
+    </a>
+  {% else %}
+    <span class="badge bg-dark">
+      <i class="bi bi-shield-lock me-1"></i>Protegido
+    </span>
+  {% endif %}
+</td>
           </tr>
           {% empty %}
           <tr>

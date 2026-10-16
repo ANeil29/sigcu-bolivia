@@ -87,7 +87,7 @@ class Sede(models.Model):
         ordering = ['departamento', 'ciudad']
 
     def __str__(self):
-        return f"{self.nombre} ({self.ciudad})"
+     return f"{self.facultad.nombre} — {self.ciudad}"
 
     @property
     def tiene_coordenadas(self):
