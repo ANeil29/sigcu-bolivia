@@ -164,30 +164,48 @@
 
   <!-- Fila: Estado Rediseño + Sedes por Departamento -->
   <table style="width:100%; margin-bottom:14px">
+    <tr style="text-align: center;">
+      <td style="width:58%; vertical-align:top; padding-right:8px">
+<div class="sec-titulo">Estado de Innovación Curricular</div>
+<div class="sec-body">
+  <table class="datos" style="text-align: center;">
+    <tr >
+      <th style="text-align: center;">Tipo de Proceso</th>
+      <th style="text-align: center;">Carreras</th>
+      <th style="text-align: center;">Porcentaje</th>
+    </tr>
     <tr>
-      <td style="width:48%; vertical-align:top; padding-right:8px">
-        <div class="sec-titulo">Estado de Rediseño Curricular</div>
-        <div class="sec-body">
-          <table class="datos">
-            <tr><th>Estado</th><th>Cantidad</th></tr>
-            <tr>
-              <td>Vigentes</td>
-              <td><span class="verde">{{ stats.vigentes }}</span></td>
-            </tr>
-            <tr>
-              <td>Próximos a vencer</td>
-              <td><span class="amarillo">{{ stats.proximas }}</span></td>
-            </tr>
-            <tr>
-              <td>Vencidos</td>
-              <td><span class="rojo">{{ stats.vencidas }}</span></td>
-            </tr>
-            <tr>
-              <td>Sin datos</td>
-              <td><span class="gris">{{ stats.sin_datos }}</span></td>
-            </tr>
-          </table>
-        </div>
+      <td>Rediseño Curricular</td>
+      <td><span style="color:#1d4ed8;font-weight:bold">{{ stats.con_rediseno }}</span></td>
+      <td>{{ stats.pct_rediseno }}%
+    </tr>
+    <tr>
+      <td>Diseño Curricular</td>
+      <td><span style="color:#15803d;font-weight:bold">{{ stats.con_diseno }}</span></td>
+      <td>{{ stats.pct_diseno }}%</td>
+    </tr>
+    <tr>
+      <td>Ajuste Curricular</td>
+      <td><span style="color:#b45309;font-weight:bold">{{ stats.con_ajuste }}</span></td>
+      <td>{{ stats.pct_ajuste }}%</td>
+    </tr>
+    <tr>
+      <td>Complementación Curricular</td>
+      <td><span style="color:#0f766e;font-weight:bold">{{ stats.con_complementacion }}</span></td>
+      <td>{{ stats.pct_complementacion }}%</td>
+    </tr>
+    <tr>
+      <td>Sin proceso registrado</td>
+      <td><span style="color:#6b7280;font-weight:bold">{{ stats.sin_proceso }}</span></td>
+      <td>{{ stats.pct_sin_proceso }}%</td>
+    </tr>
+    <tr style="background:#f0f4ff">
+      <td><strong>Total carreras</strong></td>
+      <td><strong>{{ stats.total_carreras_int }}</strong></td>
+      <td><strong>100%</strong></td>
+    </tr>
+  </table>
+</div>
       </td>
       <td style="width:48%; vertical-align:top; padding-left:8px">
         <div class="sec-titulo">Sedes por Departamento</div>

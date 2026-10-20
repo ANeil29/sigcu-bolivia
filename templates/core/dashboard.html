@@ -109,89 +109,8 @@
     </div>
   </div>
 </div>
-
-<!-- ── ACCESOS RÁPIDOS — estilo botones pill ─────────────────────── -->
-<div class="card mb-4 border-0 shadow-sm justify-content-center mx-4">
-  <div class="card-header bg-dark text-white py-2 d-flex justify-content-between align-items-center">
-    <span><i class="bi bi-lightning-charge me-2"></i>Accesos Rápidos</span>
-  </div>
-  <div class="card-body p-3">
-    <div class="d-flex flex-wrap gap-2">
-
-      <a href="{% url 'lista-universidades' %}" class="btn-pill ac-azul-oscuro">
-        <span class="pill-icono"><i class="bi bi-bank"></i></span>
-        Universidades
-      </a>
-
-      <a href="{% url 'lista-sedes' %}" class="btn-pill ac-azul-medio">
-        <span class="pill-icono"><i class="bi bi-geo-alt"></i></span>
-        Sedes
-      </a>
-
-      <a href="{% url 'lista-facultades' %}" class="btn-pill ac-indigo">
-        <span class="pill-icono"><i class="bi bi-building"></i></span>
-        Facultades
-      </a>
-
-      <a href="{% url 'lista-carreras' %}" class="btn-pill ac-azul-real">
-        <span class="pill-icono"><i class="bi bi-journal-bookmark"></i></span>
-        Carreras
-      </a>
-
-      <a href="{% url 'lista-programas' %}" class="btn-pill ac-verde">
-        <span class="pill-icono"><i class="bi bi-clipboard-check"></i></span>
-        Programas
-      </a>
-
-      <a href="{% url 'lista-procesos' %}" class="btn-pill ac-dorado">
-        <span class="pill-icono"><i class="bi bi-arrow-repeat"></i></span>
-        Procesos
-      </a>
-
-      <a href="{% url 'mapa' %}" class="btn-pill ac-rojo-suave">
-        <span class="pill-icono"><i class="bi bi-map"></i></span>
-        Mapa de Sedes
-      </a>
-
-      <a href="{% url 'buscador-carreras' %}" class="btn-pill ac-cian">
-        <span class="pill-icono"><i class="bi bi-search"></i></span>
-        Buscador
-      </a>
-
-      <a href="{% url 'lista-formularios' %}" class="btn-pill ac-violeta">
-        <span class="pill-icono"><i class="bi bi-file-earmark-text"></i></span>
-        Formularios
-      </a>
-
-      <a href="{% url 'vista-estadisticas' %}" class="btn-pill ac-naranja">
-        <span class="pill-icono"><i class="bi bi-bar-chart-line"></i></span>
-        Estadísticas
-      </a>
-
-      <a href="{% url 'reporte-carreras-excel' %}" class="btn-pill ac-verde-oscuro">
-        <span class="pill-icono"><i class="bi bi-file-earmark-excel"></i></span>
-        Exportar Excel
-      </a>
-
-      {% if user.rol == 'SUPERADMIN' %}
-      <a href="{% url 'panel-admin-usuarios' %}" class="btn-pill ac-oscuro">
-        <span class="pill-icono"><i class="bi bi-shield-lock"></i></span>
-        Administración
-      </a>
-
-      <a href="{% url 'panel-auditoria' %}" class="btn-pill ac-gris-azul">
-        <span class="pill-icono"><i class="bi bi-activity"></i></span>
-        Auditoría
-      </a>
-      {% endif %}
-
-    </div>
-  </div>
-</div>
-
 <!-- ── Tarjetas de totales con degradados ────────────────────────── -->
-<div class="row g-2 mb-3 justify-content-center mx-4">
-
+ <div class="row g-2 mb-3 justify-content-center mx-4">
   <div class="col-6 col-sm-4 col-lg">
     <div class="stat-card"
          style="background:linear-gradient(135deg,#0f1f3d,#1e3a6e)">
@@ -239,54 +158,12 @@
     </div>
   </div>
 
-</div>
-
-<!-- ── Estado de rediseño con degradados ─────────────────────────── -->
-<div class="row g-2 mb-3 justify-content-center mx-4">
-
-  <div class="col-6 col-md-3">
-    <div class="stat-card"
-         style="background:linear-gradient(135deg,#1b5e20,#388e3c)">
-      <i class="bi bi-check-circle-fill stat-icon"></i>
-      <div class="stat-num">{{ stats.vigentes }}</div>
-      <div class="stat-label">Vigentes</div>
-    </div>
-  </div>
-
-  <div class="col-6 col-md-3">
-    <div class="stat-card"
-         style="background:linear-gradient(135deg,#b07800,#d4950a)">
-      <i class="bi bi-hourglass-split stat-icon"></i>
-      <div class="stat-num">{{ stats.proximas }}</div>
-      <div class="stat-label">Próximos a vencer</div>
-    </div>
-  </div>
-
-  <div class="col-6 col-md-3">
-    <div class="stat-card"
-         style="background:linear-gradient(135deg,#b71c1c,#e53935)">
-      <i class="bi bi-x-circle-fill stat-icon"></i>
-      <div class="stat-num">{{ stats.vencidas }}</div>
-      <div class="stat-label">Vencidos</div>
-    </div>
-  </div>
-
-  <div class="col-6 col-md-3">
-    <div class="stat-card"
-         style="background:linear-gradient(135deg,#37474f,#546e7a)">
-      <i class="bi bi-dash-circle-fill stat-icon"></i>
-      <div class="stat-num">{{ stats.sin_datos }}</div>
-      <div class="stat-label">Sin datos</div>
-    </div>
-  </div>
-
-</div>
-
 <!-- ── Estado de Procesos Curriculares en la Gestión ─────────────── -->
 <div class="card mb-3 border-0 shadow-sm justify-content-center mx-4">
-  <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-    <span>
-      <i class="bi bi-diagram-3 me-2"></i>
+  <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center"
+       style="background: linear-gradient(135deg, #0f1f3d 0%, #1a3560 100%);; border-bottom:1px solid #f4f7fc">
+    <span style="font-size:.9rem; font-weight:700">
+      <i class="bi bi-diagram-3 me-2" style="color:#e8a020"></i>
       Estado de Procesos Curriculares — Gestión {{ filtro_gestion_int }}
     </span>
     <span class="badge bg-secondary">{{ stats.total_procesos_gestion }} total</span>
@@ -377,252 +254,441 @@
   </div>
 </div>
 
-<!-- ── Barras de innovación + gráfica ───────────────────────────── -->
-<div class="row g-3 justify-content-center mx-3">
-  <div class="col-md-8">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-header bg-dark text-white">
-        <i class="bi bi-bar-chart-steps me-2"></i>
-        Innovación Curricular — {{ stats.total_carreras_int }} carreras
-      </div>
-      <div class="card-body">
-
-        {% with t=stats.total_carreras_int %}
-        <div class="mb-3">
-          <div class="d-flex justify-content-between mb-1">
-            <small class="fw-bold">
-              <i class="bi bi-arrow-repeat me-1 text-primary"></i>
-              Rediseño
-            </small>
-            <small class="text-muted">
-              {{ stats.con_rediseno }}/{{ t }} · {{ stats.pct_rediseno }}%
-            </small>
-          </div>
-          <div class="progress" style="height:16px;border-radius:6px">
-            <div class="progress-bar bg-primary fw-bold"
-                 style="width:{{ stats.pct_rediseno }}%">
-              {% if stats.con_rediseno > 0 %}{{ stats.con_rediseno }}{% endif %}
-            </div>
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <div class="d-flex justify-content-between mb-1">
-            <small class="fw-bold">
-              <i class="bi bi-pencil-square me-1 text-success"></i>
-              Diseño
-            </small>
-            <small class="text-muted">
-              {{ stats.con_diseno }}/{{ t }} · {{ stats.pct_diseno }}%
-            </small>
-          </div>
-          <div class="progress" style="height:16px;border-radius:6px">
-            <div class="progress-bar bg-success fw-bold"
-                 style="width:{{ stats.pct_diseno }}%">
-              {% if stats.con_diseno > 0 %}{{ stats.con_diseno }}{% endif %}
-            </div>
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <div class="d-flex justify-content-between mb-1">
-            <small class="fw-bold">
-              <i class="bi bi-tools me-1 text-warning"></i>
-              Ajuste
-            </small>
-            <small class="text-muted">
-              {{ stats.con_ajuste }}/{{ t }} · {{ stats.pct_ajuste }}%
-            </small>
-          </div>
-          <div class="progress" style="height:16px;border-radius:6px">
-            <div class="progress-bar bg-warning fw-bold"
-                 style="width:{{ stats.pct_ajuste }}%">
-              {% if stats.con_ajuste > 0 %}{{ stats.con_ajuste }}{% endif %}
-            </div>
-          </div>
-        </div>
-
-        <div class="mb-3">
-          <div class="d-flex justify-content-between mb-1">
-            <small class="fw-bold">
-              <i class="bi bi-plus-slash-minus me-1 text-info"></i>
-              Complementación
-            </small>
-            <small class="text-muted">
-              {{ stats.con_complementacion }}/{{ t }} · {{ stats.pct_complementacion }}%
-            </small>
-          </div>
-          <div class="progress" style="height:16px;border-radius:6px">
-            <div class="progress-bar bg-info text-dark fw-bold"
-                 style="width:{{ stats.pct_complementacion }}%">
-              {% if stats.con_complementacion > 0 %}{{ stats.con_complementacion }}{% endif %}
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <div class="d-flex justify-content-between mb-1">
-            <small class="fw-bold text-secondary">
-              <i class="bi bi-dash-circle me-1"></i>Sin proceso
-            </small>
-            <small class="text-muted">
-              {{ stats.sin_proceso }}/{{ t }} · {{ stats.pct_sin_proceso }}%
-            </small>
-          </div>
-          <div class="progress" style="height:11px;border-radius:6px">
-            <div class="progress-bar bg-secondary"
-                 style="width:{{ stats.pct_sin_proceso }}%">
-            </div>
-          </div>
-        </div>
-        {% endwith %}
-
-      </div>
-    </div>
+<!-- ── ACCESOS RÁPIDOS — tres columnas categorizadas ─────────────── -->
+<div class="card mb-4 border-0 shadow-sm justify-content-center mx-4">
+  <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center"
+       style="background: linear-gradient(135deg, #0f1f3d 0%, #1a3560 100%); border-bottom:1px solid #f4f7fc">
+    <span style="font-size:.9rem; font-weight:700">
+      <i class="bi bi-lightning-charge me-2"
+         style="color:#e8a020"></i>Accesos Rápidos
+    </span>
   </div>
+  <div class="card-body p-3">
+    <div class="row g-3">
 
-  <!-- Gráfica -->
-  <div class="col-md-4">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-header bg-dark text-white">
-        <i class="bi bi-pie-chart me-2"></i>Estado Rediseño
+      <!-- Columna: Académico -->
+      <div class="col-md-4">
+        <div class="acceso-grupo">
+          <div class="acceso-grupo-titulo">
+            <i class="bi bi-mortarboard-fill"
+               style="color:#3b82f6"></i>
+            Académico
+          </div>
+          <a href="{% url 'lista-universidades' %}"
+             class="acceso-item acceso-azul">
+            <span class="acceso-item-icono">
+              <i class="bi bi-bank"></i>
+            </span>
+            Universidades
+          </a>
+          <a href="{% url 'lista-sedes' %}"
+             class="acceso-item acceso-azul">
+            <span class="acceso-item-icono">
+              <i class="bi bi-geo-alt"></i>
+            </span>
+            Sedes
+          </a>
+          <a href="{% url 'lista-facultades' %}"
+             class="acceso-item acceso-azul">
+            <span class="acceso-item-icono">
+              <i class="bi bi-building"></i>
+            </span>
+            Facultades
+          </a>
+          <a href="{% url 'lista-carreras' %}"
+             class="acceso-item acceso-azul">
+            <span class="acceso-item-icono">
+              <i class="bi bi-journal-bookmark"></i>
+            </span>
+            Carreras
+          </a>
+        </div>
       </div>
-      <div class="card-body d-flex align-items-center justify-content-center">
-        <canvas id="graficaDashboard" style="max-height:220px"></canvas>
+
+      <!-- Columna: Gestión -->
+      <div class="col-md-4">
+        <div class="acceso-grupo">
+          <div class="acceso-grupo-titulo">
+            <i class="bi bi-gear-fill"
+               style="color:#10b981"></i>
+            Gestión
+          </div>
+          <a href="{% url 'lista-programas' %}"
+             class="acceso-item acceso-verde">
+            <span class="acceso-item-icono">
+              <i class="bi bi-clipboard-check"></i>
+            </span>
+            Programas
+          </a>
+          <a href="{% url 'lista-procesos' %}"
+             class="acceso-item acceso-verde">
+            <span class="acceso-item-icono">
+              <i class="bi bi-arrow-repeat"></i>
+            </span>
+            Procesos
+          </a>
+          <a href="{% url 'lista-formularios' %}"
+             class="acceso-item acceso-verde">
+            <span class="acceso-item-icono">
+              <i class="bi bi-file-earmark-text"></i>
+            </span>
+            Formularios
+          </a>
+          <a href="{% url 'vista-estadisticas' %}"
+             class="acceso-item acceso-verde">
+            <span class="acceso-item-icono">
+              <i class="bi bi-bar-chart-line"></i>
+            </span>
+            Estadísticas
+          </a>
+        </div>
       </div>
+
+      <!-- Columna: Herramientas -->
+      <div class="col-md-4">
+        <div class="acceso-grupo">
+          <div class="acceso-grupo-titulo">
+            <i class="bi bi-tools"
+               style="color:#f59e0b"></i>
+            Herramientas
+          </div>
+          <a href="{% url 'mapa' %}"
+             class="acceso-item acceso-naranja">
+            <span class="acceso-item-icono">
+              <i class="bi bi-map"></i>
+            </span>
+            Mapa de Sedes
+          </a>
+          <a href="{% url 'buscador-carreras' %}"
+             class="acceso-item acceso-naranja">
+            <span class="acceso-item-icono">
+              <i class="bi bi-search"></i>
+            </span>
+            Buscador
+          </a>
+          <a href="{% url 'reporte-carreras-excel' %}"
+             class="acceso-item acceso-naranja">
+            <span class="acceso-item-icono">
+              <i class="bi bi-file-earmark-excel"></i>
+            </span>
+            Exportar Excel
+          </a>
+          {% if user.rol == 'SUPERADMIN' %}
+          <a href="{% url 'panel-admin-usuarios' %}"
+             class="acceso-item acceso-naranja">
+            <span class="acceso-item-icono">
+              <i class="bi bi-shield-lock"></i>
+            </span>
+            Administración
+          </a>
+          <a href="{% url 'panel-auditoria' %}"
+             class="acceso-item acceso-naranja">
+            <span class="acceso-item-icono">
+              <i class="bi bi-eye"></i>
+            </span>
+            Auditoría
+          </a>
+          {% endif %}
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 
+<!-- ── Barras de innovación + gráfica ───────────────────────────── -->
+<div class="row g-3 mb-3">
+  <div class="col-md-8">
+    <div class="innovacion-card">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h6 class="mb-0 fw-bold" style="color:#1f2937">
+            <i class="bi bi-bar-chart-steps me-2 text-primary"></i>
+            Innovación Curricular
+          </h6>
+          <small class="text-muted">
+            {{ stats.total_carreras_int }} carrera{{ stats.total_carreras_int|pluralize }}
+            — Gestión {{ filtro_gestion_int }}
+          </small>
+        </div>
+        <a href="{% url 'vista-estadisticas' %}"
+           class="btn btn-outline-secondary btn-sm"
+           style="font-size:.75rem">
+          Ver completo →
+        </a>
+      </div>
+
+      {% with t=stats.total_carreras_int|default:1 %}
+
+      <div class="mb-3">
+        <div class="d-flex justify-content-between mb-1">
+          <small class="fw-bold" style="color:#374151">
+            <span style="display:inline-block;width:10px;height:10px;
+                         background:#1d4ed8;border-radius:2px;
+                         margin-right:5px"></span>
+            Rediseño Curricular
+          </small>
+          <small class="text-muted">
+            {{ stats.con_rediseno }} / {{ t }}
+            &nbsp;·&nbsp; {{ stats.pct_rediseno }}%
+          </small>
+        </div>
+        <div class="progress" style="height:12px; border-radius:6px; background:#eff6ff">
+          <div class="progress-bar"
+               style="width:{{ stats.pct_rediseno }}%;
+                      background:#1d4ed8; border-radius:6px">
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="d-flex justify-content-between mb-1">
+          <small class="fw-bold" style="color:#374151">
+            <span style="display:inline-block;width:10px;height:10px;
+                         background:#15803d;border-radius:2px;
+                         margin-right:5px"></span>
+            Diseño Curricular
+          </small>
+          <small class="text-muted">
+            {{ stats.con_diseno }} / {{ t }}
+            &nbsp;·&nbsp; {{ stats.pct_diseno }}%
+          </small>
+        </div>
+        <div class="progress" style="height:12px; border-radius:6px; background:#f0fdf4">
+          <div class="progress-bar"
+               style="width:{{ stats.pct_diseno }}%;
+                      background:#15803d; border-radius:6px">
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="d-flex justify-content-between mb-1">
+          <small class="fw-bold" style="color:#374151">
+            <span style="display:inline-block;width:10px;height:10px;
+                         background:#b45309;border-radius:2px;
+                         margin-right:5px"></span>
+            Ajuste Curricular
+          </small>
+          <small class="text-muted">
+            {{ stats.con_ajuste }} / {{ t }}
+            &nbsp;·&nbsp; {{ stats.pct_ajuste }}%
+          </small>
+        </div>
+        <div class="progress" style="height:12px; border-radius:6px; background:#fffbeb">
+          <div class="progress-bar"
+               style="width:{{ stats.pct_ajuste }}%;
+                      background:#b45309; border-radius:6px">
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="d-flex justify-content-between mb-1">
+          <small class="fw-bold" style="color:#374151">
+            <span style="display:inline-block;width:10px;height:10px;
+                         background:#0f766e;border-radius:2px;
+                         margin-right:5px"></span>
+            Complementación Curricular
+          </small>
+          <small class="text-muted">
+            {{ stats.con_complementacion }} / {{ t }}
+            &nbsp;·&nbsp; {{ stats.pct_complementacion }}%
+          </small>
+        </div>
+        <div class="progress" style="height:12px; border-radius:6px; background:#f0fdfa">
+          <div class="progress-bar"
+               style="width:{{ stats.pct_complementacion }}%;
+                      background:#0f766e; border-radius:6px">
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-1">
+        <div class="d-flex justify-content-between mb-1">
+          <small class="fw-bold" style="color:#6b7280">
+            <span style="display:inline-block;width:10px;height:10px;
+                         background:#9ca3af;border-radius:2px;
+                         margin-right:5px"></span>
+            Sin proceso registrado
+          </small>
+          <small class="text-muted">
+            {{ stats.sin_proceso }} / {{ t }}
+            &nbsp;·&nbsp; {{ stats.pct_sin_proceso }}%
+          </small>
+        </div>
+        <div class="progress" style="height:10px; border-radius:6px; background:#f9fafb">
+          <div class="progress-bar"
+               style="width:{{ stats.pct_sin_proceso }}%;
+                      background:#9ca3af; border-radius:6px">
+          </div>
+        </div>
+      </div>
+
+      {% endwith %}
+    </div>
+  </div>
+
+  <!-- Gráfica de dona — procesos curriculares -->
+  <div class="col-md-4">
+    <div class="innovacion-card text-center">
+      <h6 class="fw-bold mb-1" style="color:#1f2937; font-size:.85rem">
+        <i class="bi bi-pie-chart me-1 text-primary"></i>
+        Procesos Curriculares
+      </h6>
+      <small class="text-muted d-block mb-2" style="font-size:.72rem">
+        Distribución por tipo — {{ stats.total_carreras_int }} carreras
+      </small>
+      <canvas id="graficaDashboard" style="max-height:200px"></canvas>
+
+      <!-- Leyenda manual más detallada -->
+      <div class="mt-3 text-start" style="font-size:.72rem">
+        <div class="d-flex justify-content-between py-1 border-bottom">
+          <span>
+            <span style="display:inline-block;width:8px;height:8px;
+                         background:#1d4ed8;border-radius:50%;
+                         margin-right:5px"></span>
+            Rediseño
+          </span>
+          <strong>{{ stats.con_rediseno }}</strong>
+        </div>
+        <div class="d-flex justify-content-between py-1 border-bottom">
+          <span>
+            <span style="display:inline-block;width:8px;height:8px;
+                         background:#15803d;border-radius:50%;
+                         margin-right:5px"></span>
+            Diseño
+          </span>
+          <strong>{{ stats.con_diseno }}</strong>
+        </div>
+        <div class="d-flex justify-content-between py-1 border-bottom">
+          <span>
+            <span style="display:inline-block;width:8px;height:8px;
+                         background:#b45309;border-radius:50%;
+                         margin-right:5px"></span>
+            Ajuste
+          </span>
+          <strong>{{ stats.con_ajuste }}</strong>
+        </div>
+        <div class="d-flex justify-content-between py-1 border-bottom">
+          <span>
+            <span style="display:inline-block;width:8px;height:8px;
+                         background:#0f766e;border-radius:50%;
+                         margin-right:5px"></span>
+            Complementación
+          </span>
+          <strong>{{ stats.con_complementacion }}</strong>
+        </div>
+        <div class="d-flex justify-content-between py-1">
+          <span>
+            <span style="display:inline-block;width:8px;height:8px;
+                         background:#9ca3af;border-radius:50%;
+                         margin-right:5px"></span>
+            Sin proceso
+          </span>
+          <strong>{{ stats.sin_proceso }}</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <style>
-  /* ── Botones pill estilo imagen de referencia ────────────────────── */
-  .btn-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    padding: .55rem 1.2rem .55rem .55rem;
-    border-radius: 50px;
-    text-decoration: none;
+   /* ── Grupos de acceso ────────────────────────────────────────────── */
+  .acceso-grupo {
+    background: #ffffff;
+    border: 1px solid #eaecf0;
+    border-radius: 12px;
+    padding: 1rem;
+    height: 100%;
+  }
+  .acceso-grupo-titulo {
     font-size: .82rem;
-    font-weight: 700;
-    color: white;
-    letter-spacing: .3px;
-    transition: transform .17s ease,
-                box-shadow .17s ease,
-                filter .17s ease;
-    white-space: nowrap;
-    position: relative;
-    overflow: hidden;
+    font-weight: 800;
+    color: #1f2937;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    margin-bottom: .75rem;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+    gap: .5rem;
   }
 
-  /* Efecto oscurecer al hover */
-  .btn-pill::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 50px;
-    background: rgba(0,0,0,0);
-    transition: background .17s ease;
+  /* Items de acceso */
+  .acceso-item {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .55rem .8rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: .85rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: .35rem;
+    transition: background .15s ease, transform .15s ease;
+    border: 1px solid transparent;
   }
-  .btn-pill:hover::after  { background: rgba(0,0,0,.15); }
-  .btn-pill:active::after { background: rgba(0,0,0,.25); }
+  .acceso-item:last-child { margin-bottom: 0; }
+  .acceso-item:hover {
+    transform: translateX(3px);
+    color: #1f2937;
+  }
 
-  .btn-pill:hover {
-    transform: translateY(-2px);
-    color: white;
-  }
-  .btn-pill:active {
-    transform: translateY(0);
-  }
-
-  /* Círculo del ícono a la izquierda */
-  .pill-icono {
+  /* Ícono circular */
+  .acceso-item-icono {
     width: 32px; height: 32px;
-    border-radius: 50%;
-    background: rgba(255,255,255,.22);
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
+    font-size: .9rem;
     flex-shrink: 0;
-    position: relative;
-    z-index: 1;
+    transition: transform .15s ease;
+  }
+  .acceso-item:hover .acceso-item-icono {
+    transform: scale(1.1);
   }
 
-  /* Texto del botón sobre el ::after */
-  .btn-pill > *:not(.pill-icono) {
-    position: relative;
-    z-index: 1;
+  /* Colores por categoría — suaves y profesionales */
+  .acceso-azul {
+    background: #eff6ff;
+  }
+  .acceso-azul:hover {
+    background: #dbeafe;
+    border-color: #bfdbfe;
+  }
+  .acceso-azul .acceso-item-icono {
+    background: #dbeafe;
+    color: #1d4ed8;
   }
 
-  /* Colores — cada uno con sombra en su color */
-  .ac-azul-oscuro  {
-    background: linear-gradient(135deg, #0f1f3d, #1e3a6e);
-    box-shadow: 0 4px 14px rgba(15,31,61,.35);
+  .acceso-verde {
+    background: #f0fdf4;
   }
-  .ac-azul-medio   {
-    background: linear-gradient(135deg, #1565c0, #1e88e5);
-    box-shadow: 0 4px 14px rgba(21,101,192,.35);
+  .acceso-verde:hover {
+    background: #dcfce7;
+    border-color: #bbf7d0;
   }
-  .ac-indigo       {
-    background: linear-gradient(135deg, #4527a0, #7c4dff);
-    box-shadow: 0 4px 14px rgba(69,39,160,.35);
-  }
-  .ac-azul-real    {
-    background: linear-gradient(135deg, #0277bd, #039be5);
-    box-shadow: 0 4px 14px rgba(2,119,189,.35);
-  }
-  .ac-verde        {
-    background: linear-gradient(135deg, #2e7d32, #43a047);
-    box-shadow: 0 4px 14px rgba(46,125,50,.35);
-  }
-  .ac-dorado       {
-    background: linear-gradient(135deg, #e65100, #ef6c00);
-    box-shadow: 0 4px 14px rgba(230,81,0,.35);
-  }
-  .ac-rojo-suave   {
-    background: linear-gradient(135deg, #c62828, #e53935);
-    box-shadow: 0 4px 14px rgba(198,40,40,.35);
-  }
-  .ac-cian         {
-    background: linear-gradient(135deg, #00695c, #00897b);
-    box-shadow: 0 4px 14px rgba(0,105,92,.35);
-  }
-  .ac-violeta      {
-    background: linear-gradient(135deg, #6a1b9a, #8e24aa);
-    box-shadow: 0 4px 14px rgba(106,27,154,.35);
-  }
-  .ac-naranja      {
-    background: linear-gradient(135deg, #bf360c, #e64a19);
-    box-shadow: 0 4px 14px rgba(191,54,12,.35);
-  }
-  .ac-verde-oscuro {
-    background: linear-gradient(135deg, #1b5e20, #388e3c);
-    box-shadow: 0 4px 14px rgba(27,94,32,.35);
-  }
-  .ac-oscuro       {
-    background: linear-gradient(135deg, #212121, #424242);
-    box-shadow: 0 4px 14px rgba(33,33,33,.35);
-  }
-  .ac-gris-azul    {
-    background: linear-gradient(135deg, #37474f, #546e7a);
-    box-shadow: 0 4px 14px rgba(55,71,79,.35);
+  .acceso-verde .acceso-item-icono {
+    background: #dcfce7;
+    color: #15803d;
   }
 
-  /* En móvil los botones se hacen un poco más pequeños */
-  @media (max-width: 576px) {
-    .btn-pill {
-      font-size: .76rem;
-      padding: .45rem .9rem .45rem .45rem;
-      gap: 7px;
-    }
-    .pill-icono {
-      width: 26px; height: 26px;
-      font-size: .85rem;
-    }
+  .acceso-naranja {
+    background: #fffbeb;
+  }
+  .acceso-naranja:hover {
+    background: #fef3c7;
+    border-color: #fde68a;
+  }
+  .acceso-naranja .acceso-item-icono {
+    background: #fef3c7;
+    color: #b45309;
   }
 
   /* ── Tarjetas estadísticas con degradado ── */
@@ -783,31 +849,50 @@
 
 <script>
   new Chart(document.getElementById('graficaDashboard'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Vigente','Próximo','Vencido','Sin datos'],
-      datasets: [{
-        data: [
-          {{ stats.vigentes }},
-          {{ stats.proximas }},
-          {{ stats.vencidas }},
-          {{ stats.sin_datos }}
-        ],
-        backgroundColor: ['#388e3c','#d4950a','#e53935','#546e7a'],
-        borderWidth: 2,
-        borderColor: '#fff'
-      }]
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { font: { size: 10 }, padding: 12 }
+  type: 'doughnut',
+  data: {
+    labels: [
+      'Rediseño Curricular',
+      'Diseño Curricular',
+      'Ajuste Curricular',
+      'Complementación',
+      'Sin proceso'
+    ],
+    datasets: [{
+      data: [
+        {{ stats.con_rediseno }},
+        {{ stats.con_diseno }},
+        {{ stats.con_ajuste }},
+        {{ stats.con_complementacion }},
+        {{ stats.sin_proceso }}
+      ],
+      backgroundColor: [
+        '#1d4ed8',
+        '#15803d',
+        '#b45309',
+        '#0f766e',
+        '#9ca3af'
+      ],
+      borderWidth: 3,
+      borderColor: '#ffffff'
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: function(ctx) {
+            const total = ctx.dataset.data.reduce((a,b) => a+b, 0) || 1;
+            const pct   = Math.round(ctx.parsed / total * 100);
+            return ` ${ctx.label}: ${ctx.parsed} (${pct}%)`;
+          }
         }
-      },
-      cutout: '65%'
-    }
-  });
+      }
+    },
+    cutout: '65%'
+  }
+});
 </script>
 {% endblock %}
