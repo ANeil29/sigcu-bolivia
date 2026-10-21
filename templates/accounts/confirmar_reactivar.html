@@ -1,0 +1,43 @@
+{% extends 'base/base.html' %}
+{% block title %}Reactivar Usuario — SIGCU{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+  <div class="col-md-5">
+    <div class="card shadow border-success">
+      <div class="card-header bg-success text-white">
+        <strong><i class="bi bi-person-check me-2"></i>Reactivar Usuario</strong>
+      </div>
+      <div class="card-body p-4 text-center">
+        <i class="bi bi-person-check-fill text-success"
+           style="font-size:3rem"></i>
+        <h5 class="mt-3">
+          ¿Reactivar a
+          <strong>{{ usuario.get_full_name|default:usuario.username }}</strong>?
+        </h5>
+        <p class="text-muted">
+          El usuario podrá volver a iniciar sesión en el sistema
+          con su rol actual:
+          <strong>{{ usuario.get_rol_display }}</strong>
+        </p>
+        <div class="alert alert-light border py-2 mb-3" style="font-size:.85rem">
+          <i class="bi bi-person me-1"></i>
+          <strong>Usuario:</strong> {{ usuario.username }}<br>
+          <i class="bi bi-envelope me-1"></i>
+          <strong>Correo:</strong> {{ usuario.email|default:"Sin correo" }}
+        </div>
+        <form method="post" class="d-flex gap-2 justify-content-center">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-success">
+            <i class="bi bi-check2 me-1"></i>Sí, reactivar
+          </button>
+          <a href="{% url 'panel-admin-usuarios' %}"
+             class="btn btn-secondary">
+            Cancelar
+          </a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

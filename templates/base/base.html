@@ -520,6 +520,41 @@
 .card .table-responsive .table {
   margin-bottom: 0;
 }
+
+/* Campo inválido */
+.form-control.is-invalid,
+.form-select.is-invalid {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 3px rgba(220,53,69,.12) !important;
+  background-color: #fff8f8 !important;
+}
+
+/* Campo válido */
+.form-control.is-valid,
+.form-select.is-valid {
+  border-color: #198754 !important;
+  box-shadow: 0 0 0 2px rgba(25,135,84,.1) !important;
+}
+
+/* Mensaje de error */
+.invalid-feedback {
+  display: block !important;
+  font-size: .8rem;
+  color: #dc3545;
+  margin-top: .3rem;
+  font-weight: 500;
+}
+
+/* Oculta los errorlist originales de Django */
+ul.errorlist {
+  display: none !important;
+}
+
+/* Error de contraseña — resalta toda la sección */
+.mb-3:has(.is-invalid) > label {
+  color: #dc3545;
+  font-weight: 600;
+}
   </style>
   
 </head>
@@ -990,6 +1025,119 @@ window.addEventListener('scroll', function() {
     navbar.classList.remove('scrolled');
   }
 }, { passive: true });
+
+document.addEventListener('DOMContentLoaded', function() {
+
+  // 1. Convierte <ul class="errorlist"> en div.invalid-feedback
+  //    y marca el campo hermano anterior como is-invalid
+  document.querySelectorAll('ul.errorlist').forEach(function(ul) {
+    // Crear el div de error
+    const div = document.createElement('div');
+    div.className = 'invalid-feedback';
+    div.style.display = 'block';
+    div.innerHTML = '<i class="bi bi-exclamation-circle me-1"></i>' +
+      Array.from(ul.querySelectorAll('li'))
+           .map(li => li.textContent.trim()).join(' · ');
+
+    // Insertar después del ul
+    ul.parentNode.insertBefore(div, ul.nextSibling);
+
+    // Buscar el campo input/select/textarea dentro del mismo mb-3
+    const contenedor = ul.closest('.mb-3, .col-md-6, .col-12, .col-md-4');
+    if (contenedor) {
+      const campo = contenedor.querySelector(
+        'input, select, textarea'
+      );
+      if (campo) {
+        campo.classList.add('is-invalid');
+        campo.classList.remove('is-valid');
+      }
+    }
+
+    // Ocultar el ul original
+    ul.style.display = 'none';
+  });
+
+  // 2. Errores no ligados a un campo (non_field_errors)
+  //    que Django pone en ul.errorlist fuera de mb-3
+  document.querySelectorAll(
+    '.alert ul.errorlist, form > ul.errorlist'
+  ).forEach(function(ul) {
+    const div = document.createElement('div');
+    div.className = 'alert alert-danger py-2 mt-2';
+    div.innerHTML = '<i class="bi bi-exclamation-triangle me-2"></i>' +
+      Array.from(ul.querySelectorAll('li'))
+           .map(li => li.textContent.trim()).join('<br>');
+    ul.parentNode.insertBefore(div, ul);
+    ul.style.display = 'none';
+  });
+
+  // 3. Validación en tiempo real al perder el foco
+  document.querySelectorAll(
+    'form input:not([type=checkbox]):not([type=file]), ' +
+    'form select, ' +
+    'form textarea'
+  ).forEach(function(campo) {
+    // Al perder el foco
+    campo.addEventListener('blur', function() {
+      if (this.hasAttribute('required') && !this.value.trim()) {
+        this.classList.add('is-invalid');
+        this.classList.remove('is-valid');
+        // Crear mensaje si no existe
+        let siguiente = this.nextElementSibling;
+        if (!siguiente || !siguiente.classList.contains('invalid-feedback')) {
+          const msg = document.createElement('div');
+          msg.className = 'invalid-feedback';
+          msg.innerHTML = '<i class="bi bi-exclamation-circle me-1"></i>' +
+                          'Este campo es obligatorio.';
+          this.parentNode.insertBefore(msg, this.nextSibling);
+        }
+      } else if (this.value.trim()) {
+        this.classList.remove('is-invalid');
+        // Solo marca verde si no tiene errores del servidor
+        if (!this.closest('.mb-3, .col-md-6')
+                  ?.querySelector('ul.errorlist')) {
+          this.classList.add('is-valid');
+        }
+      }
+    });
+
+    // Al escribir — quita el error si ya tiene valor
+    campo.addEventListener('input', function() {
+      if (this.value.trim()) {
+        this.classList.remove('is-invalid');
+        // Quita el mensaje de "campo obligatorio" dinámico
+        const sig = this.nextElementSibling;
+        if (sig && sig.classList.contains('invalid-feedback') &&
+            sig.textContent.includes('obligatorio')) {
+          sig.remove();
+        }
+      }
+    });
+  });
+
+  // 4. Al enviar el formulario — valida todos los required
+  document.querySelectorAll('form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+      let hayError = false;
+      form.querySelectorAll(
+        'input[required]:not([type=checkbox]):not([type=file]), ' +
+        'select[required], textarea[required]'
+      ).forEach(function(campo) {
+        if (!campo.value.trim()) {
+          campo.classList.add('is-invalid');
+          hayError = true;
+          // Scroll al primer error
+          if (hayError) {
+            campo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      });
+      // No prevenimos el submit — Django valida en el servidor
+      // Esto solo da feedback visual inmediato
+    });
+  });
+});
 
 </script>
 

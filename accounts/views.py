@@ -199,6 +199,26 @@ def desactivar_usuario(request, pk):
     return render(request, 'accounts/confirmar_desactivar.html',
                   {'usuario': usuario})
 
+@login_required
+@rol_requerido('SUPERADMIN')
+def reactivar_usuario(request, pk):
+    usuario = get_object_or_404(Usuario, pk=pk)
+
+    if not puede_gestionar(request.user, usuario):
+        messages.error(request,
+            'No tienes permiso para modificar este usuario.')
+        return redirect('panel-admin-usuarios')
+
+    if request.method == 'POST':
+        usuario.is_active      = True
+        usuario.activo_sistema = True
+        usuario.save()
+        messages.success(request,
+            f'✅ Usuario {usuario.get_full_name()} reactivado correctamente.')
+        return redirect('panel-admin-usuarios')
+
+    return render(request, 'accounts/confirmar_reactivar.html',
+                  {'usuario': usuario})
 
 @login_required
 @rol_requerido('SUPERADMIN')

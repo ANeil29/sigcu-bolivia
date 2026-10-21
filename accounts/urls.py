@@ -15,6 +15,7 @@ from .views import (
     rechazar_usuario,
     editar_rol_usuario,
     desactivar_usuario,
+    reactivar_usuario,
     RecuperarContrasena,
     RecuperarContrasenaEnviado,
     RecuperarContrasenaConfirmar,
@@ -80,6 +81,10 @@ urlpatterns = [
         'admin-usuarios/<int:pk>/desactivar/',
         desactivar_usuario,
         name='desactivar-usuario'
+    ),
+    path('admin-usuarios/<int:pk>/reactivar/',
+         reactivar_usuario, 
+         name='reactivar-usuario'
     ),
     path(
         'admin-usuarios/<int:pk>/restablecer-contrasena/',

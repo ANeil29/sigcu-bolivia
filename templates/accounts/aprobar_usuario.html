@@ -27,9 +27,21 @@
             {{ form.universidad }}
           </div>
           <div class="mb-3">
-            <label class="form-label">Cargo confirmado</label>
-            {{ form.cargo }}
-          </div>
+  <label class="form-label">{{ form.cargo.label }}</label>
+  {{ form.cargo }}
+</div>
+
+<!-- Campo visible solo cuando cargo = OTRO -->
+<div class="mb-3" id="div-otro-cargo-admin"
+     style="display:{% if form.instance.cargo == 'OTRO' %}block{% else %}none{% endif %}">
+  <label class="form-label">{{ form.otro_cargo.label }}</label>
+  {{ form.otro_cargo }}
+  {% if form.otro_cargo.errors %}
+  <div class="invalid-feedback d-block">
+    {{ form.otro_cargo.errors|join:", " }}
+  </div>
+  {% endif %}
+</div>
           <div class="mb-3">
             <label class="form-label">Departamento</label>
             {{ form.departamento }}
@@ -43,4 +55,24 @@
     </div>
   </div>
 </div>
+
+<script>
+function toggleOtroCargoAdmin(select) {
+  const div   = document.getElementById('div-otro-cargo-admin');
+  const input = document.getElementById('id_otro_cargo_admin');
+  if (select.value === 'OTRO') {
+    div.style.display = 'block';
+    input.required    = true;
+  } else {
+    div.style.display = 'none';
+    input.required    = false;
+    input.value       = '';
+  }
+}
+// Al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+  const sel = document.getElementById('id_cargo_admin');
+  if (sel) toggleOtroCargoAdmin(sel);
+});
+</script>
 {% endblock %}

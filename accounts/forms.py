@@ -114,29 +114,71 @@ class FormularioRegistro(forms.ModelForm):
 
 
 class FormularioAsignarRol(forms.ModelForm):
-    """Formulario que usa el superadmin para aprobar y asignar rol."""
+    otro_cargo = forms.CharField(
+        label='Especifica el cargo',
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class':       'form-control',
+            'placeholder': 'Escribe el cargo o función...',
+            'id':          'id_otro_cargo_admin',
+        })
+    )
+
     class Meta:
         model  = Usuario
-        fields = ['rol', 'universidad', 'cargo', 'departamento']
+        fields = ['rol', 'cargo', 'departamento',
+                  'universidad', 'activo_sistema']
         widgets = {
-            'rol':         forms.Select(attrs={'class': 'form-select'}),
-            'universidad': forms.Select(attrs={'class': 'form-select'}),
-            'cargo':       forms.Select(attrs={'class': 'form-select'}),
-            'departamento': forms.Select(attrs={'class': 'form-select'},
-                                         choices=[
-                                             ('', '-- Selecciona --'),
-                                             ('Potosí',     'Potosí'),
-                                             ('La Paz',     'La Paz'),
-                                             ('Cochabamba', 'Cochabamba'),
-                                             ('Santa Cruz', 'Santa Cruz'),
-                                             ('Oruro',      'Oruro'),
-                                             ('Sucre',      'Sucre'),
-                                             ('Tarija',     'Tarija'),
-                                             ('Beni',       'Beni'),
-                                             ('Pando',      'Pando'),
-                                         ]),
+            'rol':           forms.Select(attrs={'class': 'form-select'}),
+            'cargo':         forms.Select(attrs={
+                                 'class':    'form-select',
+                                 'id':       'id_cargo_admin',
+                                 'onchange': 'toggleOtroCargoAdmin(this)',
+                             }),
+            'departamento':  forms.Select(attrs={'class': 'form-select'},
+                                           choices=[
+                                               ('','-- Selecciona --'),
+                                               ('Potosí','Potosí'),
+                                               ('La Paz','La Paz'),
+                                               ('Cochabamba','Cochabamba'),
+                                               ('Santa Cruz','Santa Cruz'),
+                                               ('Oruro','Oruro'),
+                                               ('Sucre','Sucre'),
+                                               ('Tarija','Tarija'),
+                                               ('Beni','Beni'),
+                                               ('Pando','Pando'),
+                                           ]),
+            'universidad':   forms.Select(attrs={'class': 'form-select'}),
+            'activo_sistema': forms.CheckboxInput(
+                                  attrs={'class': 'form-check-input'}),
+        }
+        labels = {
+            'rol':           'Rol en el sistema *',
+            'cargo':         'Cargo o función',
+            'departamento':  'Departamento',
+            'universidad':   'Universidad',
+            'activo_sistema': '¿Activo en el sistema?',
         }
 
+    def clean(self):
+        cleaned = super().clean()
+        cargo = cleaned.get('cargo')
+        otro  = cleaned.get('otro_cargo', '').strip()
+        if cargo == 'OTRO' and not otro:
+            self.add_error('otro_cargo',
+                'Debes especificar el cargo cuando seleccionas "Otro".')
+        return cleaned
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        if self.cleaned_data.get('cargo') == 'OTRO':
+            otro = self.cleaned_data.get('otro_cargo', '').strip()
+            if otro:
+                # Guarda el cargo personalizado en observaciones del usuario
+                user.observaciones = f"Cargo: {otro}"
+        if commit:
+            user.save()
+        return user
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(

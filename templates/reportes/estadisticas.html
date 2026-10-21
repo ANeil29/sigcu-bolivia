@@ -367,6 +367,26 @@ new Chart(document.getElementById('graficaRediseno'), {
                  color: white !important;
                  -webkit-print-color-adjust: exact; }
   body { font-size: 10pt; }
+
+  /* Tarjeta de carreras por universidad */
+    #graficaUniversidades {
+        display: block !important;
+        width: 100% !important;
+        max-height: 260px !important;
+    }
+
+    #graficaUniversidades {
+        margin-bottom: 20px !important;
+    }
+
+    /* Evitar que las tarjetas se superpongan al imprimir */
+    .card.h-100 {
+        height: auto !important;
+    }
+
+    .card-body {
+        overflow: visible !important;
+    }
 }
 </style>
 {% endblock %}
