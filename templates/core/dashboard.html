@@ -41,7 +41,7 @@
 <div class="filtro-dashboard mb-4">
   <div class="filtro-header">
     <span>
-      <i class="bi bi-funnel-fill me-2"></i>Filtrar Dashboard
+      <i class="bi bi-funnel-fill me-2" style="color:#e8a020"></i>Filtrar Dashboard
     </span>
     <span class="filtro-gestion-badge">
       Gestión {{ filtro_gestion_int }}
@@ -407,13 +407,21 @@
 
 <!-- ── Barras de innovación + gráfica ───────────────────────────── -->
 <!-- ── Innovación Curricular ─────────────────────────────────────── -->
-<div class="card mb-3 border-0 shadow-sm">
+<div class="card mb-4 border-0 shadow-sm justify-content-center mx-4">
+  <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center"
+       style="background: linear-gradient(135deg, #0f1f3d 0%, #1a3560 100%); border-bottom:1px solid #f4f7fc">
+    <div class="d-flex justify-content-between align-items-center">
+    <span style="font-size:.9rem; font-weight:700">
+      <i class="bi bi-bar-chart-steps me-2" style="color:#e8a020"></i>
+      Innovación Curricular — Gestión {{ filtro_gestion_int }}
+
+{% comment %} <div class="card mb-3 border-0 shadow-sm">
   <div class="card-header py-2"
        style="background:#f8f9fb; border-bottom:1px solid #eaecf0">
     <div class="d-flex justify-content-between align-items-center">
       <span style="font-size:.88rem; font-weight:700; color:#1f2937">
         <i class="bi bi-bar-chart-steps me-2" style="color:#1d4ed8"></i>
-        Innovación Curricular — Gestión {{ filtro_gestion_int }}
+        Innovación Curricular — Gestión {{ filtro_gestion_int }} {% endcomment %}
       </span>
       <span class="badge"
             style="background:#eff6ff; color:#1d4ed8; font-size:.72rem">
@@ -519,11 +527,11 @@
 </div>
 
 <!-- ── Gráfica de Procesos Curriculares ──────────────────────────── -->
-<div class="card mb-3 border-0 shadow-sm">
-  <div class="card-header py-2"
-       style="background:#f8f9fb; border-bottom:1px solid #eaecf0">
-    <span style="font-size:.88rem; font-weight:700; color:#1f2937">
-      <i class="bi bi-pie-chart me-2" style="color:#1d4ed8"></i>
+ <div class="card mb-4 border-0 shadow-sm justify-content-center mx-4">
+  <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center"
+       style="background: linear-gradient(135deg, #0f1f3d 0%, #1a3560 100%); border-bottom:1px solid #f4f7fc">
+    <span style="font-size:.9rem; font-weight:700">
+      <i class="bi bi-pie-chart me-2" style="color:#e8a020"></i>
       Distribución de Procesos Curriculares
     </span>
   </div>

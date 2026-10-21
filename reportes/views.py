@@ -680,6 +680,7 @@ def exportar_busqueda_pdf(request):
     from xhtml2pdf import pisa
     from django.utils import timezone
     from django.db.models import Q
+    from django.contrib.staticfiles import finders
 
     q_universidad = request.GET.get('universidad', '')
     q_carrera     = request.GET.get('carrera', '')
@@ -740,6 +741,9 @@ def exportar_busqueda_pdf(request):
             'estado':      q_estado,
         },
         'total': len(resultados),
+        # Logos institucionales
+        'logo_uatf': finders.find('img/logo_uatf.png'),
+        'logo_dsa': finders.find('img/logo_dsa.jpg'),
     })
     buffer = BytesIO()
     pisa.CreatePDF(html_string, dest=buffer, encoding='utf-8')

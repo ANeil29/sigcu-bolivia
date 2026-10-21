@@ -1,247 +1,896 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:Arial,sans-serif; font-size:9pt; color:#1a1a1a; padding:1.2cm; }
+    <meta charset="UTF-8">
 
-    /* Encabezado institucional */
-    .encabezado {
-      border-bottom: 3px solid #0f1f3d;
-      padding-bottom: 10px;
-      margin-bottom: 14px;
-    }
-    .enc-top { display:table; width:100%; }
-    .enc-izq  { display:table-cell; vertical-align:middle; }
-    .enc-der  { display:table-cell; vertical-align:middle; text-align:right; width:35%; }
-    .enc-izq h1 { font-size:13pt; color:#0f1f3d; margin-bottom:2px; }
-    .enc-izq p  { font-size:8pt; color:#555; margin:1px 0; }
-    .enc-der p  { font-size:8pt; color:#555; }
+    <style>
+        @page {
+            size: letter landscape;
+            margin: 1.3cm 1.2cm 1.3cm 1.2cm;
+        }
 
-    /* Sello institucional simulado */
-    .sello {
-      display:inline-block;
-      border:2px solid #0f1f3d;
-      border-radius:50%;
-      width:50px; height:50px;
-      text-align:center; line-height:50px;
-      font-size:8pt; font-weight:bold;
-      color:#0f1f3d;
-    }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    /* Filtros aplicados */
-    .filtros {
-      background:#f0f4ff;
-      border-left:4px solid #0f1f3d;
-      padding:6px 10px;
-      margin-bottom:12px;
-      font-size:8pt;
-    }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9pt;
+            color: #1a1a1a;
+            line-height: 1.4;
+        }
 
-    /* Tabla */
-    table { width:100%; border-collapse:collapse; font-size:8pt; }
-    th {
-      background:#0f1f3d; color:#fff;
-      padding:5px 6px; text-align:left;
-    }
-    td { padding:4px 6px; border-bottom:1px solid #e0e0e0; }
-    tr:nth-child(even) td { background:#f0f4ff; }
-    .c { text-align:center; }
+        /* ── Encabezado institucional ── */
 
-    /* Badges */
-    .b-success  { color:#0a3622; background:#d1e7dd; padding:1px 6px; border-radius:8px; }
-    .b-warning  { color:#664d03; background:#fff3cd; padding:1px 6px; border-radius:8px; }
-    .b-danger   { color:#58151c; background:#f8d7da; padding:1px 6px; border-radius:8px; }
-    .b-primary  { color:#fff;    background:#0d6efd; padding:1px 6px; border-radius:8px; }
-    .b-secondary{ color:#fff;    background:#6c757d; padding:1px 6px; border-radius:8px; }
-    .b-dark     { color:#fff;    background:#212529; padding:1px 6px; border-radius:8px; }
+        .encabezado {
+            
+            padding-bottom: 10px;
+            margin-bottom: 16px;
+        }
 
-    /* Barra de progreso */
-    .barra-bg   { background:#e9ecef; height:8px; border-radius:4px; }
-    .barra-fill { background:#198754; height:8px; border-radius:4px; }
+        .enc-top {
+            display: table;
+            width: 100%;
+        }
 
-    /* Pie */
-    .pie {
-      margin-top:16px; padding-top:8px;
-      border-top:1px solid #ccc;
-      font-size:7.5pt; color:#888; text-align:center;
-    }
+        .enc-izq,
+        .enc-der {
+            display: table-cell;
+            vertical-align: middle;
+        }
 
-    /* Resumen numérico */
-    .resumen {
-      display:table; width:100%; margin-bottom:12px;
-    }
-    .res-cel {
-      display:table-cell; text-align:center;
-      border:1px solid #ddd; border-top:3px solid #0f1f3d;
-      padding:6px 4px;
-    }
-    .res-num { font-size:16pt; font-weight:bold; color:#0f1f3d; display:block; }
-    .res-lbl { font-size:7pt; color:#666; }
-.firma-bloque { margin-top: 50px; }
-    /* ── Firma siempre al fondo de la última página ── */
-.firma-final {
-  position: fixed;          /* fixed en xhtml2pdf = fijo en cada página */
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 12px 0 6px;
-  background: white;        /* tapa el contenido que pudiera quedar debajo */
+        .enc-izq {
+            width: 65%;
+        }
+
+        .enc-der {
+            width: 35%;
+            text-align: right;
+        }
+
+        .enc-izq h1 {
+            font-size: 14pt;
+            color: #0f1f3d;
+            margin-bottom: 4px;
+        }
+
+        .enc-izq p,
+        .enc-der p {
+            font-size: 8pt;
+            color: #555;
+            margin: 2px 0;
+        }
+
+        .sello {
+            display: inline-block;
+            border: 2px solid #0f1f3d;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            line-height: 22px;
+            padding-top: 3px;
+            font-size: 8pt;
+            font-weight: bold;
+            color: #0f1f3d;
+        }
+
+        /* ── Título del informe ── */
+
+        .titulo-informe {
+            text-align: center;
+            color: #0f1f3d;
+            font-size: 12pt;
+            margin: 14px 0 12px;
+        }
+
+        /* ── Introducción ── */
+
+        .introduccion {
+            margin-bottom: 14px;
+            text-align: justify;
+            line-height: 1.5;
+            font-size: 9pt;
+        }
+
+        .introduccion p {
+            margin-bottom: 7px;
+            text-indent: 22px;
+        }
+
+        /* ── Filtros aplicados ── */
+
+        .filtros {
+            background-color: #f0f4ff;
+            border-left: 4px solid #0f1f3d;
+            padding: 8px 10px;
+            margin: 12px 0;
+            font-size: 8pt;
+        }
+
+        /* ── Resumen numérico ── */
+
+        .resumen {
+            display: table;
+            width: 100%;
+            margin: 12px 0 16px;
+            border-collapse: collapse;
+        }
+
+        .res-fila {
+            display: table-row;
+        }
+
+        .res-cel {
+            display: table-cell;
+            width: 50%;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-top: 3px solid #0f1f3d;
+            padding: 8px 5px;
+        }
+
+        .res-num {
+            display: block;
+            font-size: 16pt;
+            font-weight: bold;
+            color: #0f1f3d;
+        }
+
+        .res-lbl {
+            font-size: 7.5pt;
+            color: #666;
+        }
+
+        /* ── Títulos de secciones ── */
+
+        .titulo-seccion {
+            color: #0f1f3d;
+            font-size: 10pt;
+            font-weight: bold;
+            margin: 16px 0 8px;
+            padding-bottom: 5px;
+        }
+
+        /* ── Tabla de resultados ── */
+
+        .tabla-resultados {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 7.5pt;
+            margin-top: 8px;
+        }
+
+        .tabla-resultados thead {
+            display: table-header-group;
+        }
+
+        .tabla-resultados th {
+            background-color: #0f1f3d;
+            color: #ffffff;
+            padding: 6px 4px;
+            text-align: center;
+            vertical-align: middle;
+            border: 1px solid #ffffff;
+            font-size: 7.2pt;
+        }
+
+        .tabla-resultados td {
+            padding: 5px 4px;
+            border: 1px solid #d9dee7;
+            vertical-align: top;
+            overflow-wrap: break-word;
+        }
+
+        .tabla-resultados tbody tr:nth-child(even) td {
+            background-color: #f0f4ff;
+        }
+
+        .centrado {
+            text-align: center;
+        }
+
+        /* ── Indicadores de estado ── */
+
+        .b-success {
+            color: #0a3622;
+            background-color: #d1e7dd;
+            padding: 2px 4px;
+            font-weight: bold;
+        }
+
+        .b-warning {
+            color: #664d03;
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            font-weight: bold;
+        }
+
+        .b-danger {
+            color: #58151c;
+            background-color: #f8d7da;
+            padding: 2px 4px;
+            font-weight: bold;
+        }
+
+        .b-primary {
+            color: #0f1f3d;
+            background-color: #e0e8f5;
+            padding: 2px 4px;
+        }
+
+        .b-secondary {
+            color: #41464b;
+            background-color: #e2e3e5;
+            padding: 2px 4px;
+        }
+
+        .b-dark {
+            color: #ffffff;
+            background-color: #0f1f3d;
+            padding: 2px 4px;
+            font-weight: bold;
+        }
+
+        /* ── Análisis individual ── */
+
+        .detalle-carrera {
+            margin-top: 12px;
+            text-align: justify;
+            line-height: 1.5;
+            font-size: 8.5pt;
+        }
+
+        .detalle-item {
+            margin-bottom: 12px;
+            padding-bottom: 7px;
+            page-break-inside: avoid;
+        }
+
+        .detalle-item h4 {
+            font-size: 9pt;
+            color: #0f1f3d;
+            margin-bottom: 5px;
+        }
+
+        .detalle-item p {
+            margin-bottom: 5px;
+        }
+
+        /* ── Conclusiones ── */
+
+        .conclusiones {
+            margin-top: 16px;
+            text-align: justify;
+            line-height: 1.5;
+            font-size: 9pt;
+        }
+
+        .conclusiones p {
+            margin-bottom: 7px;
+        }
+
+        /* ── Firmas y sellos ── */
+
+        .firma-final {
+            margin-top: 38px;
+            padding-top: 8px;
+            width: 100%;
+            page-break-inside: avoid;
+        }
+
+        .tabla-firmas {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.5pt;
+            margin-top: 80px;
+            padding-top: 10px;
+        }
+
+        .tabla-firmas td {
+            text-align: center;
+            vertical-align: bottom;
+            padding: 0 8px;
+            border: none;
+            background-color: #ffffff;
+        }
+
+        .firma-espacio {
+            height: 48px;
+        }
+
+        .firma-linea {
+            border-top: 1px solid #333;
+            margin: 0 10px 6px;
+            padding-top: 5px;
+        }
+
+        .firma-nombre {
+            font-size: 8.5pt;
+            font-weight: bold;
+            color: #0f1f3d;
+        }
+
+        .firma-cargo {
+            font-size: 7.5pt;
+            color: #555;
+            margin-top: 3px;
+        }
+
+        .firma-pie {
+            margin-top: 16px;
+            padding-top: 7px;
+            border-top: 1px solid #ccc;
+            text-align: center;
+            font-size: 7pt;
+            color: #777;
+        }
+
+        /* ── Pie de página informativo ── */
+
+        .pie {
+            margin-top: 18px;
+            padding-top: 7px;
+            border-top: 1px solid #ccc;
+            font-size: 7.5pt;
+            color: #777;
+            text-align: center;
+        }
+
+        .nota {
+            font-size: 8pt;
+            color: #555;
+            font-style: italic;
+            margin-top: 8px;
+        }
+        .tabla-encabezado {
+    width: 100%;
+    border-collapse: collapse;
+    border: none;
 }
-.firma-linea {
-  border-top: 1px solid #333;
-  padding-top: 6px;
-  margin: 0 10px;
-}
-.firma-nombre {
-  font-size: 8.5pt;
-  font-weight: bold;
-  color: #0f1f3d;
-}
-.firma-cargo {
-  font-size: 7.5pt;
-  color: #666;
-  margin-top: 2px;
-}
-.firma-pie {
-  margin-top: 8px;
-  text-align: center;
-  font-size: 7pt;
-  color: #aaa;
+
+.tabla-encabezado td {
+    border: none;
+    vertical-align: middle;
 }
 
-/* Espacio en el cuerpo para que la firma fija no tape contenido */
-body {
-  margin-bottom: 80px;  /* reserva espacio al fondo para la firma */
+.logo-uatf,
+.logo-dsa {
+    width: 16%;
+    text-align: center;
 }
-  </style>
+
+.logo-uatf img,
+.logo-dsa img {
+    width: 85px;
+    height: 85px;
+}
+
+.texto-encabezado {
+    width: 68%;
+    text-align: center;
+}
+
+.texto-encabezado h2 {
+    font-size: 13pt;
+    margin-bottom: 4px;
+}
+
+.texto-encabezado h3 {
+    font-size: 10pt;
+    margin-bottom: 4px;
+}
+
+.texto-encabezado p {
+    font-size: 8pt;
+    margin-bottom: 6px;
+}
+    </style>
 </head>
+
 <body>
 
-  <!-- Encabezado institucional -->
-  <div class="encabezado">
-    <div class="enc-top">
-      <div class="enc-izq">
-        <h1>SIGCU Bolivia — Reporte de Carreras</h1>
-        <p>Sistema de Información para la Gestión Curricular Universitaria</p>
-        <p>Universidad Autónoma Tomás Frías — Potosí, Bolivia</p>
-        <p>Dirección de Servicios Académicos (DSA)</p>
-      </div>
-      <div class="enc-der">
-        <div class="sello">UATF<br>DSA</div>
-        <p style="margin-top:4px"><strong>Fecha:</strong> {{ fecha|date:"d/m/Y" }}</p>
-        <p><strong>Hora:</strong> {{ fecha|date:"H:i" }} hrs</p>
-      </div>
-    </div>
-  </div>
+    <!-- ENCABEZADO INSTITUCIONAL -->
+    <div class="encabezado">
+    <table class="tabla-encabezado">
+        <tr>
+            <!-- Logo UATF -->
+            <td class="logo-uatf">
+                <img src="{{ logo_uatf }}" alt="Logo UATF">
+            </td>
 
-  <!-- Filtros aplicados -->
-  <div class="filtros">
-    <strong>Filtros aplicados:</strong>
-    {% if filtros.universidad %}Universidad: <strong>{{ filtros.universidad }}</strong> | {% endif %}
-    {% if filtros.carrera %}Carrera: <strong>{{ filtros.carrera }}</strong> | {% endif %}
-    {% if filtros.estado %}Proceso: <strong>{{ filtros.estado }}</strong> | {% endif %}
-    Total de resultados: <strong>{{ total }}</strong>
-  </div>
+            <!-- Texto institucional -->
+            <td class="texto-encabezado">
+                <h2>UNIVERSIDAD AUTÓNOMA TOMÁS FRÍAS</h2>
+                <h3>DEPARTAMENTO DE GESTIÓN CURRICULAR</h3>
+                <p>Sistema de Gestión y Seguimiento de Carreras y Programas</p>
+                <h3>INFORME DE BÚSQUEDA DE CARRERAS</h3>
+            </td>
 
-  <!-- Resumen numérico -->
-  <div class="resumen">
-    <div class="res-cel">
-      <span class="res-num">{{ total }}</span>
-      <span class="res-lbl">Carreras encontradas</span>
-    </div>
-    <div class="res-cel">
-      <span class="res-num">
-        {% with c=0 %}
-        {{ resultados|length }}
-        {% endwith %}
-      </span>
-      <span class="res-lbl">Con proceso registrado</span>
-    </div>
-  </div>
+            <!-- Logo DSA -->
+            <td class="logo-dsa">
+                <img src="{{ logo_dsa }}" alt="Logo DSA">
+            </td>
+        </tr>
+    </table>
+    <div class="enc-der">
+               
+                <p style="margin-top: 5px;">
+                    <strong>Fecha:</strong>
+                    {{ fecha|date:"d/m/Y" }}
+                </p>
 
-  <!-- Tabla de resultados -->
-  <table>
-    <thead>
-      <tr>
-        <th style="width:4%">N°</th>
-        <th style="width:8%">Univ.</th>
-        <th style="width:22%">Carrera</th>
-        <th style="width:8%">Grado</th>
-        <th style="width:8%">Ciudad</th>
-        <th style="width:14%">Tipo Proceso</th>
-        <th style="width:10%">Estado Proc.</th>
-        <th style="width:12%">Avance Fases</th>
-        <th style="width:14%">Fase Actual</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for r in resultados %}
-      <tr>
-        <td class="c">{{ forloop.counter }}</td>
-        <td class="c">
-          <span class="b-dark">{{ r.carrera.sede.facultad.universidad.sigla }}</span>
-        </td>
-        <td>
-          <strong>{{ r.carrera.nombre }}</strong><br>
-          <small style="color:#555">{{ r.carrera.get_grado_display }}</small>
-        </td>
-        <td>{{ r.carrera.get_grado_display }}</td>
-        <td>{{ r.carrera.sede.ciudad }}</td>
-        <td>
-          {% if r.ultimo_proceso %}
-            <span class="b-primary">{{ r.ultimo_proceso.get_tipo_proceso_display }}</span>
-          {% else %}
-            <span class="b-secondary">Sin proceso</span>
-          {% endif %}
-        </td>
-        <td class="c">
-          {% if r.ultimo_proceso %}
-            {% if r.ultimo_proceso.estado == 'EN_PROCESO' %}
-              <span class="b-warning">En Proceso</span>
-            {% elif r.ultimo_proceso.estado == 'CONCLUIDO' %}
-              <span class="b-success">Concluido</span>
-            {% else %}
-              <span class="b-secondary">Archivado</span>
-            {% endif %}
-          {% else %}—{% endif %}
-        </td>
-        <td>
-          {% if r.total_fases > 0 %}
-          <small>{{ r.fases_ok }}/{{ r.total_fases }}
-            ({% widthratio r.fases_ok r.total_fases 100 %}%)</small>
-          <div class="barra-bg">
-            <div class="barra-fill"
-                 style="width:{% widthratio r.fases_ok r.total_fases 100 %}%">
+                <p>
+                    <strong>Hora:</strong>
+                    {{ fecha|date:"H:i" }} hrs
+                </p>
             </div>
-          </div>
-          {% else %}—{% endif %}
-        </td>
-        <td>
-          {% if r.fase_actual %}
-            <strong>{{ r.fase_actual.tipo_fase.codigo }}</strong>
-            — {{ r.fase_actual.tipo_fase.nombre|truncatechars:20 }}
-          {% else %}
-            {% if r.ultimo_proceso %}Todas completadas{% else %}—{% endif %}
-          {% endif %}
-        </td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="9" style="text-align:center; color:#888; padding:12px">
-          No se encontraron resultados.
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+</div>
 
-  <div class="pie">
-    SIGCU Bolivia · DSA-UATF Potosí ·
-    Reporte generado el {{ fecha|date:"d/m/Y \a \l\a\s H:i" }} hrs ·
-    Documento de uso interno institucional
-  </div>
+    <!-- TÍTULO E INTRODUCCIÓN -->
+
+    <h2 class="titulo-informe">
+        INFORME DE RESULTADOS DE BÚSQUEDA DE CARRERAS
+    </h2>
+
+    <div class="introduccion">
+
+        <p>
+            En atención a la consulta efectuada mediante el Sistema de
+            Información para la Gestión Curricular Universitaria
+            (SIGCU Bolivia), se presenta el siguiente informe con los
+            resultados obtenidos a partir de los criterios de búsqueda
+            seleccionados por el usuario.
+        </p>
+
+        <p>
+            El documento tiene por finalidad exponer información sobre
+            la identificación institucional de las carreras, su grado
+            académico, ubicación, procesos curriculares registrados,
+            estado de avance y fases asociadas. Los datos presentados
+            corresponden a la información disponible en el sistema
+            a la fecha y hora de emisión del presente documento.
+        </p>
+
+        <p>
+            Los resultados se organizan inicialmente en una tabla
+            consolidada para facilitar su consulta y comparación.
+            Posteriormente, se incorpora una descripción individual
+            de cada carrera, con el propósito de facilitar el
+            seguimiento administrativo y académico de los procesos
+            curriculares.
+        </p>
+
+    </div>
+
+    <!-- FILTROS APLICADOS -->
+
+    <div class="filtros">
+        <strong>Criterios de búsqueda aplicados:</strong>
+
+        {% if filtros.universidad %}
+            Universidad:
+            <strong>{{ filtros.universidad }}</strong>.
+        {% endif %}
+
+        {% if filtros.carrera %}
+            Carrera:
+            <strong>{{ filtros.carrera }}</strong>.
+        {% endif %}
+
+        {% if filtros.estado %}
+            Estado o proceso:
+            <strong>{{ filtros.estado }}</strong>.
+        {% endif %}
+
+        <br>
+
+        <strong>Total de resultados:</strong>
+        {{ total }} carrera(s).
+    </div>
+
+    <!-- RESUMEN -->
+
+    <h3 class="titulo-seccion">
+        1. RESUMEN GENERAL DE RESULTADOS
+    </h3>
+
+    <div class="resumen"  style="text-align: center;">
+        <div class="res-fila">
+
+            <div class="res-cel">
+                <span class="res-num">{{ total }}</span>
+                <span class="res-lbl">
+                    Carreras encontradas
+                </span>
+            </div>
+
+            <div class="res-cel">
+                <span class="res-num">{{ resultados|length }}</span>
+                <span class="res-lbl">
+                    Registros incluidos en el informe
+                </span>
+            </div>
+
+        </div>
+    </div>
+
+    <p style="text-align: justify; margin-bottom: 12px;">
+        La información consolidada permite identificar las carreras
+        incluidas en la consulta, así como revisar la existencia de
+        procesos curriculares y su situación registrada. La ausencia
+        de un proceso en los resultados no implica necesariamente
+        que no existan antecedentes externos al sistema, sino que
+        no se ha identificado un proceso asociado en la información
+        utilizada para este informe.
+    </p>
+
+    <!-- TABLA DE RESULTADOS -->
+
+    <h3 class="titulo-seccion">
+        2. DETALLE CONSOLIDADO DE CARRERAS
+    </h3>
+
+    <table class="tabla-resultados">
+
+        <thead>
+            <tr>
+                <th style="width: 4%;">N.º</th>
+                <th style="width: 8%;">Univ.</th>
+                <th style="width: 20%;">Carrera</th>
+                <th style="width: 8%;">Grado</th>
+                <th style="width: 8%;">Ciudad</th>
+                <th style="width: 14%;">Tipo de proceso</th>
+                <th style="width: 10%;">Estado</th>
+                <th style="width: 12%;">Avance de fases</th>
+                <th style="width: 16%;">Fase actual</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for r in resultados %}
+                <tr>
+
+                    <td class="centrado">
+                        {{ forloop.counter }}
+                    </td>
+
+                    <td class="centrado">
+                        {% if r.carrera.sede.facultad.universidad.sigla %}
+                            <span class="b-dark">
+                                {{ r.carrera.sede.facultad.universidad.sigla }}
+                            </span>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <strong>{{ r.carrera.nombre }}</strong>
+                    </td>
+
+                    <td>
+                        {{ r.carrera.get_grado_display|default:"No especificado" }}
+                    </td>
+
+                    <td>
+                        {{ r.carrera.sede.ciudad|default:"No especificada" }}
+                    </td>
+
+                    <td>
+                        {% if r.ultimo_proceso %}
+                            {{ r.ultimo_proceso.get_tipo_proceso_display }}
+                        {% else %}
+                            <span class="b-secondary">
+                                Sin proceso registrado
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td class="centrado">
+                        {% if r.ultimo_proceso %}
+
+                            {% if r.ultimo_proceso.estado == 'EN_PROCESO' %}
+                                <span class="b-warning">
+                                    En proceso
+                                </span>
+
+                            {% elif r.ultimo_proceso.estado == 'CONCLUIDO' %}
+                                <span class="b-success">
+                                    Concluido
+                                </span>
+
+                            {% else %}
+                                <span class="b-secondary">
+                                    {{ r.ultimo_proceso.get_estado_display|default:r.ultimo_proceso.estado }}
+                                </span>
+                            {% endif %}
+
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if r.total_fases > 0 %}
+
+                            {{ r.fases_ok }}/{{ r.total_fases }}
+                            (
+                            {% widthratio r.fases_ok r.total_fases 100 %}%
+                            )
+
+                        {% else %}
+                            Sin fases registradas
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if r.fase_actual %}
+
+                            <strong>
+                                {{ r.fase_actual.tipo_fase.codigo }}
+                            </strong>
+                            — {{ r.fase_actual.tipo_fase.nombre|truncatechars:45 }}
+
+                        {% elif r.ultimo_proceso and r.total_fases > 0 and r.fases_ok == r.total_fases %}
+
+                            Todas las fases completadas
+
+                        {% else %}
+                            No identificada
+                        {% endif %}
+                    </td>
+
+                </tr>
+
+            {% empty %}
+
+                <tr>
+                    <td colspan="9" class="centrado" style="padding: 14px;">
+                        No se encontraron carreras que coincidan con
+                        los criterios de búsqueda seleccionados.
+                    </td>
+                </tr>
+
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+    <p class="nota">
+        Nota: los estados y porcentajes reflejan los registros
+        disponibles en SIGCU Bolivia al momento de generar este informe.
+    </p>
+
+    <!-- ANÁLISIS INDIVIDUAL -->
+
+    <h3 class="titulo-seccion">
+        3. ANÁLISIS INDIVIDUAL DE LAS CARRERAS
+    </h3>
+
+    <div class="detalle-carrera">
+
+        {% for r in resultados %}
+
+            <div class="detalle-item">
+
+                <h4>
+                    3.{{ forloop.counter }}.
+                    {{ r.carrera.nombre }}
+                </h4>
+
+                <p>
+                    <strong>Identificación institucional.</strong>
+                    La carrera
+                    <strong>{{ r.carrera.nombre }}</strong>
+                    corresponde al grado académico
+                    {{ r.carrera.get_grado_display|default:"no especificado" }}
+                    y se encuentra ubicada en
+                    {{ r.carrera.sede.ciudad|default:"una ubicación no especificada" }}.
+
+                    {% if r.carrera.sede.facultad.universidad.sigla %}
+                        En el registro institucional figura asociada a
+                        la universidad
+                        {{ r.carrera.sede.facultad.universidad.sigla }}.
+                    {% else %}
+                        No se dispone de la sigla de la universidad
+                        en los datos consultados.
+                    {% endif %}
+                </p>
+
+                {% if r.ultimo_proceso %}
+
+                    <p>
+                        <strong>Situación del proceso curricular.</strong>
+                        La información consultada identifica un proceso
+                        de tipo
+                        {{ r.ultimo_proceso.get_tipo_proceso_display }}.
+                        Su estado registrado es
+                        {{ r.ultimo_proceso.get_estado_display|default:r.ultimo_proceso.estado }}.
+                        Esta condición permite conocer la situación
+                        administrativa del proceso según los datos
+                        almacenados en el sistema.
+                    </p>
+
+                    <p>
+                        <strong>Avance de las fases.</strong>
+
+                        {% if r.total_fases > 0 %}
+
+                            Se registran {{ r.fases_ok }} fases completadas
+                            de un total de {{ r.total_fases }} fases,
+                            lo que representa un avance de
+                            {% widthratio r.fases_ok r.total_fases 100 %}%.
+                            Este indicador permite valorar el progreso
+                            registrado respecto del total de fases
+                            asociadas al proceso.
+
+                        {% else %}
+
+                            No se dispone de fases registradas que
+                            permitan calcular el porcentaje de avance.
+                            En consecuencia, el avance de las fases
+                            no puede determinarse a partir de los
+                            datos disponibles.
+
+                        {% endif %}
+                    </p>
+
+                    <p>
+                        <strong>Fase actual y seguimiento.</strong>
+
+                        {% if r.fase_actual %}
+
+                            La fase identificada como actual corresponde
+                            al código
+                            {{ r.fase_actual.tipo_fase.codigo }},
+                            denominada
+                            {{ r.fase_actual.tipo_fase.nombre }}.
+                            Se recomienda considerar esta información
+                            para el seguimiento de las actividades
+                            pendientes y la actualización oportuna
+                            del proceso.
+
+                        {% elif r.total_fases > 0 and r.fases_ok == r.total_fases %}
+
+                            Los datos indican que todas las fases
+                            registradas se encuentran completadas.
+                            Corresponde verificar la documentación
+                            y los antecedentes administrativos
+                            pertinentes, conforme a los procedimientos
+                            institucionales.
+
+                        {% else %}
+
+                            No se identifica una fase actual en los
+                            resultados consultados. Se recomienda
+                            verificar el registro del proceso y
+                            actualizar la información que corresponda.
+
+                        {% endif %}
+                    </p>
+
+                {% else %}
+
+                    <p>
+                        <strong>Situación del proceso curricular.</strong>
+                        En los resultados consultados no se identifica
+                        un proceso curricular asociado a esta carrera.
+                        Por tal motivo, no es posible establecer su
+                        estado de avance ni determinar una fase actual
+                        con base en la información disponible.
+                    </p>
+
+                    <p>
+                        <strong>Seguimiento recomendado.</strong>
+                        Se recomienda verificar los antecedentes
+                        administrativos y documentales de la carrera
+                        y, si corresponde, registrar o actualizar
+                        la información del proceso curricular en
+                        SIGCU Bolivia.
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+        {% empty %}
+
+            <p>
+                No existen registros para desarrollar el análisis
+                individual de las carreras.
+            </p>
+
+        {% endfor %}
+
+    </div>
+
+    <!-- CONCLUSIONES -->
+
+    <h3 class="titulo-seccion">
+        4. CONCLUSIONES Y CONSIDERACIONES PARA EL SEGUIMIENTO
+    </h3>
+
+    <div class="conclusiones">
+
+        <p>
+            El presente informe reúne los resultados obtenidos mediante
+            los criterios de búsqueda aplicados en SIGCU Bolivia.
+            La tabla consolidada y el análisis individual permiten
+            consultar la identificación de las carreras, los procesos
+            curriculares registrados y el avance de las fases cuando
+            esta información se encuentra disponible.
+        </p>
+
+        <p>
+            La información presentada constituye un instrumento de
+            apoyo para el seguimiento y la gestión curricular.
+            Se recomienda mantener actualizados los registros de
+            procesos y fases, verificar la documentación de respaldo
+            y revisar las situaciones que requieran seguimiento
+            administrativo.
+        </p>
+
+        <p>
+            Las observaciones y recomendaciones descritas tienen
+            carácter informativo y se basan en los datos disponibles
+            en el sistema al momento de la consulta. La determinación
+            de acciones administrativas corresponde a las instancias
+            competentes de la institución.
+        </p>
+
+    </div>
+
+    <!-- FIRMAS Y SELLOS -->
+
+    <div class="firma-final">
+
+        <table class="tabla-firmas">
+            <tr>
+
+                <td style="width: 47%;">
+                    <div class="firma-espacio"></div>
+                    <div class="firma-linea"></div>
+
+                    <div class="firma-nombre">
+                        DIRECTOR/A DSA - UATF
+                    </div>
+
+                    <div class="firma-cargo">
+                        Firma y sello oficial
+                    </div>
+                </td>
+
+                <td style="width: 6%; border: none;"></td>
+
+                <td style="width: 47%;">
+                    <div class="firma-espacio"></div>
+                    <div class="firma-linea"></div>
+
+                    <div class="firma-nombre">
+                        RESPONSABLE DE GESTIÓN CURRICULAR - UATF
+                    </div>
+
+                    <div class="firma-cargo">
+                        Firma y sello oficial
+                    </div>
+                </td>
+
+            </tr>
+        </table>
+
+        <div class="pie">
+            SIGCU Bolivia · Dirección de Servicios Académicos (DSA-UATF) ·
+            Potosí, Bolivia ·
+            Informe generado el {{ fecha|date:"d/m/Y H:i" }} hrs ·
+            Documento de uso institucional
+        </div>
+
+    </div>
 
 </body>
 </html>
