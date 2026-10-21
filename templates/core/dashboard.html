@@ -139,6 +139,15 @@
   </div>
 
   <div class="col-6 col-sm-4 col-lg">
+  <div class="stat-card sc-violeta"
+       style="background:linear-gradient(135deg,#8e0000,#c62828)"
+    <i class="bi bi-building stat-icon"></i>
+    <div class="stat-num">{{ stats.total_facultades }}</div>
+    <div class="stat-label">Facultades</div>
+  </div>
+</div>
+
+  <div class="col-6 col-sm-4 col-lg">
     <div class="stat-card"
          style="background:linear-gradient(135deg,#00695c,#00897b)">
       <i class="bi bi-geo-alt stat-icon"></i>
@@ -397,196 +406,200 @@
 </div>
 
 <!-- ── Barras de innovación + gráfica ───────────────────────────── -->
-<div class="row g-3 mb-3">
-  <div class="col-md-8">
-    <div class="innovacion-card">
-      <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
-          <h6 class="mb-0 fw-bold" style="color:#1f2937">
-            <i class="bi bi-bar-chart-steps me-2 text-primary"></i>
-            Innovación Curricular
-          </h6>
-          <small class="text-muted">
-            {{ stats.total_carreras_int }} carrera{{ stats.total_carreras_int|pluralize }}
-            — Gestión {{ filtro_gestion_int }}
-          </small>
-        </div>
-        <a href="{% url 'vista-estadisticas' %}"
-           class="btn btn-outline-secondary btn-sm"
-           style="font-size:.75rem">
-          Ver completo →
-        </a>
-      </div>
-
-      {% with t=stats.total_carreras_int|default:1 %}
-
-      <div class="mb-3">
-        <div class="d-flex justify-content-between mb-1">
-          <small class="fw-bold" style="color:#374151">
-            <span style="display:inline-block;width:10px;height:10px;
-                         background:#1d4ed8;border-radius:2px;
-                         margin-right:5px"></span>
-            Rediseño Curricular
-          </small>
-          <small class="text-muted">
-            {{ stats.con_rediseno }} / {{ t }}
-            &nbsp;·&nbsp; {{ stats.pct_rediseno }}%
-          </small>
-        </div>
-        <div class="progress" style="height:12px; border-radius:6px; background:#eff6ff">
-          <div class="progress-bar"
-               style="width:{{ stats.pct_rediseno }}%;
-                      background:#1d4ed8; border-radius:6px">
-          </div>
-        </div>
-      </div>
-
-      <div class="mb-3">
-        <div class="d-flex justify-content-between mb-1">
-          <small class="fw-bold" style="color:#374151">
-            <span style="display:inline-block;width:10px;height:10px;
-                         background:#15803d;border-radius:2px;
-                         margin-right:5px"></span>
-            Diseño Curricular
-          </small>
-          <small class="text-muted">
-            {{ stats.con_diseno }} / {{ t }}
-            &nbsp;·&nbsp; {{ stats.pct_diseno }}%
-          </small>
-        </div>
-        <div class="progress" style="height:12px; border-radius:6px; background:#f0fdf4">
-          <div class="progress-bar"
-               style="width:{{ stats.pct_diseno }}%;
-                      background:#15803d; border-radius:6px">
-          </div>
-        </div>
-      </div>
-
-      <div class="mb-3">
-        <div class="d-flex justify-content-between mb-1">
-          <small class="fw-bold" style="color:#374151">
-            <span style="display:inline-block;width:10px;height:10px;
-                         background:#b45309;border-radius:2px;
-                         margin-right:5px"></span>
-            Ajuste Curricular
-          </small>
-          <small class="text-muted">
-            {{ stats.con_ajuste }} / {{ t }}
-            &nbsp;·&nbsp; {{ stats.pct_ajuste }}%
-          </small>
-        </div>
-        <div class="progress" style="height:12px; border-radius:6px; background:#fffbeb">
-          <div class="progress-bar"
-               style="width:{{ stats.pct_ajuste }}%;
-                      background:#b45309; border-radius:6px">
-          </div>
-        </div>
-      </div>
-
-      <div class="mb-3">
-        <div class="d-flex justify-content-between mb-1">
-          <small class="fw-bold" style="color:#374151">
-            <span style="display:inline-block;width:10px;height:10px;
-                         background:#0f766e;border-radius:2px;
-                         margin-right:5px"></span>
-            Complementación Curricular
-          </small>
-          <small class="text-muted">
-            {{ stats.con_complementacion }} / {{ t }}
-            &nbsp;·&nbsp; {{ stats.pct_complementacion }}%
-          </small>
-        </div>
-        <div class="progress" style="height:12px; border-radius:6px; background:#f0fdfa">
-          <div class="progress-bar"
-               style="width:{{ stats.pct_complementacion }}%;
-                      background:#0f766e; border-radius:6px">
-          </div>
-        </div>
-      </div>
-
-      <div class="mb-1">
-        <div class="d-flex justify-content-between mb-1">
-          <small class="fw-bold" style="color:#6b7280">
-            <span style="display:inline-block;width:10px;height:10px;
-                         background:#9ca3af;border-radius:2px;
-                         margin-right:5px"></span>
-            Sin proceso registrado
-          </small>
-          <small class="text-muted">
-            {{ stats.sin_proceso }} / {{ t }}
-            &nbsp;·&nbsp; {{ stats.pct_sin_proceso }}%
-          </small>
-        </div>
-        <div class="progress" style="height:10px; border-radius:6px; background:#f9fafb">
-          <div class="progress-bar"
-               style="width:{{ stats.pct_sin_proceso }}%;
-                      background:#9ca3af; border-radius:6px">
-          </div>
-        </div>
-      </div>
-
-      {% endwith %}
+<!-- ── Innovación Curricular ─────────────────────────────────────── -->
+<div class="card mb-3 border-0 shadow-sm">
+  <div class="card-header py-2"
+       style="background:#f8f9fb; border-bottom:1px solid #eaecf0">
+    <div class="d-flex justify-content-between align-items-center">
+      <span style="font-size:.88rem; font-weight:700; color:#1f2937">
+        <i class="bi bi-bar-chart-steps me-2" style="color:#1d4ed8"></i>
+        Innovación Curricular — Gestión {{ filtro_gestion_int }}
+      </span>
+      <span class="badge"
+            style="background:#eff6ff; color:#1d4ed8; font-size:.72rem">
+        {{ stats.total_carreras_int }} carrera{{ stats.total_carreras_int|pluralize }}
+      </span>
     </div>
   </div>
+  <div class="card-body p-3">
+    {% with t=stats.total_carreras_int|default:1 %}
 
-  <!-- Gráfica de dona — procesos curriculares -->
-  <div class="col-md-4">
-    <div class="innovacion-card text-center">
-      <h6 class="fw-bold mb-1" style="color:#1f2937; font-size:.85rem">
-        <i class="bi bi-pie-chart me-1 text-primary"></i>
-        Procesos Curriculares
-      </h6>
-      <small class="text-muted d-block mb-2" style="font-size:.72rem">
-        Distribución por tipo — {{ stats.total_carreras_int }} carreras
-      </small>
-      <canvas id="graficaDashboard" style="max-height:200px"></canvas>
+    <div class="mb-3">
+      <div class="d-flex justify-content-between mb-1">
+        <small class="fw-bold" style="color:#374151">
+          <span style="display:inline-block;width:10px;height:10px;
+                       background:#1d4ed8;border-radius:2px;margin-right:5px">
+          </span>Rediseño Curricular
+        </small>
+        <small class="text-muted">
+          {{ stats.con_rediseno }} / {{ t }} · {{ stats.pct_rediseno }}%
+        </small>
+      </div>
+      <div class="progress" style="height:12px;border-radius:6px;background:#eff6ff">
+        <div class="progress-bar"
+             style="width:{{ stats.pct_rediseno }}%;background:#1d4ed8;border-radius:6px">
+        </div>
+      </div>
+    </div>
 
-      <!-- Leyenda manual más detallada -->
-      <div class="mt-3 text-start" style="font-size:.72rem">
-        <div class="d-flex justify-content-between py-1 border-bottom">
-          <span>
-            <span style="display:inline-block;width:8px;height:8px;
-                         background:#1d4ed8;border-radius:50%;
-                         margin-right:5px"></span>
-            Rediseño
-          </span>
-          <strong>{{ stats.con_rediseno }}</strong>
+    <div class="mb-3">
+      <div class="d-flex justify-content-between mb-1">
+        <small class="fw-bold" style="color:#374151">
+          <span style="display:inline-block;width:10px;height:10px;
+                       background:#15803d;border-radius:2px;margin-right:5px">
+          </span>Diseño Curricular
+        </small>
+        <small class="text-muted">
+          {{ stats.con_diseno }} / {{ t }} · {{ stats.pct_diseno }}%
+        </small>
+      </div>
+      <div class="progress" style="height:12px;border-radius:6px;background:#f0fdf4">
+        <div class="progress-bar"
+             style="width:{{ stats.pct_diseno }}%;background:#15803d;border-radius:6px">
         </div>
-        <div class="d-flex justify-content-between py-1 border-bottom">
-          <span>
-            <span style="display:inline-block;width:8px;height:8px;
-                         background:#15803d;border-radius:50%;
-                         margin-right:5px"></span>
-            Diseño
-          </span>
-          <strong>{{ stats.con_diseno }}</strong>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <div class="d-flex justify-content-between mb-1">
+        <small class="fw-bold" style="color:#374151">
+          <span style="display:inline-block;width:10px;height:10px;
+                       background:#b45309;border-radius:2px;margin-right:5px">
+          </span>Ajuste Curricular
+        </small>
+        <small class="text-muted">
+          {{ stats.con_ajuste }} / {{ t }} · {{ stats.pct_ajuste }}%
+        </small>
+      </div>
+      <div class="progress" style="height:12px;border-radius:6px;background:#fffbeb">
+        <div class="progress-bar"
+             style="width:{{ stats.pct_ajuste }}%;background:#b45309;border-radius:6px">
         </div>
-        <div class="d-flex justify-content-between py-1 border-bottom">
-          <span>
-            <span style="display:inline-block;width:8px;height:8px;
-                         background:#b45309;border-radius:50%;
-                         margin-right:5px"></span>
-            Ajuste
-          </span>
-          <strong>{{ stats.con_ajuste }}</strong>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <div class="d-flex justify-content-between mb-1">
+        <small class="fw-bold" style="color:#374151">
+          <span style="display:inline-block;width:10px;height:10px;
+                       background:#0f766e;border-radius:2px;margin-right:5px">
+          </span>Complementación Curricular
+        </small>
+        <small class="text-muted">
+          {{ stats.con_complementacion }} / {{ t }} · {{ stats.pct_complementacion }}%
+        </small>
+      </div>
+      <div class="progress" style="height:12px;border-radius:6px;background:#f0fdfa">
+        <div class="progress-bar"
+             style="width:{{ stats.pct_complementacion }}%;background:#0f766e;border-radius:6px">
         </div>
-        <div class="d-flex justify-content-between py-1 border-bottom">
-          <span>
-            <span style="display:inline-block;width:8px;height:8px;
-                         background:#0f766e;border-radius:50%;
-                         margin-right:5px"></span>
-            Complementación
-          </span>
-          <strong>{{ stats.con_complementacion }}</strong>
+      </div>
+    </div>
+
+    <div>
+      <div class="d-flex justify-content-between mb-1">
+        <small class="fw-bold" style="color:#6b7280">
+          <span style="display:inline-block;width:10px;height:10px;
+                       background:#9ca3af;border-radius:2px;margin-right:5px">
+          </span>Sin proceso registrado
+        </small>
+        <small class="text-muted">
+          {{ stats.sin_proceso }} / {{ t }} · {{ stats.pct_sin_proceso }}%
+        </small>
+      </div>
+      <div class="progress" style="height:10px;border-radius:6px;background:#f9fafb">
+        <div class="progress-bar"
+             style="width:{{ stats.pct_sin_proceso }}%;background:#9ca3af;border-radius:6px">
         </div>
-        <div class="d-flex justify-content-between py-1">
-          <span>
-            <span style="display:inline-block;width:8px;height:8px;
-                         background:#9ca3af;border-radius:50%;
-                         margin-right:5px"></span>
-            Sin proceso
-          </span>
-          <strong>{{ stats.sin_proceso }}</strong>
+      </div>
+    </div>
+
+    {% endwith %}
+  </div>
+</div>
+
+<!-- ── Gráfica de Procesos Curriculares ──────────────────────────── -->
+<div class="card mb-3 border-0 shadow-sm">
+  <div class="card-header py-2"
+       style="background:#f8f9fb; border-bottom:1px solid #eaecf0">
+    <span style="font-size:.88rem; font-weight:700; color:#1f2937">
+      <i class="bi bi-pie-chart me-2" style="color:#1d4ed8"></i>
+      Distribución de Procesos Curriculares
+    </span>
+  </div>
+  <div class="card-body p-3">
+    <div class="row align-items-center">
+      <div class="col-md-5 text-center">
+        <canvas id="graficaDashboard" style="max-height:200px"></canvas>
+      </div>
+      <div class="col-md-7">
+        <div class="table-responsive">
+          <table class="table table-sm mb-0" style="font-size:.8rem">
+            <thead>
+              <tr style="background:#f8f9fb">
+                <th>Tipo</th>
+                <th class="text-center">Carreras</th>
+                <th class="text-center">%</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <span style="display:inline-block;width:10px;height:10px;
+                               background:#1d4ed8;border-radius:50%;
+                               margin-right:5px"></span>
+                  Rediseño
+                </td>
+                <td class="text-center fw-bold">{{ stats.con_rediseno }}</td>
+                <td class="text-center text-muted">{{ stats.pct_rediseno }}%</td>
+              </tr>
+              <tr>
+                <td>
+                  <span style="display:inline-block;width:10px;height:10px;
+                               background:#15803d;border-radius:50%;
+                               margin-right:5px"></span>
+                  Diseño
+                </td>
+                <td class="text-center fw-bold">{{ stats.con_diseno }}</td>
+                <td class="text-center text-muted">{{ stats.pct_diseno }}%</td>
+              </tr>
+              <tr>
+                <td>
+                  <span style="display:inline-block;width:10px;height:10px;
+                               background:#b45309;border-radius:50%;
+                               margin-right:5px"></span>
+                  Ajuste
+                </td>
+                <td class="text-center fw-bold">{{ stats.con_ajuste }}</td>
+                <td class="text-center text-muted">{{ stats.pct_ajuste }}%</td>
+              </tr>
+              <tr>
+                <td>
+                  <span style="display:inline-block;width:10px;height:10px;
+                               background:#0f766e;border-radius:50%;
+                               margin-right:5px"></span>
+                  Complementación
+                </td>
+                <td class="text-center fw-bold">{{ stats.con_complementacion }}</td>
+                <td class="text-center text-muted">{{ stats.pct_complementacion }}%</td>
+              </tr>
+              <tr style="background:#f9fafb">
+                <td>
+                  <span style="display:inline-block;width:10px;height:10px;
+                               background:#9ca3af;border-radius:50%;
+                               margin-right:5px"></span>
+                  Sin proceso
+                </td>
+                <td class="text-center fw-bold">{{ stats.sin_proceso }}</td>
+                <td class="text-center text-muted">{{ stats.pct_sin_proceso }}%</td>
+              </tr>
+              <tr style="background:#eff6ff">
+                <td><strong>Total</strong></td>
+                <td class="text-center fw-bold">{{ stats.total_carreras_int }}</td>
+                <td class="text-center fw-bold">100%</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

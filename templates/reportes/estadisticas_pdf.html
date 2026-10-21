@@ -112,6 +112,42 @@
       color: #888;
       text-align: center;
     }
+    /* ── Firma siempre al fondo de la última página ── */
+.firma-final {
+  position: fixed;          /* fixed en xhtml2pdf = fijo en cada página */
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 0 6px;
+  border-top: 2px solid #0f1f3d;
+  background: white;        /* tapa el contenido que pudiera quedar debajo */
+}
+.firma-linea {
+  border-top: 1px solid #333;
+  padding-top: 6px;
+  margin: 0 10px;
+}
+.firma-nombre {
+  font-size: 8.5pt;
+  font-weight: bold;
+  color: #0f1f3d;
+}
+.firma-cargo {
+  font-size: 7.5pt;
+  color: #666;
+  margin-top: 2px;
+}
+.firma-pie {
+  margin-top: 8px;
+  text-align: center;
+  font-size: 7pt;
+  color: #aaa;
+}
+
+/* Espacio en el cuerpo para que la firma fija no tape contenido */
+body {
+  margin-bottom: 80px;  /* reserva espacio al fondo para la firma */
+}
   </style>
 </head>
 <body>

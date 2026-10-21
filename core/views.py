@@ -1,7 +1,7 @@
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from carreras.models import Carrera
-from universidades.models import Universidad, Sede
+from universidades.models import Universidad, Sede, Facultad
 from django.db import models
 from programas.models import Programa
 
@@ -78,9 +78,10 @@ def dashboard(request):
     anios_disponibles = list(range(anio_actual, 2009, -1))
 
     stats = {
+        'total_universidades':  Universidad.objects.filter(activa=True).count(),
+        'total_facultades': Facultad.objects.filter(universidad__activa=True).count(),
         'total_carreras':       carreras_qs.count(),
         'total_programas': Programa.objects.filter(activo=True).count(),
-        'total_universidades':  Universidad.objects.filter(activa=True).count(),
         'total_sedes':          Sede.objects.filter(activa=True).values(
                                     'ciudad', 'facultad__universidad'
                                 ).distinct().count(),

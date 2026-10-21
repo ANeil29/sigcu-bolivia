@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <style>
     @page {
-      size: A4 landscape;
-      margin: 1.5cm 1.2cm 2cm 1.2cm;
+      size: letter landscape;
+      margin: 1.5cm 1.2cm 1.5cm 1.2cm;
     }
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family:Arial,sans-serif; font-size:8.5pt; color:#1a1a1a; }
@@ -39,7 +39,65 @@
     .b-dark     { color:#fff;    background:#212529; padding:1px 5px; border-radius:6px; font-size:7pt; }
     .b-muted    { color:#555;    background:#e8e8e8; padding:1px 5px; border-radius:6px; font-size:7pt; }
 
-    .firma-bloque { margin-top:30px; }
+   .firma-bloque { margin-top: 50px; }
+/* ── Bloque de firmas al final del contenido ── */
+.firma-final {
+    position: static;
+    width: 100%;
+    margin-top: 55px;
+    padding: 0;
+    background: #ffffff;
+}
+
+/* Tabla de las dos firmas */
+.tabla-firmas {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    margin-top: 80px;
+    padding-top: 10px;
+}
+
+/* Espacio físico para firmar y colocar sellos */
+.firma-espacio {
+    height: 65px;
+}
+
+/* Línea para la firma */
+.firma-linea {
+    border-top: 1px solid #333333;
+    margin: 0 12px 7px;
+    padding: 0;
+}
+
+/* Nombre del responsable */
+.firma-nombre {
+    font-size: 8.5pt;
+    font-weight: bold;
+    color: #0f1f3d;
+    text-align: center;
+}
+
+/* Texto de firma y sello */
+.firma-cargo {
+    font-size: 7.5pt;
+    color: #666666;
+    margin-top: 4px;
+    text-align: center;
+}
+
+/* Pie institucional */
+.firma-pie {
+    margin-top: 18px;
+    text-align: center;
+    font-size: 7pt;
+    line-height: 1.5;
+    color: #999999;
+}
+/* Reserva espacio normal para el contenido */
+body {
+    margin-bottom: 0px;
+}
   </style>
 </head>
 <body>
