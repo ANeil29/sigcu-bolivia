@@ -21,8 +21,6 @@ from programas.models import Programa
 
 
 
-# ── Helpers ───────────────────────────────────────────────────────────────────
-
 def _stats_base():
     """Calcula las estadísticas base usadas en varios endpoints."""
     from seguimiento.models import ProcesoCurricular as PC
@@ -81,7 +79,6 @@ def _stats_base():
     }
 
 
-# ── Vista principal de estadísticas ──────────────────────────────────────────
 
 @login_required
 def vista_estadisticas(request):
@@ -118,8 +115,6 @@ def vista_estadisticas(request):
     })
 
 
-# ── Buscador por carrera específica ──────────────────────────────────────────
-
 @login_required
 def buscador_carreras(request):
     """
@@ -127,7 +122,6 @@ def buscador_carreras(request):
     Muestra el detalle de cada carrera: fases completadas, fase actual,
     año del último rediseño, etc.
     """
-    # Parámetros de búsqueda
     q_universidad = request.GET.get('universidad', '')
     q_carrera     = request.GET.get('carrera', '')
     q_estado      = request.GET.get('estado_proceso', '')
@@ -156,7 +150,6 @@ def buscador_carreras(request):
                 procesos__tipo_proceso=q_estado
             ).distinct()
 
-    # Enriquecer cada carrera con datos del proceso
     resultados = []
     for carrera in carreras_qs.order_by(
             'sede__facultad__universidad__sigla', 'nombre'):
@@ -170,7 +163,6 @@ def buscador_carreras(request):
                               'tipo_fase__orden'))
             total_fases = len(fases)
             fases_ok    = sum(1 for f in fases if f.estado == 'COMPLETADO')
-            # Fase actual = primera EN_PROCESO, si no hay, primera PENDIENTE
             fase_actual = next(
                 (f for f in fases if f.estado == 'EN_PROCESO'), None
             ) or next(
@@ -212,7 +204,6 @@ def buscador_carreras(request):
     })
 
 
-# ── Excel detallado (3 hojas) ─────────────────────────────────────────────────
 
 @login_required
 def exportar_carreras_excel(request):
@@ -220,7 +211,6 @@ def exportar_carreras_excel(request):
 
     wb = openpyxl.Workbook()
 
-    # Estilos reutilizables
     COLOR_CABECERA   = '0F1F3D'
     COLOR_SUBHEADER  = '1A3560'
     COLOR_FILA_PAR   = 'EEF2F8'

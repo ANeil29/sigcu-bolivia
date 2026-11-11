@@ -17,10 +17,9 @@ from .middleware import get_ip
 Usuario = get_user_model()
 
 
-
 def vista_login(request):
     if request.user.is_authenticated:
-        return redirect('bienvenida')      # ← si ya está logueado
+        return redirect('bienvenida') 
     form = LoginForm(request, data=request.POST or None)
     if request.method == 'POST':
         if form.is_valid():
@@ -40,7 +39,7 @@ def vista_login(request):
                 descripcion=f'Inicio de sesión desde {get_ip(request)}',
                 ip=get_ip(request),
             )
-            return redirect('bienvenida')  # ← va a bienvenida privada con stats
+            return redirect('bienvenida')
         else:
             messages.error(request, 'Usuario o contraseña incorrectos.')
     return render(request, 'accounts/login.html', {'form': form})
@@ -85,13 +84,10 @@ def panel_admin_usuarios(request):
         rol='PENDIENTE'
     ).order_by('date_joined')
 
-    # ── El usuario protegido NO aparece en la lista para otros admins ──
     activos = Usuario.objects.exclude(rol='PENDIENTE').order_by(
         'rol', 'last_name'
     )
     if not es_usuario_protegido(request.user):
-        # Si quien ve el panel NO es el usuario protegido,
-        # ocultamos al protegido de la lista
         from .proteccion import USUARIO_PROTEGIDO_ID
         activos = activos.exclude(pk=USUARIO_PROTEGIDO_ID)
 
@@ -106,7 +102,6 @@ def panel_admin_usuarios(request):
 def aprobar_usuario(request, pk):
     usuario = get_object_or_404(Usuario, pk=pk)
 
-    # Protección
     if not puede_gestionar(request.user, usuario):
         messages.error(request,
             'No tienes permiso para modificar este usuario.')
@@ -154,7 +149,6 @@ def editar_rol_usuario(request, pk):
     usuario = get_object_or_404(Usuario, pk=pk)
 
     if not puede_gestionar(request.user, usuario):
-        # Registrar intento bloqueado
         RegistroActividad.objects.create(
             usuario=request.user,
             accion='OTRO',
@@ -285,8 +279,6 @@ from django.contrib.auth.views import (
 from .forms import CambiarContrasenaAdminForm
 
 
-# Recuperación de contraseña por correo
-
 class RecuperarContrasena(PasswordResetView):
     template_name         = 'accounts/recuperar_contrasena.html'
     email_template_name   = 'accounts/email_recuperar_contrasena.html'
@@ -304,7 +296,6 @@ class RecuperarContrasenaCompletado(PasswordResetCompleteView):
     template_name = 'accounts/recuperar_completado.html'
 
 
-# Restablecer contraseña manual (solo Superadmin)
 
 @login_required
 @rol_requerido('SUPERADMIN')
@@ -328,13 +319,11 @@ def panel_auditoria(request):
     from .models import SesionActiva, RegistroActividad
     from django.utils import timezone
 
-    # Usuarios en línea (activos en los últimos 10 minutos)
     hace_10min  = timezone.now() - timezone.timedelta(minutes=10)
     en_linea    = SesionActiva.objects.select_related('usuario').filter(
                       ultimo_acceso__gte=hace_10min
                   ).order_by('-ultimo_acceso')
 
-    # Filtros de auditoría
     usuario_id  = request.GET.get('usuario', '')
     accion      = request.GET.get('accion', '')
     modulo      = request.GET.get('modulo', '')

@@ -18,7 +18,6 @@ class Programa(models.Model):
         ('OTRO', 'Otro'),
     ]
 
-    # Relaciones — igual que Carrera
     sede         = models.ForeignKey(
                        'universidades.Sede',
                        on_delete=models.PROTECT,

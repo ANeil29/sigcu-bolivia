@@ -31,7 +31,6 @@ class Facultad(models.Model):
     decano   = models.CharField(max_length=200, blank=True)
     telefono = models.CharField(max_length=50, blank=True)
 
-    # ── NUEVO ────────────────────────────────────────────────────────
     imagen_referencia = models.ImageField(
         upload_to='facultades/imagenes/%Y/',
         null=True, blank=True,
@@ -96,7 +95,6 @@ class Sede(models.Model):
     @property
     def google_maps_url(self):
         if self.tiene_coordenadas:
-            # Fuerza punto decimal con formato explícito
             lat = f"{self.latitud:.6f}"
             lon = f"{self.longitud:.6f}"
             return f"https://www.google.com/maps?q={lat},{lon}"

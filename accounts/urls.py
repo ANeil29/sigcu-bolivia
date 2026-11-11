@@ -29,12 +29,10 @@ router.register('usuarios', UsuarioViewSet)
 
 urlpatterns = [
 
-    # Autenticación
     path('login/', vista_login, name='login'),
     path('registro/', vista_registro, name='registro'),
     path('logout/', vista_logout, name='logout'),
 
-    # Recuperación de contraseña
     path(
         'recuperar/',
         RecuperarContrasena.as_view(),
@@ -56,7 +54,6 @@ urlpatterns = [
         name='recuperar-completado'
     ),
 
-    # Administración de usuarios
     path(
         'admin-usuarios/',
         panel_admin_usuarios,
@@ -92,17 +89,14 @@ urlpatterns = [
         name='restablecer-contrasena-admin'
     ),
 
-    # Auditoría
     path(
         'auditoria/',
         panel_auditoria,
         name='panel-auditoria'
     ),
 
-    # API REST
     path('', include(router.urls)),
 
-    # JWT
     path(
         'token/',
         TokenObtainPairView.as_view(),

@@ -37,7 +37,6 @@ class PlanEstudioViewSet(viewsets.ModelViewSet):
 def lista_carreras(request):
     from seguimiento.models import ProcesoCurricular
 
-    # Carreras ACTIVAS
     carreras_activas = Carrera.objects.select_related(
         'sede__facultad__universidad'
     ).prefetch_related('procesos').filter(

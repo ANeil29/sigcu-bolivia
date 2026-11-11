@@ -13,10 +13,7 @@ def dashboard(request):
     from django.utils import timezone
 
     anio_actual  = timezone.now().year
-    # Por defecto muestra la gestión anterior
     anio_default = anio_actual - 1
-
-    # Filtros desde GET
     filtro_facultad = request.GET.get('facultad', '')
     filtro_gestion  = request.GET.get('gestion',  str(anio_default))
 
@@ -25,7 +22,6 @@ def dashboard(request):
     except (ValueError, TypeError):
         filtro_gestion_int = anio_default
 
-    # Queryset base de carreras
     carreras_qs = Carrera.objects.prefetch_related('procesos').filter(
         en_funcionamiento=True
     )
@@ -34,7 +30,7 @@ def dashboard(request):
             sede__facultad__id=filtro_facultad
         )
 
-    # Procesos filtrados por gestión
+
     procesos_qs = PC.objects.filter(
         anio_inicio__lte=filtro_gestion_int
     ).filter(
@@ -58,23 +54,19 @@ def dashboard(request):
     ids_con      = ids_rediseno | ids_diseno | ids_ajuste | ids_compl
     total_int    = len(todos_ids) or 1
 
-    # Estado de procesos en la gestión filtrada
     procesos_concluidos  = procesos_qs.filter(estado='CONCLUIDO').count()
     procesos_en_proceso  = procesos_qs.filter(estado='EN_PROCESO').count()
     procesos_archivados  = procesos_qs.filter(estado='ARCHIVADO').count()
     total_procesos_gestion = procesos_qs.count()
 
-    # Por tipo en la gestión
     redisenos_gestion = procesos_qs.filter(tipo_proceso='REDISENO')
     disenos_gestion   = procesos_qs.filter(tipo_proceso='DISENO')
     ajustes_gestion   = procesos_qs.filter(tipo_proceso='AJUSTE')
 
-    # Facultades para el filtro
     facultades = Facultad.objects.select_related('universidad').order_by(
         'universidad__sigla', 'nombre'
     )
 
-    # Años disponibles para el filtro de gestión
     anios_disponibles = list(range(anio_actual, 2009, -1))
 
     stats = {
@@ -101,7 +93,6 @@ def dashboard(request):
         'pct_ajuste':          round(len(ids_ajuste & todos_ids)   / total_int * 100),
         'pct_complementacion': round(len(ids_compl & todos_ids)    / total_int * 100),
         'pct_sin_proceso':     round(len(todos_ids - ids_con)      / total_int * 100),
-        # Estado procesos en gestión
         'procesos_concluidos':  procesos_concluidos,
         'procesos_en_proceso':  procesos_en_proceso,
         'procesos_archivados':  procesos_archivados,
@@ -139,7 +130,6 @@ def bienvenida_publica(request):
     return render(request, 'core/bienvenida_publica.html')
 
 
-# Vista PRIVADA — requiere login, muestra stats
 @login_required
 def bienvenida(request):
     from universidades.models import Universidad, Sede

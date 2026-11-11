@@ -444,14 +444,12 @@ def sedes_mapa_json(request):
     """
     from carreras.models import Carrera
 
-    # Obtenemos sedes únicas con coordenadas
     sedes = Sede.objects.filter(
         activa=True,
         latitud__isnull=False,
         longitud__isnull=False
     ).select_related('facultad__universidad')
 
-    # Agrupamos por ciudad para no repetir marcadores
     ciudades_vistas = set()
     data = []
 
@@ -461,19 +459,16 @@ def sedes_mapa_json(request):
             continue
         ciudades_vistas.add(ciudad)
 
-        # Contar facultades únicas en esa ciudad
         total_facultades = Sede.objects.filter(
             activa=True,
             ciudad=ciudad
         ).values('facultad').distinct().count()
 
-        # Contar carreras activas en esa ciudad
         total_carreras = Carrera.objects.filter(
             sede__ciudad=ciudad,
             en_funcionamiento=True
         ).count()
 
-        # Coordenadas de la primera sede de esa ciudad
         primera = Sede.objects.filter(
             activa=True,
             ciudad=ciudad,
