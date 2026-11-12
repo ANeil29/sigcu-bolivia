@@ -6,6 +6,8 @@ DEBUG = False
 ALLOWED_HOSTS = [
     'sigcu.uatf.edu.bo',
     'www.sigcu.uatf.edu.bo',
+    '127.0.0.1',
+    'localhost',
 ]
 
 # Encoding
@@ -33,10 +35,15 @@ MEDIA_URL   = '/media/'
 MEDIA_ROOT  = BASE_DIR / 'media'
 
 # Seguridad HTTPS
+CSRF_TRUSTED_ORIGINS = [
+    'https://sigcu.uatf.edu.bo',
+    'https://www.sigcu.uatf.edu.bo',
+]
 CSRF_COOKIE_SECURE    = True
 SESSION_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT   = True
+SECURE_SSL_REDIRECT   = False
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
 SECURE_HSTS_SECONDS   = 31536000
 
 # Logs en producción
